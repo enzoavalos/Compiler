@@ -57,7 +57,7 @@ void Lexer::isString() {
     }
 
     if (this->isAtEnd()) {
-        cout << "Unterminated string" << endl;
+        cout << "String sin terminar" << endl;
         return;
     }
 
@@ -69,7 +69,6 @@ void Lexer::isString() {
 
 void Lexer::scanToken() {
     char c = advance();
-    cout << "char: " << c << endl;
     switch(c) {
         case ' ': break;
         case '\r': break;
