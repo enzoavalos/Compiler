@@ -33,6 +33,7 @@ enum Type {
     TOKEN_ASSIGN,
     TOKEN_SLASH,
     TOKEN_DASH,
+    TOKEN_EOF,
 };
 
 class Token
