@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include "Token.h"
+#include "SymbolTable/SymbolTable.h"
 
 using namespace std;
 
@@ -14,9 +16,11 @@ class Lexer
         int line;
         int start;
         int current;
-        char currentChar;
         vector<Token*> tokens;
+        map<string,Type> reserved_words;
+        SymbolTable symbolTable;
 
+        void initializeReservedWords();
         char advance();
         void scanToken();
         void addToken(Type type);
@@ -25,6 +29,13 @@ class Lexer
         bool isAtEnd();
         char checkNext();
         void isString();
+        void isComment();
+        void isIdentifier();
+        void isReservedWord();
+        void addSymbol(Token *);
+        //falta reconocer constantes
+        void isConstantInt();
+        void isConstantDouble();
     public:
         Lexer(string input);
         ~Lexer();

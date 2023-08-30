@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include "src/Lexer.h"
+#include "src/Lexer.cpp"
+#include "src/SymbolTable/SymbolTable.cpp"
 
 using namespace std;
 
@@ -21,17 +22,14 @@ int main(int argc, char* argv[])
     if(input.good()) {
         while(!input.eof()) {
             getline(input, temp);
-            src += temp;
+            src += temp+"\n";
         }
         input.close();
     }
     else {
         cout << "Error al abrir el archivo" << endl;
     }
-
     src += '\0';
-
-    cout << src << endl;
 
     Lexer *lexer = new Lexer(src);
     lexer->run();

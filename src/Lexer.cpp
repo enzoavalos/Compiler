@@ -1,4 +1,6 @@
 #include "Lexer.h"
+#include "Token.h"
+#include "Token.cpp"
 
 Lexer::Lexer(string input)
 {
@@ -6,6 +8,29 @@ Lexer::Lexer(string input)
     this->line = 1;
     this->start = 0;
     this->current = 0;
+    this->initializeReservedWords();
+    this->symbolTable = SymbolTable();
+}
+
+Lexer::~Lexer(){
+}
+
+void Lexer::initializeReservedWords(){
+    this->reserved_words.insert(pair<string,Type>("IF",TOKEN_IF));
+    this->reserved_words.insert(pair<string,Type>("ELSE",TOKEN_ELSE));
+    this->reserved_words.insert(pair<string,Type>("END_IF",TOKEN_END_IF));
+    this->reserved_words.insert(pair<string,Type>("PRINT",TOKEN_PRINT));
+    this->reserved_words.insert(pair<string,Type>("CLASS",TOKEN_CLASS));
+    this->reserved_words.insert(pair<string,Type>("VOID",TOKEN_VOID));
+    this->reserved_words.insert(pair<string,Type>("FOR",TOKEN_FOR));
+    this->reserved_words.insert(pair<string,Type>("IN",TOKEN_IN));
+    this->reserved_words.insert(pair<string,Type>("RANGE",TOKEN_RANGE));
+    this->reserved_words.insert(pair<string,Type>("IMPL",TOKEN_IMPL));
+    this->reserved_words.insert(pair<string,Type>("INTERFACE",TOKEN_INTERFACE));
+    this->reserved_words.insert(pair<string,Type>("IMPLEMENT",TOKEN_IMPLEMENT));
+    this->reserved_words.insert(pair<string,Type>("SHORT",TOKEN_SHORT));
+    this->reserved_words.insert(pair<string,Type>("UINT",TOKEN_UINT));
+    this->reserved_words.insert(pair<string,Type>("DOUBLE",TOKEN_DOUBLE));
 }
 
 void Lexer::run()
@@ -14,10 +39,12 @@ void Lexer::run()
         this->start = this->current;
         this->scanToken();
     }
-    this->tokens.push_back(new Token(TOKEN_EOF, "", this->line));
     for (int i = 0; i < this->tokens.size(); i++) {
-        cout << this->tokens[i]->getType() << " " << this->tokens[i]->getLexeme() << endl;
+        cout << this->tokens[i]->getType() << " " << this->tokens[i]->getLexeme() << 
+        " en linea " << this->tokens[i]->getLine() << endl;
     }
+    cout << "\n";
+    this->symbolTable.printTable();
 }
 
 bool Lexer::isAtEnd() {
@@ -35,7 +62,10 @@ void Lexer::addToken(Type type) {
 
 void Lexer::addToken(Type type, string lexeme) {
     string text = this->source.substr(start, this->current - start);
-    this->tokens.push_back(new Token(type, lexeme, this->current));
+    Token *newToken = new Token(type, lexeme, this->line);
+    this->tokens.push_back(newToken);
+    if(type == TOKEN_ID)
+        this->addSymbol(newToken);
 }
 
 bool Lexer::match(char expected) {
@@ -51,20 +81,64 @@ char Lexer::checkNext() {
 }
 
 void Lexer::isString() {
-    while (this->checkNext() != '#' && !this->isAtEnd()) {
-        if (this->checkNext() == '\n') this->line++;
+    char next;
+    while ((next = this->checkNext()) != '#' && next != '\n')
         this->advance();
-    }
-
-    if (this->isAtEnd()) {
-        cout << "String sin terminar" << endl;
+    
+    if(this->checkNext() != '#'){
+        cout << "Error, String sin terminar en linea " << this->line << endl;
         return;
     }
 
     this->advance();
-
-    string value = this->source.substr(this->start + 1, this->current - this->start - 2);
+    string value = this->source.substr(this->start + 1, this->current - this->start -2);
     this->addToken(TOKEN_STRING, value);
+}
+
+void Lexer::isComment(){
+    while(this->checkNext() != '\n' && !this->isAtEnd())
+        this->advance();
+}
+
+void Lexer::isIdentifier(){
+    char current;
+    while((current = this->checkNext()) == '_' || islower(current))
+        advance();
+    
+    string value = this->source.substr(this->start, this->current - this->start);
+    this->addToken(TOKEN_ID, value);
+}
+
+void Lexer::isReservedWord(){
+    char current;
+    while((current = this->checkNext()) == '_' || isupper(current))
+        advance();
+    
+    string value = this->source.substr(this->start, this->current - this->start);
+    auto result = this->reserved_words.find(value);
+    if(result != this->reserved_words.end())
+        this->addToken(result->second);
+    else
+        cout << "Error, palabra reservada invalida en linea " << this->line << endl;
+}
+
+void Lexer::addSymbol(Token* token){
+    this->symbolTable.addSymbol(token);
+}
+
+void Lexer::isConstantInt(){
+    while(isdigit(this->checkNext()))
+        advance();
+    
+    if(this->checkNext() == '.')
+        return;
+
+    string value = this->source.substr(this->start, this->current - this->start);
+    this->addToken(TOKEN_SHORT, value);
+}
+
+void Lexer::isConstantDouble(){
+    return;
 }
 
 void Lexer::scanToken() {
@@ -74,6 +148,7 @@ void Lexer::scanToken() {
         case '\r': break;
         case '\t': break;
         case '\n': this->line++; break;
+        case '\0': addToken(TOKEN_EOF); break;
         case '(': addToken(TOKEN_LEFT_PAREN); break;
         case ')': addToken(TOKEN_RIGHT_PAREN); break;
         case '{': addToken(TOKEN_LEFT_BRACE); break;
@@ -81,8 +156,11 @@ void Lexer::scanToken() {
         case ',': addToken(TOKEN_COMMA); break;
         case '.': addToken(TOKEN_DOT); break;
         case '-': addToken(TOKEN_MINUS); break;
-        case '+': addToken(TOKEN_PLUS); break;
         case ';': addToken(TOKEN_SEMICOLON); break;
+        case '/': addToken(TOKEN_SLASH); break;
+        case '+': 
+            match('=') ? addToken(TOKEN_PLUS_EQUAL) : addToken(TOKEN_PLUS);
+            break;
         case '=':
             match('=') ? addToken(TOKEN_EQUAL) : addToken(TOKEN_ASSIGN);
             break;
@@ -95,10 +173,24 @@ void Lexer::scanToken() {
         case '!': 
             if (match('!')) addToken(TOKEN_NOT_EQUAL);
             break;
+        case '*': match('*') ? isComment() : addToken(TOKEN_MULTIPLY); break;
         case '#': isString(); break;
-        default:
-            cout << "Error " << c << endl;
+        default:{
+            if(islower(c) or c == '_'){
+                isIdentifier();
+                break;    
+            } else if(isupper(c)){
+                isReservedWord();
+                break;
+            }else if(isdigit(c)){
+                isConstantInt();
+                break;
+            }else if(c == '.'){
+                isConstantDouble();
+                break;
+            }
+            cout << "Error, caracter " << c << " no reconocido en linea " << this->line << endl;
             break;
-
+        }
     }
 }
