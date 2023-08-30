@@ -130,11 +130,28 @@ void Lexer::isConstantInt(){
     while(isdigit(this->checkNext()))
         advance();
     
-    if(this->checkNext() == '.')
+    //en caso que sea doble
+    if(this->checkNext() == '.'){
+        isConstantDouble();
         return;
+    }
 
-    string value = this->source.substr(this->start, this->current - this->start);
-    this->addToken(TOKEN_SHORT, value);
+    if(match('_')){
+        if(match('s')){
+            string value = this->source.substr(this->start, this->current - this->start -2);
+            this->addToken(TOKEN_SHORT, value);
+            return;
+        }
+        if(match('u')){
+            if(match('i')){
+                string value = this->source.substr(this->start, this->current - this->start -3);
+                this->addToken(TOKEN_UINT, value);
+                return;
+            }
+        }
+    }
+
+    cout << "Error, constante entera invalida en linea " << this->line << endl;
 }
 
 void Lexer::isConstantDouble(){
