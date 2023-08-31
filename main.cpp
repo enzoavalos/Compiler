@@ -13,10 +13,9 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-
     fstream input;
     input.open(argv[1], ios::in);
-
+    
     string temp, src = "";
     
     if(input.good()) {

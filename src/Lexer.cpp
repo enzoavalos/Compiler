@@ -131,7 +131,7 @@ void Lexer::isConstantInt(){
         advance();
     
     //en caso que sea doble
-    if(this->checkNext() == '.'){
+    if(match('.')){
         isConstantDouble();
         return;
     }
@@ -164,23 +164,21 @@ void Lexer::isConstantDouble(){
     while(isdigit(this->checkNext()))
         advance();
 
-    if (match('.')) {
-        while(isdigit(this->checkNext()))
-            advance();
-    }
-
-    if(match('D')) {
+    if(match('D') || match('d')) {
         if(match('+') || match('-')){
             while(isdigit(this->checkNext()))
                 advance();
-            string value = this->source.substr(this->start, this->current - this->start);
-            if (isDoubleInRange(value))
-                this->addToken(TOKEN_DOUBLE, value);
-            else
-                cout << "Error, constante de doble precision fuera de rango en linea " << this->line << endl;
+        }else{
+            cout << "Error, signo de exponente de constante doble faltante, linea " << this->line << endl;
             return;
         }
     }
+
+    string value = this->source.substr(this->start, this->current - this->start);
+    if (isDoubleInRange(value))
+        this->addToken(TOKEN_DOUBLE, value);
+    else
+        cout << "Error, constante de doble precision fuera de rango en linea " << this->line << endl;
     return;
 }
 
@@ -196,9 +194,12 @@ bool Lexer::isUnsignedIntRange(string number) {
 
 bool Lexer::isDoubleInRange(string number) {
     int index = number.find('D');
-    string convertDouble = number.replace(index, 1, "e");
+    if(index == string::npos)
+        index = number.find('d');
+    if(index != string::npos)
+        number = number.replace(index, 1, "e");
     try {
-        double value = stod(convertDouble);
+        double value = stod(number);
         return true;
     } catch (exception e) {
         return false;
@@ -218,7 +219,6 @@ void Lexer::scanToken() {
         case '{': addToken(TOKEN_LEFT_BRACE); break;
         case '}': addToken(TOKEN_RIGHT_BRACE); break;
         case ',': addToken(TOKEN_COMMA); break;
-        case '.': addToken(TOKEN_DOT); break;
         case '-': addToken(TOKEN_MINUS); break;
         case ';': addToken(TOKEN_SEMICOLON); break;
         case '/': addToken(TOKEN_SLASH); break;
@@ -239,6 +239,12 @@ void Lexer::scanToken() {
             break;
         case '*': match('*') ? isComment() : addToken(TOKEN_MULTIPLY); break;
         case '#': isString(); break;
+        case '.':
+            if(isdigit(checkNext()))
+                isConstantDouble();
+            else
+                addToken(TOKEN_DOT);
+            break;
         default:{
             if(islower(c) or c == '_'){
                 isIdentifier();
