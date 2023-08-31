@@ -36,6 +36,10 @@ class Lexer
         //falta reconocer constantes
         void isConstantInt();
         void isConstantDouble();
+
+        bool isSmallIntRange(string number);
+        bool isUnsignedIntRange(string number);
+        bool isDoubleInRange(string number);
     public:
         Lexer(string input);
         ~Lexer();

@@ -64,7 +64,7 @@ void Lexer::addToken(Type type, string lexeme) {
     string text = this->source.substr(start, this->current - start);
     Token *newToken = new Token(type, lexeme, this->line);
     this->tokens.push_back(newToken);
-    if(type == TOKEN_ID)
+    if(newToken->getLexeme().size() > 0)
         this->addSymbol(newToken);
 }
 
@@ -139,13 +139,19 @@ void Lexer::isConstantInt(){
     if(match('_')){
         if(match('s')){
             string value = this->source.substr(this->start, this->current - this->start -2);
-            this->addToken(TOKEN_SHORT, value);
+            if (isSmallIntRange(value))
+                this->addToken(TOKEN_SHORT, value);
+            else
+                cout << "Error, constante de 8 bits entera fuera de rango en linea " << this->line << endl;
             return;
         }
         if(match('u')){
             if(match('i')){
                 string value = this->source.substr(this->start, this->current - this->start -3);
-                this->addToken(TOKEN_UINT, value);
+                if (isUnsignedIntRange(value))
+                    this->addToken(TOKEN_UINT, value);
+                else
+                    cout << "Error, constante entera sin signo de 16 bits fuera de rango en linea " << this->line << endl;
                 return;
             }
         }
@@ -155,7 +161,48 @@ void Lexer::isConstantInt(){
 }
 
 void Lexer::isConstantDouble(){
+    while(isdigit(this->checkNext()))
+        advance();
+
+    if (match('.')) {
+        while(isdigit(this->checkNext()))
+            advance();
+    }
+
+    if(match('D')) {
+        if(match('+') || match('-')){
+            while(isdigit(this->checkNext()))
+                advance();
+            string value = this->source.substr(this->start, this->current - this->start);
+            if (isDoubleInRange(value))
+                this->addToken(TOKEN_DOUBLE, value);
+            else
+                cout << "Error, constante de doble precision fuera de rango en linea " << this->line << endl;
+            return;
+        }
+    }
     return;
+}
+
+bool Lexer::isSmallIntRange(string number) {
+    int value = stoi(number);
+    return value >= -128 && value <= 127;
+}
+
+bool Lexer::isUnsignedIntRange(string number) {
+    unsigned int value = stoi(number);
+    return value >= 0 && value <= 4294967295;
+}
+
+bool Lexer::isDoubleInRange(string number) {
+    int index = number.find('D');
+    string convertDouble = number.replace(index, 1, "e");
+    try {
+        double value = stod(convertDouble);
+        return true;
+    } catch (exception e) {
+        return false;
+    }
 }
 
 void Lexer::scanToken() {
