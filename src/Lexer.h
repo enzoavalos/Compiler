@@ -21,6 +21,7 @@ class Lexer
         SymbolTable symbolTable;
 
         void initializeReservedWords();
+
         char advance();
         void scanToken();
         void addToken(Type type);
@@ -33,7 +34,6 @@ class Lexer
         void isIdentifier();
         void isReservedWord();
         void addSymbol(Token *);
-        //falta reconocer constantes
         void isConstantInt();
         void isConstantDouble();
 
@@ -41,7 +41,7 @@ class Lexer
         bool isUnsignedIntRange(string number);
         bool isDoubleInRange(string number);
     public:
-        Lexer(string input);
+        Lexer(string input,SymbolTable &);
         ~Lexer();
         void run();
 };

@@ -2,14 +2,14 @@
 #include "Token.h"
 #include "Token.cpp"
 
-Lexer::Lexer(string input)
+Lexer::Lexer(string input,SymbolTable &table)
 {
     this->source = input;
     this->line = 1;
     this->start = 0;
     this->current = 0;
     this->initializeReservedWords();
-    this->symbolTable = SymbolTable();
+    this->symbolTable = table;
 }
 
 Lexer::~Lexer(){
@@ -219,8 +219,8 @@ void Lexer::scanToken() {
         case '{': addToken(TOKEN_LEFT_BRACE); break;
         case '}': addToken(TOKEN_RIGHT_BRACE); break;
         case ',': addToken(TOKEN_COMMA); break;
-        case '-': addToken(TOKEN_MINUS); break;
         case ';': addToken(TOKEN_SEMICOLON); break;
+        case '-': addToken(TOKEN_MINUS); break;
         case '/': addToken(TOKEN_SLASH); break;
         case '+': 
             match('=') ? addToken(TOKEN_PLUS_EQUAL) : addToken(TOKEN_PLUS);

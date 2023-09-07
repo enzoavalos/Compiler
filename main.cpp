@@ -30,7 +30,8 @@ int main(int argc, char* argv[])
     }
     src += '\0';
 
-    Lexer *lexer = new Lexer(src);
+    SymbolTable table = SymbolTable();
+    Lexer *lexer = new Lexer(src, table);
     lexer->run();
     
 }

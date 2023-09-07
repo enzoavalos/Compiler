@@ -7,27 +7,31 @@
 using namespace std;
 
 enum State {
-    DOT,
-    DIGIT,
-    LETTER,
-    d,
-    D,
-    u,
-    i,
-    s,
-    UPPER_LETTER,
-    SYMBOL, /* / - { } */
-    UNDERSCORE,
-    PLUS,
+    NEW_LINE,
+    BL_TAB,
+    END_FILE,
+    LITERAL, // { } ( ) , ;
     MINUS,
+    SLASH,
+    PLUS,
     EQUAL,
     LESS_THAN,
     GREATER_THAN,
     EXCLAMATION,
     HASH,
     ASTERISK,
-    NEW_LINE,
-    FINAL
+    DOT,
+    LETTER,
+    LOWERCASE_d,
+    LOWERCASE_u,
+    LOWERCASE_i,
+    LOWERCASE_s,
+    UPPER_LETTER,
+    UPPERCASE_D,
+    DIGIT,
+    UNDERSCORE,
+    FINAL,
+    UNKNOWN,
 };
 
 class TransitionMatrix {
@@ -36,10 +40,10 @@ private:
 
 
     // Acciones semanticas
-    int (*SA01)(TransitionMatrix*, char &); // Iniciar lexema
+    int (*SA01)(TransitionMatrix*, char &); // Iniciar token
     int (*SA02)(TransitionMatrix*, char &); // Agregar caracter
     int (*SA03)(TransitionMatrix*, char &); // Es string
-    int (*SA04)(TransitionMatrix*, char &); // Es comentario
+    int (*SA04)(TransitionMatrix*, char &); // Es comentario, descarta caracteres
     int (*SA05)(TransitionMatrix*, char &); // Es double
     int (*SA06)(TransitionMatrix*, char &); // Es identificador
     int (*SA07)(TransitionMatrix*, char &); // Es palabra reservada

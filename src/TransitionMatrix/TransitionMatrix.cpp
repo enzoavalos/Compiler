@@ -17,8 +17,8 @@ TransitionMatrix::TransitionMatrix() {
     this->setTransition(0, DOT, 1, &SA01);
     this->setTransition(1, DIGIT, 2, &SA02);
     this->setTransition(2, DIGIT, 2, &SA02);
-    this->setTransition(2, d, 3, &SA02);
-    this->setTransition(2, D, 3, &SA02);
+    this->setTransition(2, LOWERCASE_d, 3, &SA02);
+    this->setTransition(2, UPPERCASE_D, 3, &SA02);
     this->setTransition(3, PLUS, 4, &SA02);
     this->setTransition(3, MINUS, 4, &SA02);
     this->setTransition(4, DIGIT, 5, &SA02);
@@ -29,8 +29,8 @@ TransitionMatrix::TransitionMatrix() {
     this->setTransition(0, DIGIT, 6, &SA01);
     this->setTransition(6, DIGIT, 6, &SA02);
     this->setTransition(6, UNDERSCORE, 7, &SA02);
-    this->setTransition(7, u, 8, &SA02);
-    this->setTransition(8, i, -1, &SA09);
+    this->setTransition(7, LOWERCASE_u, 8, &SA02);
+    this->setTransition(8, LOWERCASE_i, -1, &SA09);
 
     // Identifier
     this->setTransition(0, LETTER, 9, &SA01);
@@ -66,9 +66,6 @@ TransitionMatrix::TransitionMatrix() {
 
     // New line
     this->setTransition(0, NEW_LINE, 0, &SA01);
-
-
-
 }
 
 int TransitionMatrix::*SA01(TransitionMatrix* t, char &c) {
@@ -127,11 +124,11 @@ State TransitionMatrix::getState(char c) const {
 
     switch(c) {
         case '.': state = DOT; break;
-        case 'd': state = d; break;
-        case 'D': state = D; break;
-        case 'u': state = u; break;
-        case 'i': state = i; break;
-        case 's': state = s; break;
+        case 'd': state = LOWERCASE_d; break;
+        case 'D': state = UPPERCASE_D; break;
+        case 'u': state = LOWERCASE_u; break;
+        case 'i': state = LOWERCASE_i; break;
+        case 's': state = LOWERCASE_s; break;
         case '+': state = PLUS; break;
         case '-': state = MINUS; break;
         case '=': state = EQUAL; break;
@@ -141,6 +138,17 @@ State TransitionMatrix::getState(char c) const {
         case '#': state = HASH; break;
         case '*': state = ASTERISK; break;
         case '\n': state = NEW_LINE; break;
+        case '{' :
+        case '}' :
+        case '(' :
+        case ')' :
+        case ',' :
+        case ';' : state = LITERAL; break;
+        case '\r' :
+        case ' ' :
+        case '\t' : state = BL_TAB; break;
+        case '\0' : state = END_FILE; break;
+        case '_' : state = UNDERSCORE; break;
         default: {
             if (isdigit(c)) {
                 state = DIGIT;
@@ -150,11 +158,8 @@ State TransitionMatrix::getState(char c) const {
                 } else {
                     state = LETTER;
                 }
-            } else if (c == '_') {
-                state = UNDERSCORE;
-            } else {
-                state = SYMBOL;
             }
+            state = UNKNOWN; //invalid character
         }
     }
 
