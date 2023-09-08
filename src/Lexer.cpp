@@ -55,6 +55,10 @@ char Lexer::advance() {
     return this->source[this->current - 1];
 }
 
+void Lexer::back() {
+    this->current--;
+}
+
 void Lexer::addToken(Type type) {
     addToken(type, "");
 }
@@ -207,13 +211,16 @@ bool Lexer::isDoubleInRange(string number) {
 
 void Lexer::scanToken() {
     char c = advance();
-    printf("Character: %c\n", c);
-    Token * token = this->transitionMatrix.getTransition(c);
-
-    if (token != NULL)
+    bool reset = false;
+    Token * token = this->transitionMatrix.getTransition(c, reset);
+    if (token != NULL) {
+        // printf("Lexema: %s\n", token->getLexeme().c_str());
         this->addSymbol(token);
-    else 
-        cout << "No" << endl;
+    }
+    if (reset) {
+        this->back();
+    }
+    
 
 
 

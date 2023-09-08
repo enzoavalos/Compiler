@@ -25,6 +25,7 @@ class Lexer
         void initializeReservedWords();
 
         char advance();
+        void back();
         void scanToken();
         void addToken(Type type);
         void addToken(Type type, string lexeme);
