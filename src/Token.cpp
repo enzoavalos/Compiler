@@ -7,6 +7,10 @@ Token::Token(Type type, string lexeme, int line)
     this->line = line;
 }
 
+Token::~Token() {
+    
+}
+
 Type Token::getType()
 {
     return this->type;
