@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include "src/Lexer.cpp"
-#include "src/SymbolTable/SymbolTable.cpp"
+#include "src/Lexer.h"
+#include "src/SymbolTable/SymbolTable.h"
 
 using namespace std;
 
