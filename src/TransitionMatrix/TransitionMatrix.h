@@ -50,7 +50,7 @@ private:
     Token * (*SA05)(TransitionMatrix*, char &) = &SemanticActions::end_double; // Es double
     Token * (*SA06)(TransitionMatrix*, char &) = &SemanticActions::end_id; // Es identificador
     Token * (*SA07)(TransitionMatrix*, char &) = &SemanticActions::end_reserved; // Es palabra reservada
-    Token * (*SA08)(TransitionMatrix*, char &) = &SemanticActions::end_none; // Es constante int
+    Token * (*SA08)(TransitionMatrix*, char &) = &SemanticActions::end_none; // Es espacio, borrar
     Token * (*SA09)(TransitionMatrix*, char &) = &SemanticActions::end_uint; // Es constante uint
     Token * (*SA10)(TransitionMatrix*, char &) = &SemanticActions::end_short; // Es constante short
     Token * (*SA11)(TransitionMatrix*, char &) = &SemanticActions::end_op; // Es operador simple
@@ -78,7 +78,7 @@ public:
     void resetLexeme();
     void addChar(char c);
     string getLexeme() const;
-    Token * getTransition(char c);
+    Token * getTransition(char c, bool &reset);
     void printMatrix() const;
 };
 

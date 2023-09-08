@@ -99,16 +99,16 @@ TransitionMatrix::TransitionMatrix()
     }
 
     // Operadores
-    this->setTransition(0, PLUS, 11, &SA02);
+    this->setTransition(0, PLUS, 11, &SA01);
     this->setTransition(11, EQUAL, -1, &SA12);
 
-    this->setTransition(0, EQUAL, 12, &SA02);
+    this->setTransition(0, EQUAL, 12, &SA01);
     this->setTransition(12, EQUAL, -1, &SA12);
 
-    this->setTransition(0, LESS_THAN, 13, &SA02);
+    this->setTransition(0, LESS_THAN, 13, &SA01);
     this->setTransition(13, EQUAL, -1, &SA12);
 
-    this->setTransition(0, GREATER_THAN, 14, &SA02);
+    this->setTransition(0, GREATER_THAN, 14, &SA01);
     this->setTransition(14, EQUAL, -1, &SA12);
     for (int i = 0; i < UNKNOWN; i++)
     {
@@ -133,7 +133,7 @@ TransitionMatrix::TransitionMatrix()
     {
         if (i == HASH || i == NEW_LINE)
             continue;
-        this->setTransition(16, i, -1, &SA03);
+        this->setTransition(16, i, 16, &SA02);
     }
 
     this->setTransition(16, HASH, -1, &SA03);
@@ -161,6 +161,7 @@ TransitionMatrix::TransitionMatrix()
 
     // New line
     this->setTransition(0, NEW_LINE, 0, &SA01);
+
 }
 
 TransitionMatrix::~TransitionMatrix(){
@@ -173,7 +174,9 @@ void TransitionMatrix::addChar(char c)
 
 void TransitionMatrix::deleteChar()
 {
-    this->lexeme.pop_back();
+    if (this->lexeme.length() > 0)
+        this->lexeme.pop_back();
+
 }
 
 void TransitionMatrix::resetLexeme()
@@ -184,128 +187,6 @@ void TransitionMatrix::resetLexeme()
 string TransitionMatrix::getLexeme() const
 {
     return this->lexeme;
-}
-
-Token * SA01(TransitionMatrix *t, char &c)
-{
-    printf("SA01\n");
-    t->resetLexeme();
-    t->addChar(c);
-    return NULL;
-}
-
-Token * SA02(TransitionMatrix *t, char &c)
-{
-    t->addChar(c);
-    return NULL;
-}
-
-Token * SA03(TransitionMatrix *t, char &c)
-{
-    printf("String %d", t->getLexeme());
-    Token * token = new Token(TOKEN_STRING, t->getLexeme(), 0);
-    return token;
-}
-
-Token *SA04(TransitionMatrix *t, char &c)
-{
-    // t->resetLexeme();
-    return NULL;
-}
-
-Token *SA05(TransitionMatrix *t, char &c)
-{
-    string number = t->getLexeme();
-    int index = number.find('D');
-    if(index == string::npos)
-        index = number.find('d');
-    if(index != string::npos)
-        number = number.replace(index, 1, "e");
-    try {
-        double value = stod(number);
-        return new Token(TOKEN_DOUBLE, number, 0);
-    } catch (exception e) {
-        printf("Error double");
-        return NULL;
-    }
-    return NULL;
-}
-
-Token *SA06(TransitionMatrix *t, char &c)
-{
-    string value = t->getLexeme();
-    return new Token(TOKEN_ID, value, 0);
-}
-
-Token *SA07(TransitionMatrix *t, char &c)
-{
-    string value = t->getLexeme();
-    auto result = t->reserved_words.find(value);
-    if(result != t->reserved_words.end())
-        return new Token(result->second, NULL, 0);
-    else
-        cout << "Error, palabra reservada invalida" << endl;
-    return NULL;
-}
-
-Token *SA08(TransitionMatrix *t, char &c)
-{
-    return NULL;
-}
-
-Token *SA09(TransitionMatrix *t, char &c)
-{
-    string number = t->getLexeme();
-    return new Token(TOKEN_UINT, number, 0);
-}
-
-Token *SA10(TransitionMatrix *t, char &c)
-{
-    string number = t->getLexeme();
-    return new Token(TOKEN_SHORT, number, 0);
-}
-
-Token * SA11(TransitionMatrix *t, char &c) {
-    string value = t->getLexeme();
-    switch (c)
-    {
-    case '+':
-        return new Token(TOKEN_PLUS, value, 0);
-    case '-':
-        return new Token(TOKEN_MINUS, value, 0);
-    case '=':
-        return new Token(TOKEN_ASSIGN, value, 0);
-    case '<':
-        return new Token(TOKEN_LESS, value, 0);
-    case '>':
-        return new Token(TOKEN_GREATER, value, 0);
-    case '!':
-        return new Token(TOKEN_NOT_EQUAL, value, 0);
-    default:
-        return NULL;
-    }
-}
-
-Token * SA12(TransitionMatrix *t, char &c) {
-    string value = t->getLexeme();
-
-    if (value == "!=")
-        return new Token(TOKEN_NOT_EQUAL, value, 0);
-    
-    if (value == "+=")
-        return new Token(TOKEN_PLUS_EQUAL, value, 0);
-
-    if (value == "<=")
-        return new Token(TOKEN_LESS_EQUAL, value, 0);
-    
-    if (value == ">=")
-        return new Token(TOKEN_GREATER_EQUAL, value, 0);
-
-    if (value == "==")
-        return new Token(TOKEN_EQUAL, value, 0);
-
-    return NULL;
-
 }
 
 void TransitionMatrix::setTransition(int row, int column, int value, Token * (**sa)(TransitionMatrix *t, char &c))
@@ -330,13 +211,22 @@ State TransitionMatrix::getState(char c) const
         state = UPPERCASE_D;
         break;
     case 'u':
-        state = LOWERCASE_u;
+        if (this->state == 7)
+            state = LOWERCASE_u;
+        else
+            state = LETTER;
         break;
     case 'i':
-        state = LOWERCASE_i;
+        if (this->state == 8)
+            state = LOWERCASE_i;
+        else
+            state = LETTER;
         break;
     case 's':
-        state = LOWERCASE_s;
+        if (this->state == 7)
+            state = LOWERCASE_s;
+        else
+            state = LETTER;
         break;
     case '+':
         state = PLUS;
@@ -413,31 +303,42 @@ State TransitionMatrix::getState(char c) const
 
 
 
-Token * TransitionMatrix::getTransition(char c) {
+Token * TransitionMatrix::getTransition(char c, bool &reset) {
     State state = this->getState(c);
-    printf("State: %d\n", state);
     int next = this->matrix[this->state][state];
+    printf("Character: %c\n", c);
     printf("Next: %d\n", next);
     printf("Actual: %d\n", this->state);
+    printf("---------\n");
     Token * (**sa)(TransitionMatrix *t, char &c) = this->matrix_sa[this->state][state];
-    this->state = next;
-    printf("SA: %p\n", sa);
     if (sa != NULL)
     {
-        // Se llama la funcion bien, pero cuando intenta acceder a la matriz de transiciones, tira segmentation fault
+        // Se llama la funcWion bien, pero cuando intenta acceder a la matriz de transiciones, tira segmentation fault
         Token * token = (*sa)(this, c);
-        if (token != NULL && next != -1)
+        if (token != NULL && next == -1)
         {   
-           
             this->state = 0;
             this->resetLexeme();
-            return NULL;
-            // return token;
+            return token;
+        }
+
+        if (token != NULL)
+        {
+            delete token;
         }
     }
-    else
-    {
-        return NULL;
+    
+    if (next == -1) {
+        if (this->state == END_FILE) {
+            reset = false;
+            return NULL;
+        }
+        this->state = 0;
+        this->resetLexeme();
+        this->deleteChar();
+
+    } else {
+        this->state = next;
     }
 
     return NULL;
