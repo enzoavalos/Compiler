@@ -1,6 +1,4 @@
 #include "Lexer.h"
-#include "Token.h"
-#include "Token.cpp"
 
 Lexer::Lexer(string input,SymbolTable &table)
 {
@@ -10,6 +8,7 @@ Lexer::Lexer(string input,SymbolTable &table)
     this->current = 0;
     this->initializeReservedWords();
     this->symbolTable = table;
+    this->transitionMatrix = TransitionMatrix();
 }
 
 Lexer::~Lexer(){
@@ -208,59 +207,85 @@ bool Lexer::isDoubleInRange(string number) {
 
 void Lexer::scanToken() {
     char c = advance();
-    switch(c) {
-        case ' ': break;
-        case '\r': break;
-        case '\t': break;
-        case '\n': this->line++; break;
-        case '\0': addToken(TOKEN_EOF); break;
-        case '(': addToken(TOKEN_LEFT_PAREN); break;
-        case ')': addToken(TOKEN_RIGHT_PAREN); break;
-        case '{': addToken(TOKEN_LEFT_BRACE); break;
-        case '}': addToken(TOKEN_RIGHT_BRACE); break;
-        case ',': addToken(TOKEN_COMMA); break;
-        case ';': addToken(TOKEN_SEMICOLON); break;
-        case '-': addToken(TOKEN_MINUS); break;
-        case '/': addToken(TOKEN_SLASH); break;
-        case '+': 
-            match('=') ? addToken(TOKEN_PLUS_EQUAL) : addToken(TOKEN_PLUS);
-            break;
-        case '=':
-            match('=') ? addToken(TOKEN_EQUAL) : addToken(TOKEN_ASSIGN);
-            break;
-        case '<':
-            match('=') ? addToken(TOKEN_LESS_EQUAL) : addToken(TOKEN_LESS);
-            break;
-        case '>':
-            match('=') ? addToken(TOKEN_GREATER_EQUAL) : addToken(TOKEN_GREATER);
-            break;
-        case '!': 
-            if (match('!')) addToken(TOKEN_NOT_EQUAL);
-            break;
-        case '*': match('*') ? isComment() : addToken(TOKEN_MULTIPLY); break;
-        case '#': isString(); break;
-        case '.':
-            if(isdigit(checkNext()))
-                isConstantDouble();
-            else
-                addToken(TOKEN_DOT);
-            break;
-        default:{
-            if(islower(c) or c == '_'){
-                isIdentifier();
-                break;    
-            } else if(isupper(c)){
-                isReservedWord();
-                break;
-            }else if(isdigit(c)){
-                isConstantInt();
-                break;
-            }else if(c == '.'){
-                isConstantDouble();
-                break;
-            }
-            cout << "Error, caracter " << c << " no reconocido en linea " << this->line << endl;
-            break;
-        }
-    }
+    printf("Character: %c\n", c);
+    Token * token = this->transitionMatrix.getTransition(c);
+
+    if (token != NULL)
+        this->addSymbol(token);
+    else 
+        cout << "No" << endl;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // switch(c) {
+    //     case ' ': break;
+    //     case '\r': break;
+    //     case '\t': break;
+    //     case '\n': this->line++; break;
+    //     case '\0': addToken(TOKEN_EOF); break;
+    //     case '(': addToken(TOKEN_LEFT_PAREN); break;
+    //     case ')': addToken(TOKEN_RIGHT_PAREN); break;
+    //     case '{': addToken(TOKEN_LEFT_BRACE); break;
+    //     case '}': addToken(TOKEN_RIGHT_BRACE); break;
+    //     case ',': addToken(TOKEN_COMMA); break;
+    //     case ';': addToken(TOKEN_SEMICOLON); break;
+    //     case '-': addToken(TOKEN_MINUS); break;
+    //     case '/': addToken(TOKEN_SLASH); break;
+    //     case '+': 
+    //         match('=') ? addToken(TOKEN_PLUS_EQUAL) : addToken(TOKEN_PLUS);
+    //         break;
+    //     case '=':
+    //         match('=') ? addToken(TOKEN_EQUAL) : addToken(TOKEN_ASSIGN);
+    //         break;
+    //     case '<':
+    //         match('=') ? addToken(TOKEN_LESS_EQUAL) : addToken(TOKEN_LESS);
+    //         break;
+    //     case '>':
+    //         match('=') ? addToken(TOKEN_GREATER_EQUAL) : addToken(TOKEN_GREATER);
+    //         break;
+    //     case '!': 
+    //         if (match('!')) addToken(TOKEN_NOT_EQUAL);
+    //         break;
+    //     case '*': match('*') ? isComment() : addToken(TOKEN_MULTIPLY); break;
+    //     case '#': isString(); break;
+    //     case '.':
+    //         if(isdigit(checkNext()))
+    //             isConstantDouble();
+    //         else
+    //             addToken(TOKEN_DOT);
+    //         break;
+    //     default:{
+    //         if(islower(c) or c == '_'){
+    //             isIdentifier();
+    //             break;    
+    //         } else if(isupper(c)){
+    //             isReservedWord();
+    //             break;
+    //         }else if(isdigit(c)){
+    //             isConstantInt();
+    //             break;
+    //         }else if(c == '.'){
+    //             isConstantDouble();
+    //             break;
+    //         }
+    //         cout << "Error, caracter " << c << " no reconocido en linea " << this->line << endl;
+    //         break;
+    //     }
+    // }
 }

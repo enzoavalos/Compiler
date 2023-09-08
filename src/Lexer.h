@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include "Token.h"
 #include "SymbolTable/SymbolTable.h"
+#include "TransitionMatrix/TransitionMatrix.h"
 
 using namespace std;
 
@@ -19,6 +19,8 @@ class Lexer
         vector<Token*> tokens;
         map<string,Type> reserved_words;
         SymbolTable symbolTable;
+        TransitionMatrix transitionMatrix;
+        
 
         void initializeReservedWords();
 
