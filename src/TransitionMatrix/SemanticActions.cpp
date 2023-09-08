@@ -3,7 +3,6 @@
 
 Token * SemanticActions::initialize_token(TransitionMatrix *t, char &c)
 {
-    printf("Initialize token");
     t->resetLexeme();
     t->addChar(c);
     return NULL;
@@ -17,7 +16,7 @@ Token * SemanticActions::add_character(TransitionMatrix *t, char &c)
 
 Token * SemanticActions::end_string(TransitionMatrix *t, char &c)
 {
-    printf("String %d", t->getLexeme());
+    t->addChar(c);
     Token * token = new Token(TOKEN_STRING, t->getLexeme(), 0);
     return token;
 }
@@ -30,6 +29,7 @@ Token *SemanticActions::end_comment(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
 {
+    t->addChar(c);
     string number = t->getLexeme();
     int index = number.find('D');
     if(index == string::npos)
@@ -48,16 +48,18 @@ Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_id(TransitionMatrix *t, char &c)
 {
+    t->addChar(c);
     string value = t->getLexeme();
     return new Token(TOKEN_ID, value, 0);
 }
 
 Token *SemanticActions::end_reserved(TransitionMatrix *t, char &c)
 {
+    t->addChar(c);
     string value = t->getLexeme();
     auto result = t->reserved_words.find(value);
     if(result != t->reserved_words.end())
-        return new Token(result->second, NULL, 0);
+        return new Token(result->second, value, 0);
     else
         cout << "Error, palabra reservada invalida" << endl;
     return NULL;
@@ -70,18 +72,21 @@ Token *SemanticActions::end_none(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
 {
+    t->addChar(c);
     string number = t->getLexeme();
     return new Token(TOKEN_UINT, number, 0);
 }
 
 Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
 {
+    t->addChar(c);
     string number = t->getLexeme();
     return new Token(TOKEN_SHORT, number, 0);
 }
 
 Token * SemanticActions::end_op(TransitionMatrix *t, char &c) {
     string value = t->getLexeme();
+    printf("Operador simple: %s\n", value.c_str());
     switch (c)
     {
     case '+':
@@ -124,5 +129,31 @@ Token * SemanticActions::end_complex_op(TransitionMatrix *t, char &c) {
 }
 
 Token * SemanticActions::end_symbol(TransitionMatrix *t, char &c) {
-    return NULL;
+    t->addChar(c);
+    string value = t->getLexeme();
+
+    switch (c)
+    {
+    case '(':
+        return new Token(TOKEN_LEFT_PAREN, value, 0);
+    case ')':
+        return new Token(TOKEN_RIGHT_PAREN, value, 0);
+    case '{':
+        return new Token(TOKEN_LEFT_BRACE, value, 0);
+    case '}':
+        return new Token(TOKEN_RIGHT_BRACE, value, 0);
+    case ',':
+        return new Token(TOKEN_COMMA, value, 0);
+    case ';':
+        return new Token(TOKEN_SEMICOLON, value, 0);
+    case '/':
+        return new Token(TOKEN_SLASH, value, 0);
+    case '*':
+        return new Token(TOKEN_MULTIPLY, value, 0);
+    case '.':
+        return new Token(TOKEN_DOT, value, 0);
+    default:
+        return NULL;
+    }
+
 }
