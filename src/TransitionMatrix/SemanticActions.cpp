@@ -3,6 +3,7 @@
 
 Token * SemanticActions::initialize_token(TransitionMatrix *t, char &c)
 {
+        t->read_last = false;
     t->resetLexeme();
     t->addChar(c);
     return NULL;
@@ -10,12 +11,14 @@ Token * SemanticActions::initialize_token(TransitionMatrix *t, char &c)
 
 Token * SemanticActions::add_character(TransitionMatrix *t, char &c)
 {
+        t->read_last = false;
     t->addChar(c);
     return NULL;
 }
 
 Token * SemanticActions::end_string(TransitionMatrix *t, char &c)
 {
+    t->read_last = false;
     t->addChar(c);
     Token * token = new Token(TOKEN_STRING, t->getLexeme(), 0);
     return token;
@@ -29,7 +32,7 @@ Token *SemanticActions::end_comment(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
 {
-    t->addChar(c);
+    t->read_last = true;
     string number = t->getLexeme();
     int index = number.find('D');
     if(index == string::npos)
@@ -48,14 +51,14 @@ Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_id(TransitionMatrix *t, char &c)
 {
-    t->addChar(c);
+        t->read_last = true;
     string value = t->getLexeme();
     return new Token(TOKEN_ID, value, 0);
 }
 
 Token *SemanticActions::end_reserved(TransitionMatrix *t, char &c)
 {
-    t->addChar(c);
+        t->read_last = true;
     string value = t->getLexeme();
     auto result = t->reserved_words.find(value);
     if(result != t->reserved_words.end())
@@ -72,6 +75,7 @@ Token *SemanticActions::end_none(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
 {
+        t->read_last = false;
     t->addChar(c);
     string number = t->getLexeme();
     return new Token(TOKEN_UINT, number, 0);
@@ -79,14 +83,18 @@ Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
 {
+        t->read_last = false;
     t->addChar(c);
     string number = t->getLexeme();
     return new Token(TOKEN_SHORT, number, 0);
 }
 
 Token * SemanticActions::end_op(TransitionMatrix *t, char &c) {
+        t->read_last = true;
     string value = t->getLexeme();
-    printf("Operador simple: %s\n", value.c_str());
+
+    // Revisar, por ahora anda
+    c = value[0];
     switch (c)
     {
     case '+':
@@ -107,6 +115,8 @@ Token * SemanticActions::end_op(TransitionMatrix *t, char &c) {
 }
 
 Token * SemanticActions::end_complex_op(TransitionMatrix *t, char &c) {
+        t->read_last = false;
+        t->addChar(c);
     string value = t->getLexeme();
 
     if (value == "!=")
@@ -129,6 +139,7 @@ Token * SemanticActions::end_complex_op(TransitionMatrix *t, char &c) {
 }
 
 Token * SemanticActions::end_symbol(TransitionMatrix *t, char &c) {
+    t->read_last = false;
     t->addChar(c);
     string value = t->getLexeme();
 

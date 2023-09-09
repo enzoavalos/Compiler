@@ -214,11 +214,11 @@ void Lexer::scanToken() {
     bool reset = false;
     Token * token = this->transitionMatrix.getTransition(c, reset);
     if (token != NULL) {
-        // printf("Lexema: %s\n", token->getLexeme().c_str());
         this->addSymbol(token);
     }
     if (reset) {
         this->back();
+        reset = false;
     }
     
 

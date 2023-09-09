@@ -72,6 +72,11 @@ private:
     void deleteChar();
 
 public:
+    // TODO: Mejorar esto
+    // Este valor se utiliza cuando un token termina de leerse con un caracter inesperado, de manera que hay que volver a leer el ultimo caracter
+    // para analizarlo como si fuese el siguiente Token
+    bool read_last = false;
+
     map<string,Type> reserved_words;
     TransitionMatrix();
     ~TransitionMatrix();
