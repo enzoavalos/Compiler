@@ -51,7 +51,7 @@ TransitionMatrix::TransitionMatrix()
     {
         if (i == DIGIT || i == LOWERCASE_d || i == UPPERCASE_D)
             continue;
-        this->setTransition(2, i, -1, &SA05); // Cambiar accion semantica, es un punto solo
+        this->setTransition(2, i, -1, &SA13);
     }
 
     this->setTransition(3, PLUS, 4, &SA02);
@@ -69,6 +69,13 @@ TransitionMatrix::TransitionMatrix()
     // Numbers
     this->setTransition(0, DIGIT, 6, &SA01);
     this->setTransition(6, DIGIT, 6, &SA02);
+    for (int i = 0; i < UNKNOWN; i++)
+    {
+        if (i == DIGIT)
+            continue;
+        this->setTransition(6, i, -1, &SA05);
+    }
+
     this->setTransition(6, UNDERSCORE, 7, &SA02);
     this->setTransition(7, LOWERCASE_u, 8, &SA02);
     this->setTransition(7, LOWERCASE_s, -1, &SA10);
@@ -160,7 +167,10 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(18, NEW_LINE, 0, &SA01);
 
     // New line
-    this->setTransition(0, NEW_LINE, 0, &SA01);
+    this->setTransition(0, NEW_LINE, 0, &SA08);
+    this->setTransition(0, BL_TAB, 0, &SA08);
+    this->setTransition(0, END_FILE, 0, &SA08);
+
 
 }
 
@@ -313,12 +323,13 @@ Token * TransitionMatrix::getTransition(char c, bool &reset) {
     Token * (**sa)(TransitionMatrix *t, char &c) = this->matrix_sa[this->state][state];
     if (sa != NULL)
     {
-        // Se llama la funcWion bien, pero cuando intenta acceder a la matriz de transiciones, tira segmentation fault
         Token * token = (*sa)(this, c);
         if (token != NULL && next == -1)
         {   
             this->state = 0;
             this->resetLexeme();
+            printf("Read last: %d\n", this->read_last);
+            reset = this->read_last;
             return token;
         }
 
