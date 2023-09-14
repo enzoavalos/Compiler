@@ -17,32 +17,15 @@ class Lexer
         int start;
         int current;
         vector<Token*> tokens;
-        map<string,Type> reserved_words;
         SymbolTable symbolTable;
         TransitionMatrix transitionMatrix;
         
-
-        void initializeReservedWords();
-
         char advance();
         void back();
-        void scanToken();
-        void addToken(Type type);
-        void addToken(Type type, string lexeme);
-        bool match(char expected);
+        Token* scanToken();
         bool isAtEnd();
-        char checkNext();
-        void isString();
-        void isComment();
-        void isIdentifier();
-        void isReservedWord();
         void addSymbol(Token *);
-        void isConstantInt();
-        void isConstantDouble();
 
-        bool isSmallIntRange(string number);
-        bool isUnsignedIntRange(string number);
-        bool isDoubleInRange(string number);
     public:
         Lexer(string input,SymbolTable &);
         ~Lexer();
