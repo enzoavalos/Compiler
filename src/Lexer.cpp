@@ -14,10 +14,11 @@ Lexer::~Lexer(){
 
 void Lexer::run()
 {
-    while (!this->isAtEnd()) {
-        this->start = this->current;
+    while (!this->isAtEnd())
+    {
         this->scanToken();
     }
+    
     for (int i = 0; i < this->tokens.size(); i++) {
         cout << this->tokens[i]->getType() << " " << this->tokens[i]->getLexeme() << 
         " en linea " << this->tokens[i]->getLine() << endl;
@@ -44,16 +45,22 @@ void Lexer::addSymbol(Token* token){
 }
 
 Token* Lexer::scanToken() {
-    char c = advance();
-    bool reset = false;
-    Token * token = this->transitionMatrix.getTransition(c, reset);
-    if (token != NULL) {
-        this->addSymbol(token);
-        return token;
+    Token * token = NULL;
+
+    // Mientras no se haya encontrado un token y no se haya llegado al final del archivo, seguir buscando
+    while (token == NULL && !this->isAtEnd()) {
+        char c = advance();
+        bool reset = false;
+        token = this->transitionMatrix.getTransition(c, reset);
+        if (token != NULL) {
+            this->addSymbol(token);
+            return token;
+        }
+        if (reset) {
+            this->back();
+            reset = false;
+        }
     }
-    if (reset) {
-        this->back();
-        reset = false;
-    }
-    return NULL;
+
+    return token;
 }
