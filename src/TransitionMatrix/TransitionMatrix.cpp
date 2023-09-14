@@ -3,6 +3,8 @@
 TransitionMatrix::TransitionMatrix()
 {
 
+    this->line = 1;
+
 
     this->reserved_words.insert(pair<string,Type>("IF",TOKEN_IF));
     this->reserved_words.insert(pair<string,Type>("ELSE",TOKEN_ELSE));
@@ -20,15 +22,15 @@ TransitionMatrix::TransitionMatrix()
     this->reserved_words.insert(pair<string,Type>("UINT",TOKEN_UINT));
     this->reserved_words.insert(pair<string,Type>("DOUBLE",TOKEN_DOUBLE));
 
-    int total = FINAL;
     // En un momento pense que si con -1 identificas que no hay una transicion valida
-    for (int i = 0; i < ROWS; i++)
+    for (int i = 0; i < UNKNOWN; i++)
     {
-        for (int j = 0; j < total; j++)
+        for (int j = 0; j < UNKNOWN; j++)
         {
             this->setTransition(i, j, -1, NULL);
         }
     }
+
 
     // La idea es establecer las transiciones desde un estado, con un caracter, hacia otro estado y con una accion semantica
 
@@ -47,6 +49,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(2, DIGIT, 2, &SA02);
     this->setTransition(2, LOWERCASE_d, 3, &SA02);
     this->setTransition(2, UPPERCASE_D, 3, &SA02);
+    // Para todos los caracteres que no son digito, d o D. Transicion a estado final simbolo
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == DIGIT || i == LOWERCASE_d || i == UPPERCASE_D)
@@ -59,6 +62,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(4, DIGIT, 5, &SA02);
     this->setTransition(5, DIGIT, 5, &SA02);
     this->setTransition(6, DOT, 2, &SA05);
+    // Para todos los caracteres que no son digito. Transicion a estado final double
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == DIGIT)
@@ -69,6 +73,7 @@ TransitionMatrix::TransitionMatrix()
     // Numbers
     this->setTransition(0, DIGIT, 6, &SA01);
     this->setTransition(6, DIGIT, 6, &SA02);
+    // Para todos los caracteres que no son digito. Transicion a estado final double
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == DIGIT)
@@ -87,6 +92,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(9, LETTER, 9, &SA02);
     this->setTransition(9, DIGIT, 9, &SA02);
     this->setTransition(9, UNDERSCORE, 9, &SA02);
+    // Para todos los caracteres que no son digito, letra o guion bajo. Transicion a estado final identificador
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == LETTER || i == DIGIT || i == UNDERSCORE)
@@ -98,6 +104,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(0, UPPER_LETTER, 10, &SA01);
     this->setTransition(10, UPPER_LETTER, 10, &SA02);
     this->setTransition(10, UNDERSCORE, 10, &SA02);
+    // Para todos los caracteres que no son letra o guion bajo. Transicion a estado final palabra reservada
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == UPPER_LETTER || i == UNDERSCORE)
@@ -117,6 +124,7 @@ TransitionMatrix::TransitionMatrix()
 
     this->setTransition(0, GREATER_THAN, 14, &SA01);
     this->setTransition(14, EQUAL, -1, &SA12);
+    // Para todos los caracteres que no son operador =. Transicion a estado final operador
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == EQUAL)
@@ -164,13 +172,12 @@ TransitionMatrix::TransitionMatrix()
         this->setTransition(18, i, 18, &SA02);
     }
 
-    this->setTransition(18, NEW_LINE, 0, &SA01);
+    this->setTransition(18, NEW_LINE, 0, NULL);
 
     // New line
-    this->setTransition(0, NEW_LINE, 0, &SA08);
-    this->setTransition(0, BL_TAB, 0, &SA08);
-    this->setTransition(0, END_FILE, 0, &SA08);
-
+    this->setTransition(0, NEW_LINE, 0, NULL);
+    this->setTransition(0, BL_TAB, 0, NULL);
+    this->setTransition(0, END_FILE, 0, NULL);
 
 }
 
@@ -205,7 +212,7 @@ void TransitionMatrix::setTransition(int row, int column, int value, Token * (**
     this->matrix_sa[row][column] = sa;
 }
 
-State TransitionMatrix::getState(char c) const
+State TransitionMatrix::getState(char c)
 {
     State state;
 
@@ -316,19 +323,22 @@ State TransitionMatrix::getState(char c) const
 Token * TransitionMatrix::getTransition(char c, bool &reset) {
     State state = this->getState(c);
     int next = this->matrix[this->state][state];
-    printf("Character: %c\n", c);
-    printf("Next: %d\n", next);
-    printf("Actual: %d\n", this->state);
-    printf("---------\n");
+    // printf("Character: %c\n", c);
+    // printf("Next: %d\n", next);
+    // printf("Actual: %d\n", this->state);
+    // printf("---------\n");
     Token * (**sa)(TransitionMatrix *t, char &c) = this->matrix_sa[this->state][state];
+
     if (sa != NULL)
     {
         Token * token = (*sa)(this, c);
+        if (state == NEW_LINE)
+            this->line++;
         if (token != NULL && next == -1)
         {   
             this->state = 0;
             this->resetLexeme();
-            printf("Read last: %d\n", this->read_last);
+            // printf("Read last: %d\n", this->read_last);
             reset = this->read_last;
             return token;
         }
@@ -338,6 +348,10 @@ Token * TransitionMatrix::getTransition(char c, bool &reset) {
             delete token;
         }
     }
+
+    // Aumentar linea aca y en la if de arriba para todos los casos, no es la mejor opcion pero no se me ocurrio donde hacerlo
+    if (state == NEW_LINE)
+        this->line++;
     
     if (next == -1) {
         if (this->state == END_FILE) {
@@ -353,4 +367,9 @@ Token * TransitionMatrix::getTransition(char c, bool &reset) {
     }
 
     return NULL;
+}
+
+int TransitionMatrix::getLine() const
+{
+    return this->line;
 }
