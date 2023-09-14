@@ -70,8 +70,6 @@ Token *SemanticActions::end_reserved(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_none(TransitionMatrix *t, char &c)
 {   
-    printf("LINE\n");
-    t->line++;
     return NULL;
 }
 

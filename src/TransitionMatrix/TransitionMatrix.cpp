@@ -212,7 +212,7 @@ void TransitionMatrix::setTransition(int row, int column, int value, Token * (**
     this->matrix_sa[row][column] = sa;
 }
 
-State TransitionMatrix::getState(char c)
+State TransitionMatrix::getState(char c) const
 {
     State state;
 
