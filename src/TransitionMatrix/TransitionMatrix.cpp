@@ -30,19 +30,14 @@ TransitionMatrix::TransitionMatrix()
         }
     }
 
-
-    // La idea es establecer las transiciones desde un estado, con un caracter, hacia otro estado y con una accion semantica
-
-    // Faltaria definir los errores y los finales
-
-    // DOUBLES (REVISAR)
+    // DOUBLES
     this->setTransition(0, DOT, 1, &SA01);
     this->setTransition(1, DIGIT, 2, &SA02);
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == DIGIT)
             continue;
-        this->setTransition(1, i, FINAL, &SA05);
+        this->setTransition(1, i, FINAL, &SA13);
     }
     this->setTransition(2, DIGIT, 2, &SA02);
     this->setTransition(2, LOWERCASE_d, 3, &SA02);
@@ -52,14 +47,13 @@ TransitionMatrix::TransitionMatrix()
     {
         if (i == DIGIT || i == LOWERCASE_d || i == UPPERCASE_D)
             continue;
-        this->setTransition(2, i, FINAL, &SA13);
+        this->setTransition(2, i, FINAL, &SA05);
     }
 
     this->setTransition(3, PLUS, 4, &SA02);
     this->setTransition(3, MINUS, 4, &SA02);
     this->setTransition(4, DIGIT, 5, &SA02);
     this->setTransition(5, DIGIT, 5, &SA02);
-    this->setTransition(6, DOT, 2, &SA05);
     // Para todos los caracteres que no son digito. Transicion a estado final double
     for (int i = 0; i < UNKNOWN; i++)
     {
@@ -71,13 +65,7 @@ TransitionMatrix::TransitionMatrix()
     // ENTEROS
     this->setTransition(0, DIGIT, 6, &SA01);
     this->setTransition(6, DIGIT, 6, &SA02);
-    // Para todos los caracteres que no son digito. Transicion a estado final double
-    for (int i = 0; i < UNKNOWN; i++)
-    {
-        if (i == DIGIT)
-            continue;
-        this->setTransition(6, i, FINAL, &SA05);
-    }
+    this->setTransition(6, DOT, 2, &SA02);
     this->setTransition(6, UNDERSCORE, 7, &SA02);
     this->setTransition(7, LOWERCASE_u, 8, &SA02);
     this->setTransition(7, LOWERCASE_s, FINAL, &SA10);
@@ -131,14 +119,13 @@ TransitionMatrix::TransitionMatrix()
         this->setTransition(13, i, FINAL, &SA11);
         this->setTransition(14, i, FINAL, &SA11);
     }
-
     this->setTransition(0, EXCLAMATION, 15, &SA02);
     this->setTransition(15, EXCLAMATION, FINAL, &SA12);
 
     // LITERALES
     this->setTransition(0, LITERAL, FINAL, &SA13);
 
-    // STRINGS
+    // STRINGS (REVISAR QUE NO SE RECONOZCAN LOS # COMO PARTE DEL STRING)
     this->setTransition(0, HASH, 16, &SA01);
     for (int i = 0; i < UNKNOWN; i++)
     {
@@ -150,20 +137,22 @@ TransitionMatrix::TransitionMatrix()
     //REVISAR QUE SUCEDE CON STRINGS QUE TIENEN SALTO DE LINEA ANTES DEL # FINAL
     this->setTransition(16, NEW_LINE, FINAL, &SA03);
 
-    // COMENTARIOS - REVISAR QUE SE RECONOZCA EL SIMBOLO * DE MULTIPLICACION
+    // COMENTARIOS
     this->setTransition(0, ASTERISK, 17, &SA01);
+    this->setTransition(17, ASTERISK, 18, &SA08);
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == ASTERISK)
-            this->setTransition(17, ASTERISK, 18, &SA02);
+            continue;
         this->setTransition(17, i, FINAL, &SA11);
     }
 
+    this->setTransition(18, NEW_LINE, 0, &SA04);
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == NEW_LINE)
-            this->setTransition(18, NEW_LINE, 0, NULL);
-        this->setTransition(18, i, 18, NULL);
+            continue;
+        this->setTransition(18, i, 18, &SA08);
     }
 
     // NEW LINE - TAB - EOF

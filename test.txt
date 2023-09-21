@@ -1,12 +1,5 @@
-+
-*
-==
-!!
-+=
-:
-IF
-IMPL
-RETURN
->=
-fjdsljf_djsk
-_fdjshfdsk
+1.
+.6
+3.d-5
+**comentario de varias lineas
+#hola mundo#
