@@ -17,7 +17,7 @@ class Lexer
         int start;
         int current;
         vector<Token*> tokens;
-        SymbolTable symbolTable;
+        SymbolTable * symbolTable;
         TransitionMatrix transitionMatrix;
         
         char advance();
@@ -25,9 +25,8 @@ class Lexer
         Token* scanToken();
         bool isAtEnd();
         void addSymbol(Token *);
-
     public:
-        Lexer(string input,SymbolTable &);
+        Lexer(string input,SymbolTable *);
         ~Lexer();
         void run();
 };

@@ -1,7 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include "src/Lexer.h"
-#include "src/SymbolTable/SymbolTable.h"
+#include "src/Lexer.cpp"
+#include "src/SymbolTable/SymbolTable.cpp"
+#include "src/TransitionMatrix/TransitionMatrix.cpp"
+#include "src/TransitionMatrix/SemanticActions.cpp"
+#include "src/Token.cpp"
 
 using namespace std;
 
@@ -31,7 +34,6 @@ int main(int argc, char* argv[])
     src += '\0';
 
     SymbolTable table = SymbolTable();
-    Lexer *lexer = new Lexer(src, table);
+    Lexer *lexer = new Lexer(src, &table);
     lexer->run();
-    
 }

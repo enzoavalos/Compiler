@@ -1,12 +1,11 @@
 #include "Lexer.h"
 
-Lexer::Lexer(string input,SymbolTable &table)
+Lexer::Lexer(string input,SymbolTable * table)
 {
     this->source = input;
     this->start = 0;
     this->current = 0;
     this->symbolTable = table;
-    this->transitionMatrix = TransitionMatrix();
 }
 
 Lexer::~Lexer(){
@@ -23,8 +22,8 @@ void Lexer::run()
         cout << this->tokens[i]->getType() << " " << this->tokens[i]->getLexeme() << 
         " en linea " << this->tokens[i]->getLine() << endl;
     }
-    cout << "\n";
-    this->symbolTable.printTable();
+    cout << "\n\n";
+    this->symbolTable->printTable();
 }
 
 bool Lexer::isAtEnd() {
@@ -41,12 +40,13 @@ void Lexer::back() {
 }
 
 void Lexer::addSymbol(Token* token){
-    this->symbolTable.addSymbol(token);
+    //Solo se agrega a la tabla de simbolos aquellos tokens que tengan lexema
+    if(!token->getLexeme().empty())
+        this->symbolTable->addSymbol(token);
 }
 
 Token* Lexer::scanToken() {
     Token * token = NULL;
-
     // Mientras no se haya encontrado un token y no se haya llegado al final del archivo, seguir buscando
     while (token == NULL && !this->isAtEnd()) {
         char c = advance();
@@ -54,6 +54,7 @@ Token* Lexer::scanToken() {
         token = this->transitionMatrix.getTransition(c, reset);
         if (token != NULL) {
             this->addSymbol(token);
+            this->tokens.push_back(token);
             return token;
         }
         if (reset) {
