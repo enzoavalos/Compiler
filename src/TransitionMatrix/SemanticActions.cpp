@@ -1,5 +1,6 @@
 #include "SemanticActions.h"
 #include "TransitionMatrix.h"
+#include "../Logger.cpp"
 
 Token * SemanticActions::initialize_token(TransitionMatrix *t, char &c)
 {
@@ -18,32 +19,15 @@ Token * SemanticActions::add_character(TransitionMatrix *t, char &c)
 
 Token * SemanticActions::end_string(TransitionMatrix *t, char &c)
 {
-    t->setReadLast(false);
-    t->addChar(c);
-    Token * token = new Token(TOKEN_STRING, t->getLexeme(), t->getLine());
+    t->setReadLast(true);
+    string value = "\"" + t->getLexeme() + "\"";
+    Token * token = new Token(TOKEN_STRING, value, t->getLine());
     return token;
 }
 
 Token *SemanticActions::end_comment(TransitionMatrix *t, char &c)
 {
-    return NULL;
-}
-
-Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
-{
-    t->setReadLast(true);
-    string number = t->getLexeme();
-    int index = number.find('D');
-    if(index == string::npos)
-        index = number.find('d');
-    if(index != string::npos)
-        number = number.replace(index, 1, "e");
-    try {
-        double value = stod(number);
-        return new Token(TOKEN_DOUBLE, number, t->getLine());
-    } catch (exception e) {
-        printf("Error double");
-    }
+    t->setReadLast(false);
     return NULL;
 }
 
@@ -59,49 +43,85 @@ Token * SemanticActions::end_reserved(TransitionMatrix *t, char &c)
     t->setReadLast(true);
     string value = t->getLexeme();
     Token * token = t->getReservedWord(value);
-    if(token == NULL)
-        cout << "Error, palabra reservada invalida" << endl;
+    if(token == NULL){
+        string errorMsg = "Linea " + to_string(t->getLine()) + ": Error, palabra reservada invalida";
+        Logger::logError(errorMsg);
+    }
     return token;
 }
 
-Token *SemanticActions::end_none(TransitionMatrix *t, char &c)
+Token *SemanticActions::discard_character(TransitionMatrix *t, char &c)
 {   
+    t->setReadLast(false);
+    t->resetLexeme();
+    return NULL;
+}
+
+Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
+{
+    t->setReadLast(true);
+    string number = t->getLexeme();
+    int index = number.find('D');
+    if(index == string::npos)
+        index = number.find('d');
+    if(index != string::npos)
+        number = number.replace(index, 1, "e");
+    
+    try {
+        double value = stod(number);
+        return new Token(TOKEN_DOUBLE, number, t->getLine());
+    } catch(const std::invalid_argument& e){
+        string errorMsg = "Linea " + to_string(t->getLine()) + ": Error, argumento invalido para constante de tipo DOUBLE: " + e.what();
+        Logger::logError(errorMsg);
+    } catch(const std::out_of_range& e){
+        string errorMsg = "Linea " + to_string(t->getLine()) + ": Error, constante de tipo DOUBLE fuera de rango";
+        Logger::logError(errorMsg);
+    }
     return NULL;
 }
 
 Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
 {
-    t->setReadLast(false);
+    t->setReadLast(true);
     t->addChar(c);
     string number = t->getLexeme();
-    unsigned int value = stoi(number);
-
-    if (value >= 0 && value <= 4294967295) {
-        return new Token(TOKEN_SHORT, number, t->getLine());
-    } else
-        printf("Error uint");
-    
+    try{
+        unsigned int value = stoul(number);
+        return new Token(TOKEN_UINT, number, t->getLine());
+    } catch(const std::invalid_argument& e){
+        string errorMsg = "Linea " + to_string(t->getLine()) + ": Error, argumento invalido para constante de tipo UINT: " + e.what();
+        Logger::logError(errorMsg);
+    } catch(const std::out_of_range& e){
+        string errorMsg = "Linea " + to_string(t->getLine()) + ": Error, constante de tipo UINT fuera de rango";
+        Logger::logError(errorMsg);
+    }
     return NULL;
 }
 
 Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
 {
-    t->setReadLast(false);
+    t->setReadLast(true);
     t->addChar(c);
     string number = t->getLexeme();
-    int value = stoi(number);
 
-    if (value >= -128 && value <= 127) {
-        return new Token(TOKEN_UINT, number, t->getLine());
-    } else
-        printf("Error short");
+    try{
+        int value = stoi(number);
+        if (value < -128 || value > 127)
+            throw std::out_of_range("");
+        return new Token(TOKEN_SHORT, number, t->getLine());
+    } catch(const std::invalid_argument& e){
+        string errorMsg = "Linea " + to_string(t->getLine()) + ": Error, argumento invalido para constante de tipo SHORT: " + e.what();
+        Logger::logError(errorMsg);
+    } catch(const std::out_of_range& e){
+        string errorMsg = "Linea " + to_string(t->getLine()) + ": Error, constante de tipo SHORT fuera de rango";
+        Logger::logError(errorMsg);
+    }
     return NULL;
 }
 
 Token * SemanticActions::end_op(TransitionMatrix *t, char &c) {
     t->setReadLast(true);
     string value = t->getLexeme();
-    // Revisar, por ahora anda
     c = value[0];
     switch (c)
     {
@@ -146,7 +166,7 @@ Token * SemanticActions::end_complex_op(TransitionMatrix *t, char &c) {
 }
 
 Token * SemanticActions::end_symbol(TransitionMatrix *t, char &c) {
-    t->setReadLast(false);
+    t->setReadLast(true);
     t->addChar(c);
     string value = t->getLexeme();
 

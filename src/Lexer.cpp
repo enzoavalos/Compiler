@@ -19,8 +19,8 @@ void Lexer::run()
     }
     
     for (int i = 0; i < this->tokens.size(); i++) {
-        cout << this->tokens[i]->getType() << " " << this->tokens[i]->getLexeme() << 
-        " en linea " << this->tokens[i]->getLine() << endl;
+        cout << "Linea " << this->tokens[i]->getLine() << ": token " << this->tokens[i]->getType() << " "
+            << this->tokens[i]->getLexeme() << endl;
     }
     cout << "\n\n";
     this->symbolTable->printTable();

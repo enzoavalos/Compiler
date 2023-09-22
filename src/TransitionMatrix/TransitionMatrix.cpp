@@ -2,8 +2,6 @@
 
 TransitionMatrix::TransitionMatrix()
 {
-    this->line = 1;
-
     this->reserved_words.insert(pair<string,Type>("IF",TOKEN_IF));
     this->reserved_words.insert(pair<string,Type>("ELSE",TOKEN_ELSE));
     this->reserved_words.insert(pair<string,Type>("END_IF",TOKEN_END_IF));
@@ -126,7 +124,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(0, LITERAL, FINAL, &SA13);
 
     // STRINGS (REVISAR QUE NO SE RECONOZCAN LOS # COMO PARTE DEL STRING)
-    this->setTransition(0, HASH, 16, &SA01);
+    this->setTransition(0, HASH, 16, &SA08);
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == HASH || i == NEW_LINE)
@@ -134,8 +132,8 @@ TransitionMatrix::TransitionMatrix()
         this->setTransition(16, i, 16, &SA02);
     }
     this->setTransition(16, HASH, FINAL, &SA03);
-    //REVISAR QUE SUCEDE CON STRINGS QUE TIENEN SALTO DE LINEA ANTES DEL # FINAL
-    this->setTransition(16, NEW_LINE, FINAL, &SA03);
+    // Strings con \n antes del # final se eliminan
+    this->setTransition(16, NEW_LINE, FINAL, &SA08);
 
     // COMENTARIOS
     this->setTransition(0, ASTERISK, 17, &SA01);
@@ -211,7 +209,7 @@ State TransitionMatrix::getState(char c) const
         if (this->state == 2)
             state = UPPERCASE_D;
         else
-            state = LETTER;
+            state = UPPER_LETTER;
         break;
     case 'u':
         if (this->state == 7)
@@ -312,26 +310,23 @@ Token * TransitionMatrix::getTransition(char c, bool &reset) {
     int next = this->matrix[this->state][state];
     Token * (**sa)(TransitionMatrix *t, char &c) = this->matrix_sa[this->state][state];
 
-    // REVISAR QUE SE LLEVE BIEN EL CONTEO DE LAS LINEAS
-    if (state == NEW_LINE)
-        this->line++;
-
-    if (sa != NULL)
-    {
+    if (sa != NULL){
         Token * token = (*sa)(this, c);
-        if (token != NULL && next == FINAL)
-        {   
-            this->state = 0;
-            this->resetLexeme();
-            reset = this->read_last;
-            return token;
-        }
-
-        if (token != NULL)
-        {
+        if (token != NULL){
+            if(next == FINAL){
+                if (state == NEW_LINE)
+                    this->line++;
+                this->state = 0;
+                this->resetLexeme();
+                reset = this->read_last;
+                return token;
+            }
             delete token;
         }
     }
+
+    if (state == NEW_LINE)
+        this->line++;
     
     if (next == FINAL) {
         if (this->state == END_FILE) {
@@ -360,7 +355,7 @@ void TransitionMatrix::setReadLast(bool newValue){
 Token * TransitionMatrix::getReservedWord(string value) const{
     auto result = this->reserved_words.find(value);
     if(result != this->reserved_words.end())
-        return new Token(result->second, value, this->getLine());
+        return new Token(result->second, "", this->getLine());
     else
         return NULL;
 }

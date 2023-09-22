@@ -1,5 +1,19 @@
-1.
-.6
-3.d-5
-**comentario de varias lineas
+42942954_ui
+123_s
+.6D-45
 #hola mundo#
++
+** comentario de muchas lineas
+*
++=
+==
+!!
+IF
+RETURN
+dshhsk_fhdj
+_hfdshfdj
+.hsdf_
+:
+(
+
+algo += 5_s

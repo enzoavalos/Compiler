@@ -40,12 +40,11 @@ class TransitionMatrix {
         const static int STATES = 19; //cantidad de estados
         int matrix[STATES][UNKNOWN];
         Token * (**matrix_sa[STATES][UNKNOWN])(TransitionMatrix * t, char & c);
-        int line;
+        int line = 1;
         int state = 0;
         string lexeme = "";
         map<string,Type> reserved_words;
-        // TODO: Mejorar esto
-        // Este valor se utiliza cuando un token termina de leerse con un caracter inesperado, de manera que hay que volver a leer el ultimo caracter
+        // read_last se usa cuando un token termina de leerse con un caracter inesperado, de manera que hay que volver a leer el ultimo caracter
         // para analizarlo como si fuese el siguiente Token
         bool read_last = false;
         // Acciones semanticas
@@ -56,7 +55,7 @@ class TransitionMatrix {
         Token * (*SA05)(TransitionMatrix*, char &) = &SemanticActions::end_double; // Es double
         Token * (*SA06)(TransitionMatrix*, char &) = &SemanticActions::end_id; // Es identificador
         Token * (*SA07)(TransitionMatrix*, char &) = &SemanticActions::end_reserved; // Es palabra reservada
-        Token * (*SA08)(TransitionMatrix*, char &) = &SemanticActions::end_none; // Es espacio, borrar
+        Token * (*SA08)(TransitionMatrix*, char &) = &SemanticActions::discard_character; // Es espacio, borrar
         Token * (*SA09)(TransitionMatrix*, char &) = &SemanticActions::end_uint; // Es constante uint
         Token * (*SA10)(TransitionMatrix*, char &) = &SemanticActions::end_short; // Es constante short
         Token * (*SA11)(TransitionMatrix*, char &) = &SemanticActions::end_op; // Es operador simple
