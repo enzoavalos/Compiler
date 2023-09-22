@@ -82,7 +82,7 @@ Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
 {
-    t->setReadLast(true);
+    t->setReadLast(false);
     t->addChar(c);
     string number = t->getLexeme();
     try{
@@ -100,7 +100,7 @@ Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
 
 Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
 {
-    t->setReadLast(true);
+    t->setReadLast(false);
     t->addChar(c);
     string number = t->getLexeme();
 
