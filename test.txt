@@ -1,19 +1,11 @@
 42942954_ui
 123_s
 .6D-45
-#hola mundo#
-+
-** comentario de muchas lineas
-*
-+=
-==
-!!
-IF
-RETURN
-dshhsk_fhdj
-_hfdshfdj
-.hsdf_
+3263265216_s
+.
+_mivariable
+.funcion_suma
+;
 :
 (
-
-algo += 5_s
+algo+=5_s

@@ -2,130 +2,168 @@
 // Declaraciones de código C si es necesario
 %}
 
-%token ID  // Identificador
-%token COMMA  // Coma
-%token LBRACE  // Llave izquierda '{'
-%token RBRACE  // Llave derecha '}'
-%token LPAREN
-%token RPAREN
-%token SHORT UINT DOUBLE VOID STRING CLASS INTERFACE IMPLEMENT  // Palabras clave
-%token LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL  // Operadores de comparación
-%token IF ELSE END_IF PRINT FOR IN RANGE  // Palabras clave adicionales
+%token ID ERROR
+
+%token SHORT UINT DOUBLE VOID STRING CLASS INTERFACE IMPLEMENT IMPL
+%token IF ELSE END_IF PRINT FOR IN RANGE RETURN
+
+%token LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL // Operadores de comparación
+
 %left '=' '+='  // Asociatividad izquierda para asignación y asignación con adición
 %left '.'  // Asociatividad izquierda para acceso a atributos y métodos
 
-%left '+' '-'  // Operadores aritméticos de suma y resta
-%left '*' '/'  // Operadores aritméticos de multiplicación y división
 %nonassoc UMINUS  // Operador de negación unaria (para expresiones negativas) Esto lo recomendo chatgpt, veremos
 
 %start programa
 
 %%
 
-sentencias: sentencias sentencia
-          | sentencia;
+programa        : '{' sentencias '}'
+                ;
 
-sentencia: declarativa COMMA
-         | ejecutable COMMA;
+sentencias      : sentencias sentencia
+                | sentencia
+                ;
 
-tipo: SHORT
-    | UINT
-    | DOUBLE;
+sentencia       : declarativa ','
+                | ejecutable ','
+                ;
 
-lista_variables: lista_variables ID
-              | ID;
+declarativa     : tipo lista_variables ','
+                | clase_declaration
+                | objeto_declaration
+                | interface_declaration
+                | implement_declaration
+                ;
 
-declarativa: tipo lista_variables COMMA
-          | clase_declaration
-          | objeto_declaration
-          | interface_declaration
-          | implement_declaration;
+ejecutable      : asignacion
+                | invocacion
+                | seleccion
+                | print
+                | bucle_for
+                | acceso_objeto  // Nueva regla para el acceso a atributos y métodos
+                ;
 
-interface_declaration: INTERFACE ID LBRACE interface_metodos RBRACE;
+lista_variables : lista_variables ID
+                | ID
+                ;
 
-interface_metodos: interface_metodos interface_metodo_declaration
-                | /* Puede no haber métodos en la interfaz */;
+clase_declaration       : CLASS ID '{' atributos metodos '}'
+                        ;
 
-interface_metodo_declaration: VOID ID LPAREN RPAREN COMMA;
+interface_declaration   : INTERFACE ID '{' interface_metodos '}'
+                        ;
 
-implement_declaration: CLASS ID IMPLEMENT ID LBRACE implement_metodos RBRACE;
+interface_metodos       : interface_metodos interface_metodo_declaration
+                        | /* Puede no haber métodos en la interfaz */
+                        ;
 
-implement_metodos: implement_metodos implement_metodo_declaration
-                | /* Puede no haber métodos implementados */;
+// REVISAR PARAMETROS DE LAS INTERFACES
+interface_metodo_declaration    : VOID ID '(' ')' ','
+                                ;
 
-implement_metodo_declaration: VOID ID LPAREN RPAREN LBRACE sentencias RBRACE;
+implement_declaration   : CLASS ID IMPLEMENT ID '{' implement_metodos '}'
+                        ;
 
-clase_declaration: CLASS ID LBRACE atributos metodos RBRACE;
+implement_metodos       : implement_metodos implement_metodo_declaration
+                        | /* Puede no haber métodos implementados */;
 
-atributos: atributos atributo_declaration
-         | /* Puede no haber atributos */;
+implement_metodo_declaration    : VOID ID '(' ')' '{' sentencias '}'
+                                ;
 
-atributo_declaration: tipo lista_variables COMMA;
+atributos               : atributos atributo_declaration
+                        | /* Puede no haber atributos */
+                        ;
 
-metodos: metodos metodo_declaration
-       | /* Puede no haber métodos */;
+atributo_declaration    : tipo lista_variables ','
+                        ;
 
-metodo_declaration: VOID ID LPAREN RPAREN LBRACE sentencias RBRACE;
+metodos                 : metodos metodo_declaration
+                        | /* Puede no haber métodos */
+                        ;
 
-objeto_declaration: ID lista_objetos COMMA;
+// REVISAR PARAMETROS DE FUNCIONES Y METODOS
+metodo_declaration      : VOID ID '(' ')' '{' sentencias retorno '}'
+                        ;
+                        
+// REVISAR SENTENCIA DE RETORNO
+retorno                 : RETURN
+                        | // Puede no aparecer la palabra return
+                        ;
 
-lista_objetos: lista_objetos objeto
-            | objeto;
+objeto_declaration      : ID lista_objetos ','
+                        ;
 
-objeto: ID
-     | ID '.' ID;  // Acceso a atributos o métodos de un objeto
+lista_objetos           : lista_objetos objeto
+                        | objeto
+                        ;
 
-ejecutable: asignacion
-          | invocacion
-          | seleccion
-          | print
-          | bucle_for
-          | acceso_objeto;  // Nueva regla para el acceso a atributos y métodos
+objeto          : ID
+                ;
 
-asignacion: ID asignador expresion
-         | ID '.' ID asignador expresion;  // Asignación de atributo
+asignacion      : ID asignador expresion
+                | ID '.' ID asignador expresion  // Asignación de atributo
+                ;
 
-asignador: '='
-        | '+=';
+asignador       : '='
+                | '+='
+                ;
 
-expresion: 
-    expresion '+' termino | expresion '-' termino | termino
+invocacion      : ID '(' parametros ')'
+                ;
 
-termino:
-        factor | termino '*' factor | termino '/' factor;
+parametros      : expresion
+                | /* Puede no haber parámetros */
+                ;
 
-factor: ID | constante
+seleccion       : IF '(' condicion ')' bloque_sentencias ELSE bloque_sentencias END_IF
+                | IF '(' condicion ')' bloque_sentencias END_IF
+                ;
 
-constante: UINT
-        | SHORT
-        | DOUBLE;
+condicion       : expresion comparador expresion
+                ;
 
-invocacion: ID '(' parametros ')';
-
-parametros: expresion
-         | /* Puede no haber parámetros */;
-
-seleccion: IF '(' condicion ')' bloque_sentencias ELSE bloque_sentencias END_IF | IF '(' condicion ')' bloque_sentencias END_IF;
-
-condicion:
-        expresion '<' expresion
-        | expresion '>' expresion
-        | expresion LESS_EQUAL expresion
-        | expresion GREATER_EQUAL expresion
-        | expresion EQUAL expresion
-        | expresion NOT_EQUAL expresion;
+comparador      : '<'
+                | '>'
+                | LESS_EQUAL
+                | GREATER_EQUAL
+                | EQUAL
+                | NOT_EQUAL
+                ;
         
+bloque_sentencias       : sentencia
+                        | '{' sentencias '}'
+                        ;
 
-bloque_sentencias: sentencia
-               | LBRACE sentencias RBRACE;
+print   : PRINT '(' STRING ')'
+        ;
 
-print: PRINT '(' STRING ')';
+bucle_for       : FOR ID IN RANGE '(' constante ';' constante ';' constante ')' bloque_sentencias
+                ;
 
-bucle_for: FOR ID IN RANGE '(' constante ';' constante ';' constante ')' bloque_sentencias;
+acceso_objeto   : ID '.' ID
+                | ID '.' ID '(' parametros ')'  // Invocación de método de objeto
+                ;
 
-acceso_objeto: ID '.' ID
-             | ID '.' ID '(' parametros ')';  // Invocación de método de objeto
+expresion       : expresion '+' termino
+                | expresion '-' termino
+                | termino
+                ;
 
-%%
+termino         : factor
+                | termino '*' factor
+                | termino '/' factor
+                ;
 
-// Código de acciones semánticas si es necesario
+factor          : ID
+                | constante
+                ;
+
+constante       : UINT
+                | SHORT
+                | DOUBLE;
+
+tipo    : SHORT
+        | UINT
+        | DOUBLE
+        ;
