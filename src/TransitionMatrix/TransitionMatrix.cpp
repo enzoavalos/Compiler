@@ -123,7 +123,7 @@ TransitionMatrix::TransitionMatrix()
     // LITERALES
     this->setTransition(0, LITERAL, FINAL, &SA13);
 
-    // STRINGS (REVISAR QUE NO SE RECONOZCAN LOS # COMO PARTE DEL STRING)
+    // STRINGS
     this->setTransition(0, HASH, 16, &SA08);
     for (int i = 0; i < UNKNOWN; i++)
     {
@@ -133,7 +133,7 @@ TransitionMatrix::TransitionMatrix()
     }
     this->setTransition(16, HASH, FINAL, &SA03);
     // Strings con \n antes del # final se eliminan
-    this->setTransition(16, NEW_LINE, FINAL, &SA08);
+    this->setTransition(16, NEW_LINE, FINAL, &SA03);
 
     // COMENTARIOS
     this->setTransition(0, ASTERISK, 17, &SA01);

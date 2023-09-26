@@ -44,8 +44,8 @@ class TransitionMatrix {
         int state = 0;
         string lexeme = "";
         map<string,Type> reserved_words;
-        // read_last se usa cuando un token termina de leerse con un caracter inesperado, de manera que hay que volver a leer el ultimo caracter
-        // para analizarlo como si fuese el siguiente Token
+        /*Variable usada para denotar cuando un token termina de leerse con un caracter inesperado, con lo que hay que tenerlo en cuenta
+        para cuando se analice el proximo token*/
         bool read_last = false;
         // Acciones semanticas
         Token * (*SA01)(TransitionMatrix*, char &) = &SemanticActions::initialize_token; // Iniciar token

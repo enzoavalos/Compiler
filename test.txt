@@ -1,11 +1,7 @@
 42942954_ui
 123_s
-.6D-45
-3263265216_s
-.
 _mivariable
 .funcion_suma
-;
-:
-(
 algo+=5_s
+#string#
+funcion_suma

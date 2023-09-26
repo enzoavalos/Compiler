@@ -19,7 +19,11 @@ Token * SemanticActions::add_character(TransitionMatrix *t, char &c)
 
 Token * SemanticActions::end_string(TransitionMatrix *t, char &c)
 {
-    t->setReadLast(true);
+    t->setReadLast(false);
+    if(c != '#'){
+        Logger::logError("cadena incompleta", t->getLine());
+        return NULL;
+    }
     string value = "\"" + t->getLexeme() + "\"";
     Token * token = new Token(TOKEN_STRING, value, t->getLine());
     return token;

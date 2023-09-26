@@ -59,9 +59,7 @@ Token *Lexer::scanToken()
     while (token == NULL && !this->isAtEnd())
     {
         char c = advance();
-        cout<<"Leido " << c << endl;
         token = this->transitionMatrix.getTransition(c, reset);
-        cout << "Encontrado "<< (token != NULL) << endl;
 
         if (token != NULL)
         {

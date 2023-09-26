@@ -5,7 +5,7 @@ Token::Token(Type type, string lexeme, int line)
     this->type = type;
     this->lexeme = lexeme;
     this->line = line;
-    this->references = 0;
+    this->references = 1;
 }
 
 Token::~Token() {

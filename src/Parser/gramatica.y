@@ -2,7 +2,7 @@
 // Declaraciones de código C si es necesario
 %}
 
-%token ID ERROR
+%token ID CTE ERROR
 
 %token SHORT UINT DOUBLE VOID STRING CLASS INTERFACE IMPLEMENT IMPL
 %token IF ELSE END_IF PRINT FOR IN RANGE RETURN
@@ -31,20 +31,22 @@ sentencia       : declarativa ','
 
 declarativa     : tipo lista_variables ','
                 | clase_declaration
-                | objeto_declaration
+                | objeto_declaration ','
                 | interface_declaration
                 | implement_declaration
+                | distributed_method_implementation
                 ;
 
-ejecutable      : asignacion
-                | invocacion
-                | seleccion
-                | print
-                | bucle_for
-                | acceso_objeto  // Nueva regla para el acceso a atributos y métodos
+ejecutable      : asignacion ','
+                | invocacion ','
+                | seleccion ','
+                | print ','
+                | bucle_for ','
+                | acceso_objeto ','  // Nueva regla para el acceso a atributos y métodos
                 ;
 
-lista_variables : lista_variables ID
+// Variables se separan con ";"
+lista_variables : lista_variables ';' ID
                 | ID
                 ;
 
@@ -58,8 +60,7 @@ interface_metodos       : interface_metodos interface_metodo_declaration
                         | /* Puede no haber métodos en la interfaz */
                         ;
 
-// REVISAR PARAMETROS DE LAS INTERFACES
-interface_metodo_declaration    : VOID ID '(' ')' ','
+interface_metodo_declaration    : VOID ID '(' parametro ')' ','
                                 ;
 
 implement_declaration   : CLASS ID IMPLEMENT ID '{' implement_metodos '}'
@@ -68,7 +69,7 @@ implement_declaration   : CLASS ID IMPLEMENT ID '{' implement_metodos '}'
 implement_metodos       : implement_metodos implement_metodo_declaration
                         | /* Puede no haber métodos implementados */;
 
-implement_metodo_declaration    : VOID ID '(' ')' '{' sentencias '}'
+implement_metodo_declaration    : VOID ID '(' parametro ')' '{' sentencias '}'
                                 ;
 
 atributos               : atributos atributo_declaration
@@ -79,11 +80,19 @@ atributo_declaration    : tipo lista_variables ','
                         ;
 
 metodos                 : metodos metodo_declaration
+                        | metodos interface_metodo_declaration
                         | /* Puede no haber métodos */
                         ;
 
-// REVISAR PARAMETROS DE FUNCIONES Y METODOS
-metodo_declaration      : VOID ID '(' ')' '{' sentencias retorno '}'
+// Solo se permite un parametro en los metodos y funciones
+parametro      : tipo ID
+                | //puede no haber parametros
+                ;
+
+distributed_method_implementation       : IMPL FOR ID ':' '{' metodo_declaration '}'
+                                        ;
+
+metodo_declaration      : VOID ID '(' parametro ')' '{' sentencias retorno '}' ','
                         ;
                         
 // REVISAR SENTENCIA DE RETORNO
@@ -91,10 +100,10 @@ retorno                 : RETURN
                         | // Puede no aparecer la palabra return
                         ;
 
-objeto_declaration      : ID lista_objetos ','
+objeto_declaration      : ID lista_objetos
                         ;
 
-lista_objetos           : lista_objetos objeto
+lista_objetos           : lista_objetos ';' objeto
                         | objeto
                         ;
 
@@ -109,10 +118,10 @@ asignador       : '='
                 | '+='
                 ;
 
-invocacion      : ID '(' parametros ')'
+invocacion      : ID '(' argumentos ')'
                 ;
 
-parametros      : expresion
+argumentos      : expresion
                 | /* Puede no haber parámetros */
                 ;
 
@@ -138,11 +147,11 @@ bloque_sentencias       : sentencia
 print   : PRINT '(' STRING ')'
         ;
 
-bucle_for       : FOR ID IN RANGE '(' constante ';' constante ';' constante ')' bloque_sentencias
+bucle_for       : FOR ID IN RANGE '(' CTE ';' CTE ';' CTE ')' bloque_sentencias
                 ;
 
 acceso_objeto   : ID '.' ID
-                | ID '.' ID '(' parametros ')'  // Invocación de método de objeto
+                | ID '.' ID '(' argumentos ')'  // Invocación de método de objeto
                 ;
 
 expresion       : expresion '+' termino
@@ -156,12 +165,8 @@ termino         : factor
                 ;
 
 factor          : ID
-                | constante
+                | CTE  //REVISAR COMO REPRESENTAR A LAS CONSTANTES
                 ;
-
-constante       : UINT
-                | SHORT
-                | DOUBLE;
 
 tipo    : SHORT
         | UINT
