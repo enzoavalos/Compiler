@@ -1,7 +1,7 @@
-algo
-1234_s
-5643_ui
-123456_
-43234_u
-4565_i
-5454s
+42942954_ui
+123_s
+_mivariable
+.funcion_suma
+algo+=5_s
+#string#
+funcion_suma

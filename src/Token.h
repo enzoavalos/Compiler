@@ -7,46 +7,49 @@ using namespace std;
 
 enum Type {
     TOKEN_ID = 1,
-    TOKEN_STRING = 3,
-    TOKEN_PLUS = 4,
-    TOKEN_MINUS = 5,
-    TOKEN_LESS = 6,
-    TOKEN_LESS_EQUAL = 7,
-    TOKEN_GREATER = 8,
-    TOKEN_GREATER_EQUAL = 9,
-    TOKEN_EQUAL = 10,
-    TOKEN_NOT_EQUAL = 11,
-    TOKEN_LEFT_PAREN = 18,
-    TOKEN_RIGHT_PAREN = 19,
-    TOKEN_LEFT_BRACE = 20,
-    TOKEN_RIGHT_BRACE = 21,
-    TOKEN_COMMA = 22,
-    TOKEN_SEMICOLON,
-    TOKEN_DOT = 23,
-    TOKEN_ASSIGN = 24,
-    TOKEN_SLASH = 25,
-    TOKEN_DASH = 26,
-    TOKEN_EOF = 27,
-    TOKEN_MULTIPLY = 37,
-    //operador +=
-    TOKEN_PLUS_EQUAL = 38,
-    //constantes
-    TOKEN_SHORT = 34,
-    TOKEN_UINT = 35,
-    TOKEN_DOUBLE = 36,
+    TOKEN_STRING = 2,
+    // Operadores
+    TOKEN_LESS_EQUAL = 3,
+    TOKEN_GREATER_EQUAL = 4,
+    TOKEN_EQUAL = 5,
+    TOKEN_NOT_EQUAL = 6,
+    TOKEN_PLUS_EQUAL = 7,
+    // Constantes
+    TOKEN_SHORT = 8,
+    TOKEN_UINT = 9,
+    TOKEN_DOUBLE = 10,
     //palabras reservadas
-    TOKEN_IF = 12,
-    TOKEN_ELSE = 13,
-    TOKEN_END_IF = 14,
-    TOKEN_PRINT = 15,
-    TOKEN_CLASS = 16,
-    TOKEN_VOID = 17,
-    TOKEN_FOR = 28,
-    TOKEN_IN = 29,
-    TOKEN_RANGE = 30,
-    TOKEN_IMPL = 31,
-    TOKEN_INTERFACE = 32,
-    TOKEN_IMPLEMENT = 33,
+    TOKEN_IF = 11,
+    TOKEN_ELSE = 12,
+    TOKEN_END_IF = 13,
+    TOKEN_PRINT = 14,
+    TOKEN_CLASS = 15,
+    TOKEN_VOID = 16,
+    TOKEN_FOR = 17,
+    TOKEN_IN = 18,
+    TOKEN_RANGE = 19,
+    TOKEN_IMPL = 20,
+    TOKEN_INTERFACE = 21,
+    TOKEN_IMPLEMENT = 22,
+    TOKEN_RETURN = 23,
+    // EOF
+    TOKEN_EOF = 24,
+    // Return ASCII value
+    TOKEN_PLUS = 43,
+    TOKEN_MINUS = 45,
+    TOKEN_LESS = 60,
+    TOKEN_GREATER = 62,
+    TOKEN_LEFT_PAREN = 40,
+    TOKEN_RIGHT_PAREN = 41,
+    TOKEN_LEFT_BRACE = 123,
+    TOKEN_RIGHT_BRACE = 125,
+    TOKEN_COMMA = 44,
+    TOKEN_SEMICOLON = 59,
+    TOKEN_DOT = 46,
+    TOKEN_ASSIGN = 61,
+    TOKEN_SLASH = 47,
+    TOKEN_MULTIPLY = 42, 
+    TOKEN_COLON = 58,
 };
 
 class Token
@@ -55,6 +58,7 @@ class Token
         Type type;
         string lexeme;
         int line;
+        int references;
 
     public:
         Token(Type type, string lexeme, int line);
@@ -62,6 +66,9 @@ class Token
         Type getType();
         string getLexeme();
         int getLine();
+        void increaseReferences();
+        void decreaseReferences();
+        int getReferences() const;
 };
 
 #endif // TOKEN_H

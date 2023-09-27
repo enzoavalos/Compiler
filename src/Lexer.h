@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include "Token.h"
 #include "SymbolTable/SymbolTable.h"
+#include "TransitionMatrix/TransitionMatrix.h"
 
 using namespace std;
 
@@ -17,32 +17,18 @@ class Lexer
         int start;
         int current;
         vector<Token*> tokens;
-        map<string,Type> reserved_words;
-        SymbolTable symbolTable;
-
-        void initializeReservedWords();
+        SymbolTable * symbolTable;
+        TransitionMatrix transitionMatrix;
+        
         char advance();
-        void scanToken();
-        void addToken(Type type);
-        void addToken(Type type, string lexeme);
-        bool match(char expected);
+        void back();
+        
         bool isAtEnd();
-        char checkNext();
-        void isString();
-        void isComment();
-        void isIdentifier();
-        void isReservedWord();
         void addSymbol(Token *);
-        //falta reconocer constantes
-        void isConstantInt();
-        void isConstantDouble();
-
-        bool isSmallIntRange(string number);
-        bool isUnsignedIntRange(string number);
-        bool isDoubleInRange(string number);
     public:
-        Lexer(string input);
+        Lexer(string input,SymbolTable *);
         ~Lexer();
+        Token* scanToken();
         void run();
 };
 
