@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <string.h>
 #include "src/Lexer.cpp"
 #include "src/SymbolTable/SymbolTable.cpp"
 #include "src/TransitionMatrix/TransitionMatrix.cpp"
@@ -7,6 +8,8 @@
 #include "src/Token.cpp"
 
 using namespace std;
+int yylex();
+Lexer *lexer;
 
 int main(int argc, char* argv[])
 {
@@ -34,6 +37,18 @@ int main(int argc, char* argv[])
     src += '\0';
 
     SymbolTable table = SymbolTable();
-    Lexer *lexer = new Lexer(src, &table);
+    lexer = new Lexer(src, &table);
+
     lexer->run();
+}
+
+int yylex() {
+    Token *token = lexer->scanToken();
+
+    string lex = token->getLexeme();
+
+    char *cstr = new char[lex.length() + 1];
+    strcpy(cstr, lex.c_str());
+    // yylval = cstr; Define later
+    return token->getType();
 }

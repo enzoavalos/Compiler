@@ -22,12 +22,13 @@ class Lexer
         
         char advance();
         void back();
-        Token* scanToken();
+        
         bool isAtEnd();
         void addSymbol(Token *);
     public:
         Lexer(string input,SymbolTable *);
         ~Lexer();
+        Token* scanToken();
         void run();
 };
 
