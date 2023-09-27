@@ -9,8 +9,11 @@
 
 %token LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL // Operadores de comparación
 
+// Pregunta, que = sea asociativo a izquierda es parte de las consignas? Crei que era a derecha (en general)
 %left '=' '+='  // Asociatividad izquierda para asignación y asignación con adición
 %left '.'  // Asociatividad izquierda para acceso a atributos y métodos
+%left '+' '-'
+%left '*' '/'
 
 %nonassoc UMINUS  // Operador de negación unaria (para expresiones negativas) Esto lo recomendo chatgpt, veremos
 
@@ -171,4 +174,5 @@ factor          : ID
 tipo    : SHORT
         | UINT
         | DOUBLE
+        | STRING
         ;
