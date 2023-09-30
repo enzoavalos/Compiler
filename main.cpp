@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include "src/Parser/SyntacticActions.cpp"
 #include "src/Lexer.cpp"
 #include "src/SymbolTable/SymbolTable.cpp"
 #include "src/TransitionMatrix/TransitionMatrix.cpp"
@@ -9,10 +10,20 @@
 
 using namespace std;
 int yylex();
+void yyerror(const char *);
+#include "src/Parser/gramatica.tab.cpp"
 Lexer *lexer;
+
+#if YYDEBUG
+    extern int yydebug;
+#else
+    static int yydebug = 0;
+#endif
+
 
 int main(int argc, char* argv[])
 {
+    yydebug = 0;
 	if (argc < 2)
 	{
 		cout << "Ingrese un nombre de archivo" << endl;
@@ -38,17 +49,24 @@ int main(int argc, char* argv[])
 
     SymbolTable table = SymbolTable();
     lexer = new Lexer(src, &table);
+    yyparse();
 
-    lexer->run();
+    table.printTable();
+}
+
+void yyerror(const char * text)
+{
+    cout << text << endl;
 }
 
 int yylex() {
     Token *token = lexer->scanToken();
-
+    printf("Token: %d\n", token->getType());
+    printf("Lexema: %s\n", token->getLexeme().c_str());
     string lex = token->getLexeme();
 
     char *cstr = new char[lex.length() + 1];
     strcpy(cstr, lex.c_str());
-    // yylval = cstr; Define later
+    yylval.string = cstr;
     return token->getType();
 }
