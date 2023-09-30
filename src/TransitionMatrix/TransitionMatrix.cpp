@@ -1,23 +1,24 @@
 #include "TransitionMatrix.h"
+#include "../Parser/gramatica.tab.hpp"
 
 TransitionMatrix::TransitionMatrix()
 {
-    this->reserved_words.insert(pair<string,Type>("IF",TOKEN_IF));
-    this->reserved_words.insert(pair<string,Type>("ELSE",TOKEN_ELSE));
-    this->reserved_words.insert(pair<string,Type>("END_IF",TOKEN_END_IF));
-    this->reserved_words.insert(pair<string,Type>("PRINT",TOKEN_PRINT));
-    this->reserved_words.insert(pair<string,Type>("CLASS",TOKEN_CLASS));
-    this->reserved_words.insert(pair<string,Type>("VOID",TOKEN_VOID));
-    this->reserved_words.insert(pair<string,Type>("FOR",TOKEN_FOR));
-    this->reserved_words.insert(pair<string,Type>("IN",TOKEN_IN));
-    this->reserved_words.insert(pair<string,Type>("RANGE",TOKEN_RANGE));
-    this->reserved_words.insert(pair<string,Type>("IMPL",TOKEN_IMPL));
-    this->reserved_words.insert(pair<string,Type>("INTERFACE",TOKEN_INTERFACE));
-    this->reserved_words.insert(pair<string,Type>("IMPLEMENT",TOKEN_IMPLEMENT));
-    this->reserved_words.insert(pair<string,Type>("SHORT",TOKEN_SHORT));
-    this->reserved_words.insert(pair<string,Type>("UINT",TOKEN_UINT));
-    this->reserved_words.insert(pair<string,Type>("DOUBLE",TOKEN_DOUBLE));
-    this->reserved_words.insert(pair<string,Type>("RETURN",TOKEN_RETURN));
+    this->reserved_words.insert(pair<string,int>("IF", IF));
+    this->reserved_words.insert(pair<string,int>("ELSE", ELSE));
+    this->reserved_words.insert(pair<string,int>("END_IF",END_IF));
+    this->reserved_words.insert(pair<string,int>("PRINT",PRINT));
+    this->reserved_words.insert(pair<string,int>("CLASS",CLASS));
+    this->reserved_words.insert(pair<string,int>("VOID",VOID));
+    this->reserved_words.insert(pair<string,int>("FOR",FOR));
+    this->reserved_words.insert(pair<string,int>("IN",IN));
+    this->reserved_words.insert(pair<string,int>("RANGE",RANGE));
+    this->reserved_words.insert(pair<string,int>("IMPL",IMPL));
+    this->reserved_words.insert(pair<string,int>("INTERFACE",INTERFACE));
+    this->reserved_words.insert(pair<string,int>("IMPLEMENT",IMPLEMENT));
+    this->reserved_words.insert(pair<string,int>("SHORT",SHORT));
+    this->reserved_words.insert(pair<string,int>("UINT",UINT));
+    this->reserved_words.insert(pair<string,int>("DOUBLE",DOUBLE));
+    this->reserved_words.insert(pair<string,int>("RETURN",RETURN));
 
     // Se identifica el estado final con FINAL
     for (int i = 0; i < STATES; i++)
@@ -97,20 +98,20 @@ TransitionMatrix::TransitionMatrix()
 
     // OPERADORES
     this->setTransition(0, PLUS, 11, &SA01);
-    this->setTransition(11, EQUAL, FINAL, &SA12);
+    this->setTransition(11, EQUALEQUAL, FINAL, &SA12);
 
-    this->setTransition(0, EQUAL, 12, &SA01);
-    this->setTransition(12, EQUAL, FINAL, &SA12);
+    this->setTransition(0, EQUALEQUAL, 12, &SA01);
+    this->setTransition(12, EQUALEQUAL, FINAL, &SA12);
 
     this->setTransition(0, LESS_THAN, 13, &SA01);
-    this->setTransition(13, EQUAL, FINAL, &SA12);
+    this->setTransition(13, EQUALEQUAL, FINAL, &SA12);
 
     this->setTransition(0, GREATER_THAN, 14, &SA01);
-    this->setTransition(14, EQUAL, FINAL, &SA12);
+    this->setTransition(14, EQUALEQUAL, FINAL, &SA12);
     // Para todos los caracteres que no son operador =. Transicion a estado final operador
     for (int i = 0; i < UNKNOWN; i++)
     {
-        if (i == EQUAL)
+        if (i == EQUALEQUAL)
             continue;
         this->setTransition(11, i, FINAL, &SA11);
         this->setTransition(12, i, FINAL, &SA11);
@@ -236,7 +237,7 @@ State TransitionMatrix::getState(char c) const
         state = MINUS;
         break;
     case '=':
-        state = EQUAL;
+        state = EQUALEQUAL;
         break;
     case '<':
         state = LESS_THAN;

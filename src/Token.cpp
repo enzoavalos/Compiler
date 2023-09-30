@@ -1,6 +1,6 @@
 #include "Token.h"
 
-Token::Token(Type type, string lexeme, int line)
+Token::Token(int type, string lexeme, int line)
 {
     this->type = type;
     this->lexeme = lexeme;
@@ -12,7 +12,7 @@ Token::~Token() {
     
 }
 
-Type Token::getType()
+int Token::getType()
 {
     return this->type;
 }

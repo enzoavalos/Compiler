@@ -15,7 +15,7 @@ enum State {
     MINUS,
     SLASH,
     PLUS,
-    EQUAL,
+    EQUALEQUAL,
     LESS_THAN,
     GREATER_THAN,
     EXCLAMATION,
@@ -43,7 +43,7 @@ class TransitionMatrix {
         int line = 1;
         int state = 0;
         string lexeme = "";
-        map<string,Type> reserved_words;
+        map<string,int> reserved_words;
         /*Variable usada para denotar cuando un token termina de leerse con un caracter inesperado, con lo que hay que tenerlo en cuenta
         para cuando se analice el proximo token*/
         bool read_last = false;

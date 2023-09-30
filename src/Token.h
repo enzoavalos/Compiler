@@ -55,15 +55,15 @@ enum Type {
 class Token
 {
     private:
-        Type type;
+        int type;
         string lexeme;
         int line;
         int references;
 
     public:
-        Token(Type type, string lexeme, int line);
+        Token(int type, string lexeme, int line);
         ~Token();
-        Type getType();
+        int getType();
         string getLexeme();
         int getLine();
         void increaseReferences();
