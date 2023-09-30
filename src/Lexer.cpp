@@ -59,6 +59,10 @@ Token *Lexer::scanToken()
     while (token == NULL && !this->isAtEnd())
     {
         char c = advance();
+        if (c == '\0') {
+            token = new Token(0, "", this->current);
+            break;
+        }
         token = this->transitionMatrix.getTransition(c, reset);
 
         if (token != NULL)
