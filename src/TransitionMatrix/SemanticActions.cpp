@@ -1,6 +1,7 @@
 #include "SemanticActions.h"
 #include "TransitionMatrix.h"
 #include "../Logger.cpp"
+#include "../Parser/gramatica.tab.hpp"
 
 Token * SemanticActions::initialize_token(TransitionMatrix *t, char &c)
 {
@@ -25,7 +26,7 @@ Token * SemanticActions::end_string(TransitionMatrix *t, char &c)
         return NULL;
     }
     string value = "\"" + t->getLexeme() + "\"";
-    Token * token = new Token(TOKEN_STRING, value, t->getLine());
+    Token * token = new Token(STRING, value, t->getLine());
     return token;
 }
 
@@ -39,7 +40,7 @@ Token *SemanticActions::end_id(TransitionMatrix *t, char &c)
 {
     t->setReadLast(true);
     string value = t->getLexeme();
-    return new Token(TOKEN_ID, value, t->getLine());
+    return new Token(ID, value, t->getLine());
 }
 
 Token * SemanticActions::end_reserved(TransitionMatrix *t, char &c)
@@ -72,7 +73,7 @@ Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
     
     try {
         double value = stod(number);
-        return new Token(TOKEN_DOUBLE, number, t->getLine());
+        return new Token(CTE, number, t->getLine());
     } catch(const std::invalid_argument& e){
         Logger::logError("argumento invalido para constante de tipo DOUBLE", t->getLine());
     } catch(const std::out_of_range& e){
@@ -88,7 +89,7 @@ Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
     string number = t->getLexeme();
     try{
         unsigned int value = stoul(number);
-        return new Token(TOKEN_UINT, number, t->getLine());
+        return new Token(CTE, number, t->getLine());
     } catch(const std::invalid_argument& e){
         Logger::logError("argumento invalido para constante de tipo UINT", t->getLine());
     } catch(const std::out_of_range& e){
@@ -107,7 +108,7 @@ Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
         int value = stoi(number);
         if (value < -128 || value > 127)
             throw std::out_of_range("");
-        return new Token(TOKEN_SHORT, number, t->getLine());
+        return new Token(CTE, number, t->getLine());
     } catch(const std::invalid_argument& e){
         Logger::logError("argumento invalido para constante de tipo SHORT", t->getLine());
     } catch(const std::out_of_range& e){
