@@ -1,8 +1,7 @@
 %{
 // Declaraciones de código C si es necesario
+#include "SyntacticActions.h"
 %}
-
-%token ID CTE ERROR
 
 %token SHORT UINT DOUBLE VOID STRING CLASS INTERFACE IMPLEMENT IMPL
 %token IF ELSE END_IF PRINT FOR IN RANGE RETURN
@@ -15,6 +14,14 @@
 
 %nonassoc UMINUS  // Operador de negación unaria (para expresiones negativas) Esto lo recomendo chatgpt, veremos
 
+%union {
+        int number = 0;
+        char *string;
+}
+
+%token <string> ID CTE
+%type <string> factor
+
 %start programa
 
 %%
@@ -22,28 +29,28 @@
 programa        : '{' sentencias '}'
                 ;
 
-sentencias      : sentencias sentencia
-                | sentencia
+sentencias      : sentencia
+                | sentencias sentencia
                 ;
 
 sentencia       : declarativa ','
                 | ejecutable ','
                 ;
 
-declarativa     : tipo lista_variables ','
+declarativa     : tipo lista_variables
                 | clase_declaration
-                | objeto_declaration ','
+                | objeto_declaration
                 | interface_declaration
                 | implement_declaration
                 | distributed_method_implementation
                 ;
 
-ejecutable      : asignacion ','
-                | invocacion ','
-                | seleccion ','
-                | print ','
-                | bucle_for ','
-                | acceso_objeto ','  // Nueva regla para el acceso a atributos y métodos
+ejecutable      : asignacion
+                | invocacion
+                | seleccion
+                | print
+                | bucle_for
+                | acceso_objeto  // Nueva regla para el acceso a atributos y métodos
                 ;
 
 // Variables se separan con ";"
@@ -162,11 +169,11 @@ expresion       : expresion '+' termino
 
 termino         : factor
                 | termino '*' factor
-                | termino '/' factor { SyntacticActions::check_division_by_zero(Lexer::symbolTable,$3.cadena); }
+                | termino '/' factor { SyntacticActions::check_division_by_zero($3); }
                 ;
 
 factor          : ID
-                | CTE  //REVISAR COMO REPRESENTAR A LAS CONSTANTES
+                | CTE { $$ = $1; }  //REVISAR COMO REPRESENTAR A LAS CONSTANTES
                 ;
 
 tipo    : SHORT
