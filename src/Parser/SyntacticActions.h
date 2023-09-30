@@ -8,8 +8,8 @@ using namespace std;
 
 class SyntacticActions {
     public:
-        static void check_division_by_zero(SymbolTable * symbol_table, string key);
-        static void check_limits(SymbolTable * symbol_table, string key);
+        static void check_division_by_zero(char* key);
+        static void check_limits(char* key);
 };
 
 
