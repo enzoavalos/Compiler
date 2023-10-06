@@ -43,27 +43,27 @@
      UINT = 259,
      DOUBLE = 260,
      VOID = 261,
-     STRING = 262,
-     CLASS = 263,
-     INTERFACE = 264,
-     IMPLEMENT = 265,
-     IMPL = 266,
-     IF = 267,
-     ELSE = 268,
-     END_IF = 269,
-     PRINT = 270,
-     FOR = 271,
-     IN = 272,
-     RANGE = 273,
-     RETURN = 274,
-     LESS_EQUAL = 275,
-     GREATER_EQUAL = 276,
-     EQUAL = 277,
-     NOT_EQUAL = 278,
-     PLUS_EQUAL = 279,
-     UMINUS = 280,
-     ID = 281,
-     CTE = 282
+     CLASS = 262,
+     INTERFACE = 263,
+     IMPLEMENT = 264,
+     IMPL = 265,
+     IF = 266,
+     ELSE = 267,
+     END_IF = 268,
+     PRINT = 269,
+     FOR = 270,
+     IN = 271,
+     RANGE = 272,
+     RETURN = 273,
+     LESS_EQUAL = 274,
+     GREATER_EQUAL = 275,
+     EQUAL = 276,
+     NOT_EQUAL = 277,
+     PLUS_EQUAL = 278,
+     UMINUS = 279,
+     ID = 280,
+     CTE = 281,
+     STRING = 282
    };
 #endif
 
@@ -74,7 +74,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 17 ".\\gramatica.ypp"
+#line 17 "gramatica.ypp"
 
         int number = 0;
         char *string;

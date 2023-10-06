@@ -10,6 +10,7 @@ class SyntacticActions {
     public:
         static void check_division_by_zero(char* key);
         static void check_limits(char* key);
+        static void addNegativeConstant(char* key);
 };
 
 

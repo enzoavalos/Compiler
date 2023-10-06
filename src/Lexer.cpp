@@ -12,22 +12,6 @@ Lexer::~Lexer()
 {
 }
 
-void Lexer::run()
-{
-    while (!this->isAtEnd())
-    {
-        this->scanToken();
-    }
-
-    for (int i = 0; i < this->tokens.size(); i++)
-    {
-        cout << "Linea " << this->tokens[i]->getLine() << ": token " << this->tokens[i]->getType() << " "
-             << this->tokens[i]->getLexeme() << endl;
-    }
-    cout << "\n\n";
-    this->symbolTable->printTable();
-}
-
 bool Lexer::isAtEnd()
 {
     return this->current >= this->source.length();
@@ -66,10 +50,7 @@ Token *Lexer::scanToken()
         token = this->transitionMatrix.getTransition(c, reset);
 
         if (token != NULL)
-        {
             this->addSymbol(token);
-            this->tokens.push_back(token);
-        }
 
         if (reset & c != '\n')
             this->back();

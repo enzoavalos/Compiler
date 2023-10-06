@@ -25,7 +25,7 @@ Token * SymbolTable::getSymbol(string lexeme) const{
 }
 
 void SymbolTable::printTable() const{
-    cout << "Tabla de simbolos\n";
+    cout << "\nTabla de simbolos\n";
     for(auto& pair: this->symbols)
         cout << pair.first << " referencias: " << pair.second->getReferences() << endl;
 }

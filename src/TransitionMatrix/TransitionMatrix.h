@@ -64,7 +64,6 @@ class TransitionMatrix {
 
         State getState(char) const;
         void setTransition(int, int, int, Token * (**sa)(TransitionMatrix * t, char & c));
-        int next(char c);
         void deleteChar();
 
     public:
@@ -75,7 +74,6 @@ class TransitionMatrix {
         void setReadLast(bool);
         string getLexeme() const;
         Token * getTransition(char c, bool &reset);
-        void printMatrix() const;
         int getLine() const;
         Token * getReservedWord(string) const;
 };

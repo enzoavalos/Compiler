@@ -41,7 +41,6 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(2, DIGIT, 2, &SA02);
     this->setTransition(2, LOWERCASE_d, 3, &SA02);
     this->setTransition(2, UPPERCASE_D, 3, &SA02);
-    // Para todos los caracteres que no son digito, d o D. Transicion a estado final simbolo
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == DIGIT || i == LOWERCASE_d || i == UPPERCASE_D)
@@ -53,7 +52,6 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(3, MINUS, 4, &SA02);
     this->setTransition(4, DIGIT, 5, &SA02);
     this->setTransition(5, DIGIT, 5, &SA02);
-    // Para todos los caracteres que no son digito. Transicion a estado final double
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == DIGIT)
@@ -76,7 +74,6 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(9, LETTER, 9, &SA02);
     this->setTransition(9, DIGIT, 9, &SA02);
     this->setTransition(9, UNDERSCORE, 9, &SA02);
-    // Para todos los caracteres que no son digito, letra o guion bajo. Transicion a estado final identificador
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == LETTER || i == DIGIT || i == UNDERSCORE)
@@ -88,7 +85,6 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(0, UPPER_LETTER, 10, &SA01);
     this->setTransition(10, UPPER_LETTER, 10, &SA02);
     this->setTransition(10, UNDERSCORE, 10, &SA02);
-    // Para todos los caracteres que no son letra o guion bajo. Transicion a estado final palabra reservada
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == UPPER_LETTER || i == UNDERSCORE)
@@ -108,7 +104,6 @@ TransitionMatrix::TransitionMatrix()
 
     this->setTransition(0, GREATER_THAN, 14, &SA01);
     this->setTransition(14, EQUALEQUAL, FINAL, &SA12);
-    // Para todos los caracteres que no son operador =. Transicion a estado final operador
     for (int i = 0; i < UNKNOWN; i++)
     {
         if (i == EQUALEQUAL)
@@ -123,6 +118,7 @@ TransitionMatrix::TransitionMatrix()
 
     // LITERALES
     this->setTransition(0, LITERAL, FINAL, &SA13);
+    this->setTransition(0, MINUS, FINAL, &SA13);
 
     // STRINGS
     this->setTransition(0, HASH, 16, &SA08);

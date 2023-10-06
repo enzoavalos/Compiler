@@ -61,9 +61,11 @@ void yyerror(const char * text)
 
 int yylex() {
     Token *token = lexer->scanToken();
-    printf("Token: %d\n", token->getType());
-    printf("Lexema: %s\n", token->getLexeme().c_str());
     string lex = token->getLexeme();
+
+    /*printf("Linea %d: token: %d\n",token->getLine(), token->getType());
+    if(lex != "")
+        printf("Lexema: %s\n", lex.c_str());*/
 
     char *cstr = new char[lex.length() + 1];
     strcpy(cstr, lex.c_str());

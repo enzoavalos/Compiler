@@ -1,7 +1,60 @@
-42942954_ui
-123_s
-_mivariable
-.funcion_suma
-algo+=5_s
-#string#
-funcion_suma
+{
+    q(-7_s),
+    z(),
+    q(a+b),
+
+    SHORT int1 ; int2 ,
+    
+    clase.objeto = algo ,
+
+    int1 = 43_s / 0_s ,
+
+    VOID funcion ( DOUBLE arg ){
+        SHORT x ,
+        x = arg ,
+        RETURN ,
+    } ,
+
+    VOID funcion ( ){
+        SHORT y ,
+        RETURN ,
+    } ,
+
+    IF ( int1 !! int2 ){
+        DOUBLE d1 ,
+        d1 += int1 ,
+    } ELSE
+        d1 = int2 ,
+    END_IF ,
+
+    IF ( int1 !! int2 )
+        SHORT aux ,
+    END_IF ,
+
+    PRINT #hola mundo# ,
+
+    IMPL FOR clase : {
+        VOID p (){
+            DOUBLE s ,
+        } ,
+    } ,
+
+    INTERFACE z {
+        VOID q () ,
+    } ,
+
+    CLASS clase IMPLEMENT z {
+        VOID q (){
+            int1 = 45_s * 45.d+21 ,
+        } ,
+    } ,
+
+    FOR i IN RANGE (2_s; 10_s; 1_s)
+        int1 += i ,
+    ,
+
+    FOR i IN RANGE (2_s; 10_s; 1_s){
+        int1 = i,
+        q(34_s),
+    } ,
+}

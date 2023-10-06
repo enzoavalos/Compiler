@@ -13,23 +13,19 @@ class Lexer
 {
     private:
         string source;
-        int line;
         int start;
         int current;
-        vector<Token*> tokens;
         SymbolTable * symbolTable;
         TransitionMatrix transitionMatrix;
         
         char advance();
         void back();
-        
         bool isAtEnd();
         void addSymbol(Token *);
     public:
         Lexer(string input,SymbolTable *);
         ~Lexer();
         Token* scanToken();
-        void run();
 };
 
 #endif // LEXER_H

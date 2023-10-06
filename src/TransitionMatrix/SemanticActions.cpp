@@ -146,19 +146,19 @@ Token * SemanticActions::end_complex_op(TransitionMatrix *t, char &c) {
     string value = t->getLexeme();
 
     if (value == "!!")
-        return new Token(TOKEN_NOT_EQUAL, "", t->getLine());
+        return new Token(NOT_EQUAL, "", t->getLine());
     
     if (value == "+=")
-        return new Token(TOKEN_PLUS_EQUAL, "", t->getLine());
+        return new Token(PLUS_EQUAL, "", t->getLine());
 
     if (value == "<=")
-        return new Token(TOKEN_LESS_EQUAL, "", t->getLine());
+        return new Token(LESS_EQUAL, "", t->getLine());
     
     if (value == ">=")
-        return new Token(TOKEN_GREATER_EQUAL, "", t->getLine());
+        return new Token(GREATER_EQUAL, "", t->getLine());
 
     if (value == "==")
-        return new Token(TOKEN_EQUAL, "", t->getLine());
+        return new Token(EQUAL, "", t->getLine());
 
     return NULL;
 }
@@ -193,6 +193,8 @@ Token * SemanticActions::end_symbol(TransitionMatrix *t, char &c) {
         return new Token(TOKEN_DOT, "", t->getLine());
     case ':':
         return new Token(TOKEN_COLON, "", t->getLine());
+    case '-':
+        return new Token(TOKEN_MINUS, "", t->getLine());
     default:
         return NULL;
     }
