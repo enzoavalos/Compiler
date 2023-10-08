@@ -73,7 +73,7 @@ Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
     
     try {
         double value = stod(number);
-        return new Token(CTE, number, t->getLine());
+        return new Token(CTE_DOUBLE, number, t->getLine());
     } catch(const std::invalid_argument& e){
         Logger::logError("argumento invalido para constante de tipo DOUBLE", t->getLine());
     } catch(const std::out_of_range& e){
@@ -89,7 +89,7 @@ Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
     string number = t->getLexeme();
     try{
         unsigned int value = stoul(number);
-        return new Token(CTE, number, t->getLine());
+        return new Token(CTE_UINT, number, t->getLine());
     } catch(const std::invalid_argument& e){
         Logger::logError("argumento invalido para constante de tipo UINT", t->getLine());
     } catch(const std::out_of_range& e){
@@ -108,7 +108,7 @@ Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
         int value = stoi(number);
         if (value < -128 || value > 127)
             throw std::out_of_range("");
-        return new Token(CTE, number, t->getLine());
+        return new Token(CTE_SHORT, number, t->getLine());
     } catch(const std::invalid_argument& e){
         Logger::logError("argumento invalido para constante de tipo SHORT", t->getLine());
     } catch(const std::out_of_range& e){

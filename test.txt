@@ -1,12 +1,11 @@
 {
+    clase.objeto = algo ,
+    clase.objeto() ,
+    
     q(-7_s),
-    z(),
     q(a+b),
 
     SHORT int1 ; int2 ,
-    
-    clase.objeto = algo ,
-
     int1 = 43_s / 0_s ,
 
     VOID funcion ( DOUBLE arg ){
@@ -47,6 +46,7 @@
         VOID q (){
             int1 = 45_s * 45.d+21 ,
         } ,
+        ca ,
     } ,
 
     FOR i IN RANGE (2_s; 10_s; 1_s)
@@ -56,5 +56,16 @@
     FOR i IN RANGE (2_s; 10_s; 1_s){
         int1 = i,
         q(34_s),
+    } ,
+
+    CLASS clase {
+        SHORT a ,
+        VOID m() {
+            SHORT s ,
+            VOID funcion1(){
+                DOUBLE zz ,
+                zz = 45_s - zz ,
+            } ,
+        } ,
     } ,
 }

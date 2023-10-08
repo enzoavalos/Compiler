@@ -1,11 +1,10 @@
 #include "Lexer.h"
 
-Lexer::Lexer(string input, SymbolTable *table)
+Lexer::Lexer(string input)
 {
     this->source = input;
     this->start = 0;
     this->current = 0;
-    this->symbolTable = table;
 }
 
 Lexer::~Lexer()
@@ -32,7 +31,7 @@ void Lexer::addSymbol(Token *token)
 {
     // Solo se agrega a la tabla de simbolos aquellos tokens que tengan lexema
     if (!token->getLexeme().empty())
-        this->symbolTable->addSymbol(token);
+        symbolTable->addSymbol(token);
 }
 
 Token *Lexer::scanToken()

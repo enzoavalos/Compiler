@@ -2,7 +2,6 @@
 #define LEXER_H
 
 #include <iostream>
-#include <vector>
 #include <map>
 #include "SymbolTable/SymbolTable.h"
 #include "TransitionMatrix/TransitionMatrix.h"
@@ -15,7 +14,6 @@ class Lexer
         string source;
         int start;
         int current;
-        SymbolTable * symbolTable;
         TransitionMatrix transitionMatrix;
         
         char advance();
@@ -23,7 +21,8 @@ class Lexer
         bool isAtEnd();
         void addSymbol(Token *);
     public:
-        Lexer(string input,SymbolTable *);
+        static SymbolTable * symbolTable;
+        Lexer(string input);
         ~Lexer();
         Token* scanToken();
 };

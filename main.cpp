@@ -20,6 +20,8 @@ Lexer *lexer;
     static int yydebug = 0;
 #endif
 
+SymbolTable table = SymbolTable();
+SymbolTable * Lexer::symbolTable = &table;
 
 int main(int argc, char* argv[])
 {
@@ -47,8 +49,7 @@ int main(int argc, char* argv[])
     }
     src += '\0';
 
-    SymbolTable table = SymbolTable();
-    lexer = new Lexer(src, &table);
+    lexer = new Lexer(src);
     yyparse();
 
     table.printTable();
