@@ -1,4 +1,8 @@
 {
+    a = 4_s,
+    b = 4_s,
+    c = -4_s,
+    
     clase.objeto = algo ,
     clase.objeto() ,
     

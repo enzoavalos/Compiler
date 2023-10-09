@@ -40,10 +40,10 @@ class TransitionMatrix {
         const static int STATES = 19; //cantidad de estados
         int matrix[STATES][UNKNOWN];
         Token * (**matrix_sa[STATES][UNKNOWN])(TransitionMatrix * t, char & c);
-        int line = 1;
         int state = 0;
         string lexeme = "";
         map<string,int> reserved_words;
+        static int line;
         /*Variable usada para denotar cuando un token termina de leerse con un caracter inesperado, con lo que hay que tenerlo en cuenta
         para cuando se analice el proximo token*/
         bool read_last = false;
@@ -67,6 +67,8 @@ class TransitionMatrix {
         void deleteChar();
 
     public:
+        static int getLine();
+
         TransitionMatrix();
         ~TransitionMatrix();
         void resetLexeme();
@@ -74,8 +76,9 @@ class TransitionMatrix {
         void setReadLast(bool);
         string getLexeme() const;
         Token * getTransition(char c, bool &reset);
-        int getLine() const;
         Token * getReservedWord(string) const;
 };
+
+int TransitionMatrix::line = 1;
 
 #endif

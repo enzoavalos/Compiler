@@ -340,9 +340,9 @@ Token * TransitionMatrix::getTransition(char c, bool &reset) {
     return NULL;
 }
 
-int TransitionMatrix::getLine() const
+int TransitionMatrix::getLine()
 {
-    return this->line;
+    return line;
 }
 
 void TransitionMatrix::setReadLast(bool newValue){

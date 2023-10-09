@@ -60,12 +60,11 @@
      EQUAL = 276,
      NOT_EQUAL = 277,
      PLUS_EQUAL = 278,
-     UMINUS = 279,
-     ID = 280,
-     STRING = 281,
-     CTE_SHORT = 282,
-     CTE_UINT = 283,
-     CTE_DOUBLE = 284
+     ID = 279,
+     STRING = 280,
+     CTE_SHORT = 281,
+     CTE_UINT = 282,
+     CTE_DOUBLE = 283
    };
 #endif
 
@@ -84,7 +83,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 88 "gramatica.tab.hpp"
+#line 87 "gramatica.tab.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
