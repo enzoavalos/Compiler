@@ -52,6 +52,7 @@ ejecutable      : asignacion
                 | print
                 | bucle_for
                 | acceso_atributo
+                | retorno
                 ;
 
 declaracion_variables   : tipo lista_variables
@@ -101,7 +102,6 @@ herencia_composicion    : herencia_composicion ID ','   { Logger::infoMsg("Heren
                         ;
 
 sentencias_metodo       : sentencias_metodo declaracion_variables ','
-                        | sentencias_metodo retorno ','
                         | sentencias_metodo ejecutable ','
                         | sentencias_metodo local_function_declaration ','
                         |
@@ -111,7 +111,6 @@ local_function_declaration      : VOID ID '(' parametro ')' '{' sentencias_funci
                                 ;
 
 sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','
-                                | sentencias_funcion_local retorno ','
                                 | sentencias_funcion_local ejecutable ','
                                 | sentencias_funcion_local local_function_declaration ',' { Logger::logError("No se permite anidamiento multiple de funciones locales") }
                                 |
@@ -127,7 +126,6 @@ distributed_method_implementation       : IMPL FOR ID ':' '{' metodos_clase '}' 
                                         ;
                         
 retorno                 : RETURN
-                        |
                         ;
 
 objeto_declaration      : ID lista_objetos

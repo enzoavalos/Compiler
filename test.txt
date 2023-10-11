@@ -57,6 +57,9 @@
     CLASS clase IMPLEMENT z {
         VOID q (){
             int1 = 45_s * 45.d+21 ,
+            IF (int1 == 14_ui)
+                RETURN ,
+            END_IF ,
         } ,
         ca ,
     } ,
