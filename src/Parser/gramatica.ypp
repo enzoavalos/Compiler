@@ -1,7 +1,6 @@
 %{
 // Declaraciones de código C si es necesario
 #include "SyntacticActions.h"
-#include "../TransitionMatrix/TransitionMatrix.h"
 #include "gramatica.tab.hpp"
 %}
 
@@ -10,7 +9,6 @@
 
 %token LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL // Operadores de comparación
 
-// Pregunta, que = sea asociativo a izquierda es parte de las consignas? Crei que era a derecha (en general)
 %left '=' PLUS_EQUAL  // Asociatividad izquierda para asignación y asignación con adición
 %left '.'  // Asociatividad izquierda para acceso a atributos y métodos
 
@@ -27,6 +25,8 @@
 %%
 
 programa        : '{' sentencias '}'
+                | '{' sentencias        { Logger::logError("Se esperaba llave como fin del programa") }
+                | sentencias '}'        { Logger::logError("Se esperaba llave como inicion del programa") }
                 ;
 
 sentencias      : sentencia
@@ -55,47 +55,48 @@ ejecutable      : asignacion
                 ;
 
 declaracion_variables   : tipo lista_variables
+                        //| lista_variables       { Logger::logError("Falta especificar el tipo de las variables") }
                         ;
 
 lista_variables : lista_variables ';' ID
                 | ID
                 ;
 
-clase_declaration       : CLASS ID '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase", TransitionMatrix::getLine()) }
+clase_declaration       : CLASS ID '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase") }
                         ;
 
-interface_declaration   : INTERFACE ID '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz", TransitionMatrix::getLine()) }
+interface_declaration   : INTERFACE ID '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz") }
                         ;
 
 interface_metodos       : interface_metodos interface_metodo_declaration
                         |
                         ;
 
-interface_metodo_declaration    : VOID ID '(' parametro ')' ',' { Logger::infoMsg("Declaracion de metodo de interfaz", TransitionMatrix::getLine()) }
+interface_metodo_declaration    : VOID ID '(' parametro ')' ',' { Logger::infoMsg("Declaracion de metodo de interfaz") }
                                 ;
 
-implement_declaration   : CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz", TransitionMatrix::getLine()) }
+implement_declaration   : CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz") }
                         ;
 
 atributos               : atributos atributo_declaration
                         |
                         ;
 
-atributo_declaration    : declaracion_variables ',' { Logger::infoMsg("Declaracion de atributos de clase", TransitionMatrix::getLine()) }
+atributo_declaration    : declaracion_variables ',' { Logger::infoMsg("Declaracion de atributos de clase") }
                         ;
 
 metodos_clase   : metodos_clase metodo_declaration
                 |
                 ;
 
-metodo_declaration      : funcion_declaration ',' { Logger::infoMsg("Declaracion de metodo", TransitionMatrix::getLine()) }
+metodo_declaration      : funcion_declaration ',' { Logger::infoMsg("Declaracion de metodo") }
                         ;
 
-funcion_declaration     : VOID ID '(' parametro ')' '{' sentencias_metodo '}' { Logger::infoMsg("Declaracion de funcion", TransitionMatrix::getLine()) }
+funcion_declaration     : VOID ID '(' parametro ')' '{' sentencias_metodo '}' { Logger::infoMsg("Declaracion de funcion") }
                         |
                         ;
 
-herencia_composicion    : herencia_composicion ID ','   { Logger::infoMsg("Herencia por composicion", TransitionMatrix::getLine()) }
+herencia_composicion    : herencia_composicion ID ','   { Logger::infoMsg("Herencia por composicion") }
                         |
                         ;
 
@@ -106,24 +107,27 @@ sentencias_metodo       : sentencias_metodo declaracion_variables ','
                         |
                         ;
 
-local_function_declaration      : VOID ID '(' parametro ')' '{' sentencias_funcion_local '}' { Logger::infoMsg("Declaracion de funcion local", TransitionMatrix::getLine()) }
+local_function_declaration      : VOID ID '(' parametro ')' '{' sentencias_funcion_local '}' { Logger::infoMsg("Declaracion de funcion local") }
                                 ;
 
 sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','
                                 | sentencias_funcion_local retorno ','
                                 | sentencias_funcion_local ejecutable ','
-                                | sentencias_funcion_local local_function_declaration ',' { Logger::logError("No se permite anidamiento multiple de funciones locales", TransitionMatrix::getLine()) }
+                                | sentencias_funcion_local local_function_declaration ',' { Logger::logError("No se permite anidamiento multiple de funciones locales") }
                                 |
                                 ;
 
 parametro       : tipo ID
+                | ID                    { Logger::logError("Falta el tipo del argumento") }
+                | parametro ';' tipo ID { Logger::logError("Solo se permite un parametro en declaracion de funcion") }
                 |
                 ;
 
-distributed_method_implementation       : IMPL FOR ID ':' '{' metodos_clase '}'    { Logger::infoMsg("Declaracion distribuida de metodos", TransitionMatrix::getLine()) }
+distributed_method_implementation       : IMPL FOR ID ':' '{' metodos_clase '}'    { Logger::infoMsg("Declaracion distribuida de metodos") }
                                         ;
                         
 retorno                 : RETURN
+                        |
                         ;
 
 objeto_declaration      : ID lista_objetos
@@ -136,27 +140,35 @@ lista_objetos           : lista_objetos ';' objeto
 objeto          : ID
                 ;
 
-asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple", TransitionMatrix::getLine()) }
-                | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo", TransitionMatrix::getLine()) }
+asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple") }
+                | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo") }
+                | ID asignador  { Logger::logError("Asignacion vacia") }
+                | ID '.' ID asignador    { Logger::logError("Asignacion vacia") }
                 ;
 
 asignador       : '='
                 | PLUS_EQUAL
                 ;
 
-invocacion      : ID '(' argumentos ')' { Logger::infoMsg("Invocacion de funcion", TransitionMatrix::getLine()) }
-                | ID '.' ID '(' argumentos ')'  { Logger::infoMsg("Invocacion de metodo", TransitionMatrix::getLine()) }
+invocacion      : ID '(' argumentos ')' { Logger::infoMsg("Invocacion de funcion") }
+                | ID '.' ID '(' argumentos ')'  { Logger::infoMsg("Invocacion de metodo") }
                 ;
 
 argumentos      : expresion
+                | argumentos ';' expresion      { Logger::logError("Solo se permite un argumento en invocacion de funcion") }
                 |
                 ;
 
-seleccion       : IF '(' condicion ')' bloque_sentencias ELSE bloque_sentencias END_IF  { Logger::infoMsg("Sentencia IF completa", TransitionMatrix::getLine()) }
-                | IF '(' condicion ')' bloque_sentencias END_IF { Logger::infoMsg("Sentencia IF sin ELSE", TransitionMatrix::getLine()) }
+seleccion       : IF '(' condicion ')' bloque_sentencias ELSE bloque_sentencias END_IF  { Logger::infoMsg("Sentencia IF completa") }
+                | IF '(' condicion ')' bloque_sentencias END_IF { Logger::infoMsg("Sentencia IF sin ELSE") }
+                | IF '(' condicion ')' bloque_sentencias { Logger::logError("Falta sentencia END_IF") }
+                | IF '(' condicion ')' bloque_sentencias ELSE bloque_sentencias { Logger::logError("Falta sentencia END_IF") }
                 ;
 
-condicion       : expresion comparador expresion        { Logger::infoMsg("Condicion de control", TransitionMatrix::getLine()) }
+condicion       : expresion comparador expresion        { Logger::infoMsg("Condicion de control") }
+                | expresion comparador          { Logger::logError("Se esperaba expresion en lado derecho de comparacion") }
+                | comparador expresion          { Logger::logError("Se esperaba expresion en lado izquierdo de comparacion") }
+                | expresion                     { Logger::logError("Se esperaba un operador de comparacion") }
                 ;
 
 comparador      : '<'
@@ -171,25 +183,37 @@ bloque_sentencias       : sentencia
                         | '{' sentencias '}'
                         ;
 
-print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT", TransitionMatrix::getLine()) }
+print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT") }
+        | PRINT         { Logger::logError("Se esperaba cadena para imprimir") }
+        | STRING        { Logger::logError("Falta sentencia PRINT") }
         ;
 
-bucle_for       : FOR ID IN RANGE '(' constante ';' constante ';' constante ')' bloque_sentencias { Logger::infoMsg("Sentencia FOR", TransitionMatrix::getLine()) }
+bucle_for       : FOR ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias { Logger::infoMsg("Sentencia FOR") }
+                | ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia FOR") }
+                | FOR IN RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Se esperaba una variable") }
+                | FOR ID IN '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia RANGE") }
+                | FOR ID RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia IN") }
                 ;
 
-acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo", TransitionMatrix::getLine()) }
+argumento_bucle_for     : constante ';' constante ';' constante
+                        | constante ';' constante { Logger::logError("Sentencia FOR recibe 3 parametros, 2 encontrados") }
+                        | constante { Logger::logError("Sentencia FOR recibe 3 parametros, 1 encontrados") }
+                        |       { Logger::logError("Sentencia FOR recibe 3 parametros, ninguno encontrado") }
+                        ;
+
+acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo") }
                 ;
 
 expresion       : expresion '+' termino
                 | expresion '-' termino
-                | tipo '(' expresion ')' { Logger::logError("Conversion explicita no permitida", TransitionMatrix::getLine()) }
+                | tipo '(' expresion ')' { Logger::logError("Conversion explicita no permitida") }
                 | expresion '+' '(' expresion_parentesis ')'
                 | expresion '-' '(' expresion_parentesis ')'
                 | '(' expresion_parentesis ')'
                 | termino
                 ;
 
-expresion_parentesis    : '(' expresion_parentesis ')' { Logger::logError("Anidamiento de expresiones con parentesis no permitida", TransitionMatrix::getLine()) }
+expresion_parentesis    : '(' expresion_parentesis ')' { Logger::logError("Anidamiento de expresiones con parentesis no permitida") }
                         | termino '+' termino
                         | termino '-' termino
                         | termino
@@ -201,7 +225,7 @@ termino         : factor
                 ;
 
 factor          : ID
-                | '-' constante { SyntacticActions::addNegativeConstant($2) }
+                | '-' constante { SyntacticActions::addNegativeConstant($2); }
                 | constante
                 ;
 

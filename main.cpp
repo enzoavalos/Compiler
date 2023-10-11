@@ -64,9 +64,9 @@ int yylex() {
     Token *token = lexer->scanToken();
     string lex = token->getLexeme();
 
-    /*printf("Linea %d: token: %d\n",token->getLine(), token->getType());
+    printf("Linea %d: token: %d\n",token->getLine(), token->getType());
     if(lex != "")
-        printf("Lexema: %s\n", lex.c_str());*/
+        printf("Lexema: %s\n", lex.c_str());
 
     char *cstr = new char[lex.length() + 1];
     strcpy(cstr, lex.c_str());

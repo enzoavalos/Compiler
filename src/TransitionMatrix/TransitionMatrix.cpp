@@ -25,7 +25,7 @@ TransitionMatrix::TransitionMatrix()
     {
         for (int j = 0; j < UNKNOWN; j++)
         {
-            this->setTransition(i, j, FINAL, NULL);
+            this->setTransition(i, j, FINAL, &SA14);
         }
     }
 
@@ -113,7 +113,7 @@ TransitionMatrix::TransitionMatrix()
         this->setTransition(13, i, FINAL, &SA11);
         this->setTransition(14, i, FINAL, &SA11);
     }
-    this->setTransition(0, EXCLAMATION, 15, &SA02);
+    this->setTransition(0, EXCLAMATION, 15, &SA01);
     this->setTransition(15, EXCLAMATION, FINAL, &SA12);
 
     // LITERALES

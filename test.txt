@@ -2,6 +2,12 @@
     a = 4_s,
     b = 4_s,
     c = -4_s,
+
+    c = (a + 45_ui) - (c * d) ,
+
+    a = .7d+32 ,
+    b = 1.6D-1 ,
+    c = -1.D-45 ,
     
     clase.objeto = algo ,
     clase.objeto() ,
@@ -23,7 +29,7 @@
         RETURN ,
     } ,
 
-    IF ( int1 !! int2 ){
+    IF ( int1 >= int2 ){
         DOUBLE d1 ,
         d1 += int1 ,
     } ELSE
@@ -34,7 +40,9 @@
         SHORT aux ,
     END_IF ,
 
-    PRINT #hola mundo# ,
+    IF ( int1 <= int2 )
+        PRINT #hola mundo# ,
+    END_IF ,
 
     IMPL FOR clase : {
         VOID p (){

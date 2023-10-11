@@ -8,6 +8,8 @@ using namespace std;
 class TransitionMatrix;
 
 class SemanticActions {
+    private:
+        static size_t idMaxLength;
     public:
         static Token * initialize_token(TransitionMatrix* t, char& c);
         static Token * add_character(TransitionMatrix* t, char& c);
@@ -22,6 +24,9 @@ class SemanticActions {
         static Token * end_op(TransitionMatrix* t, char& c);
         static Token * end_complex_op(TransitionMatrix* t, char& c);
         static Token * end_symbol(TransitionMatrix* t, char& c);
+        static Token * lexicError(TransitionMatrix* t, char& c);
 };
+
+size_t SemanticActions::idMaxLength = 20;
 
 #endif //SEMANTIC_ACTIONS_H

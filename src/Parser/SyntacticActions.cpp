@@ -18,7 +18,7 @@ void SyntacticActions::check_division_by_zero(char* key){
                 throw std::invalid_argument("");
         }
         catch(const std::invalid_argument& e){
-            Logger::logError("division por cero", token->getLine());
+            Logger::logError("division por cero");
         }
 }
 
@@ -29,7 +29,7 @@ void SyntacticActions::checkLimitsDouble(char* key){
         double value = std::stod(token->getLexeme());
     }
     catch(const std::exception& e){
-        Logger::logError("constante de tipo DOUBLE fuera de rango", token->getLine());
+        Logger::logError("constante de tipo DOUBLE fuera de rango");
     }
 }
 
@@ -42,7 +42,7 @@ void SyntacticActions::checkLimitsShort(char* key){
             throw std::out_of_range("");
     }
     catch(const std::exception& e){
-        Logger::logError("constante de tipo SHORT fuera de rango", token->getLine());
+        Logger::logError("constante de tipo SHORT fuera de rango");
     }
 }
 
@@ -53,7 +53,7 @@ void SyntacticActions::checkLimitsUint(char* key){
         unsigned int value = std::stod(token->getLexeme());
     }
     catch(const std::exception& e){
-        Logger::logError("constante de tipo UINT fuera de rango", token->getLine());
+        Logger::logError("constante de tipo UINT fuera de rango");
     }
 }
 

@@ -22,7 +22,7 @@ Token * SemanticActions::end_string(TransitionMatrix *t, char &c)
 {
     t->setReadLast(false);
     if(c != '#'){
-        Logger::logError("cadena incompleta", t->getLine());
+        Logger::logError("cadena incompleta");
         return NULL;
     }
     string value = "\"" + t->getLexeme() + "\"";
@@ -40,6 +40,11 @@ Token *SemanticActions::end_id(TransitionMatrix *t, char &c)
 {
     t->setReadLast(true);
     string value = t->getLexeme();
+    if(value.length() > static_cast<int>(SemanticActions::idMaxLength)){
+        value.resize(SemanticActions::idMaxLength);
+        string warnMsg = "longitud de id excede los 20 caracteres, sera truncado a " + value;
+        Logger::logWarning(warnMsg);
+    }
     return new Token(ID, value, t->getLine());
 }
 
@@ -49,7 +54,7 @@ Token * SemanticActions::end_reserved(TransitionMatrix *t, char &c)
     string value = t->getLexeme();
     Token * token = t->getReservedWord(value);
     if(token == NULL){
-        Logger::logError("palabra reservada invalida", t->getLine());
+        Logger::logError("palabra reservada invalida");
     }
     return token;
 }
@@ -75,9 +80,9 @@ Token *SemanticActions::end_double(TransitionMatrix *t, char &c)
         double value = stod(number);
         return new Token(CTE_DOUBLE, number, t->getLine());
     } catch(const std::invalid_argument& e){
-        Logger::logError("argumento invalido para constante de tipo DOUBLE", t->getLine());
+        Logger::logError("argumento invalido para constante de tipo DOUBLE");
     } catch(const std::out_of_range& e){
-        Logger::logError("constante de tipo DOUBLE fuera de rango", t->getLine());
+        Logger::logError("constante de tipo DOUBLE fuera de rango");
     }
     return NULL;
 }
@@ -91,9 +96,9 @@ Token *SemanticActions::end_uint(TransitionMatrix *t, char &c)
         unsigned int value = stoul(number);
         return new Token(CTE_UINT, number, t->getLine());
     } catch(const std::invalid_argument& e){
-        Logger::logError("argumento invalido para constante de tipo UINT", t->getLine());
+        Logger::logError("argumento invalido para constante de tipo UINT");
     } catch(const std::out_of_range& e){
-        Logger::logError("constante de tipo UINT fuera de rango", t->getLine());
+        Logger::logError("constante de tipo UINT fuera de rango");
     }
     return NULL;
 }
@@ -110,9 +115,9 @@ Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
             throw std::out_of_range("");
         return new Token(CTE_SHORT, number, t->getLine());
     } catch(const std::invalid_argument& e){
-        Logger::logError("argumento invalido para constante de tipo SHORT", t->getLine());
+        Logger::logError("argumento invalido para constante de tipo SHORT");
     } catch(const std::out_of_range& e){
-        Logger::logError("constante de tipo SHORT fuera de rango", t->getLine());
+        Logger::logError("constante de tipo SHORT fuera de rango");
     }
     return NULL;
 }
@@ -198,4 +203,12 @@ Token * SemanticActions::end_symbol(TransitionMatrix *t, char &c) {
     default:
         return NULL;
     }
+}
+
+Token * SemanticActions::lexicError(TransitionMatrix *t, char &c) {
+    t->setReadLast(false);
+    string value = t->getLexeme() + c;
+    Logger::logError("No se ha podido reconocer " + value);
+
+    return NULL;
 }

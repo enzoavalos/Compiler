@@ -61,6 +61,7 @@ class TransitionMatrix {
         Token * (*SA11)(TransitionMatrix*, char &) = &SemanticActions::end_op; // Es operador simple
         Token * (*SA12)(TransitionMatrix*, char &) = &SemanticActions::end_complex_op; // Es operador compuesto
         Token * (*SA13)(TransitionMatrix*, char &) = &SemanticActions::end_symbol; // Es simbolo
+        Token * (*SA14)(TransitionMatrix*, char &) = &SemanticActions::lexicError; // Error lexico
 
         State getState(char) const;
         void setTransition(int, int, int, Token * (**sa)(TransitionMatrix * t, char & c));
