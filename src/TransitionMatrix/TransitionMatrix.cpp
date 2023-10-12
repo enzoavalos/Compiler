@@ -21,9 +21,9 @@ TransitionMatrix::TransitionMatrix()
     this->reserved_words.insert(pair<string,int>("RETURN",RETURN));
 
     // Se identifica el estado final con FINAL
-    for (int i = 0; i < STATES; i++)
+    for (int i = 0; i <= STATES; i++)
     {
-        for (int j = 0; j < UNKNOWN; j++)
+        for (int j = 0; j <= UNKNOWN; j++)
         {
             this->setTransition(i, j, FINAL, &SA14);
         }
@@ -41,7 +41,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(2, DIGIT, 2, &SA02);
     this->setTransition(2, LOWERCASE_d, 3, &SA02);
     this->setTransition(2, UPPERCASE_D, 3, &SA02);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == DIGIT || i == LOWERCASE_d || i == UPPERCASE_D)
             continue;
@@ -52,7 +52,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(3, MINUS, 4, &SA02);
     this->setTransition(4, DIGIT, 5, &SA02);
     this->setTransition(5, DIGIT, 5, &SA02);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == DIGIT)
             continue;
@@ -74,7 +74,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(9, LETTER, 9, &SA02);
     this->setTransition(9, DIGIT, 9, &SA02);
     this->setTransition(9, UNDERSCORE, 9, &SA02);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == LETTER || i == DIGIT || i == UNDERSCORE)
             continue;
@@ -85,7 +85,7 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(0, UPPER_LETTER, 10, &SA01);
     this->setTransition(10, UPPER_LETTER, 10, &SA02);
     this->setTransition(10, UNDERSCORE, 10, &SA02);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == UPPER_LETTER || i == UNDERSCORE)
             continue;
@@ -104,7 +104,7 @@ TransitionMatrix::TransitionMatrix()
 
     this->setTransition(0, GREATER_THAN, 14, &SA01);
     this->setTransition(14, EQUALEQUAL, FINAL, &SA12);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == EQUALEQUAL)
             continue;
@@ -116,13 +116,16 @@ TransitionMatrix::TransitionMatrix()
     this->setTransition(0, EXCLAMATION, 15, &SA01);
     this->setTransition(15, EXCLAMATION, FINAL, &SA12);
 
+
+
     // LITERALES
     this->setTransition(0, LITERAL, FINAL, &SA13);
     this->setTransition(0, MINUS, FINAL, &SA13);
+    this->setTransition(0, SLASH, FINAL, &SA13);
 
     // STRINGS
     this->setTransition(0, HASH, 16, &SA08);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == HASH || i == NEW_LINE)
             continue;
@@ -135,7 +138,7 @@ TransitionMatrix::TransitionMatrix()
     // COMENTARIOS
     this->setTransition(0, ASTERISK, 17, &SA01);
     this->setTransition(17, ASTERISK, 18, &SA08);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == ASTERISK)
             continue;
@@ -143,7 +146,7 @@ TransitionMatrix::TransitionMatrix()
     }
 
     this->setTransition(18, NEW_LINE, 0, &SA04);
-    for (int i = 0; i < UNKNOWN; i++)
+    for (int i = 0; i <= UNKNOWN; i++)
     {
         if (i == NEW_LINE)
             continue;
@@ -250,6 +253,9 @@ State TransitionMatrix::getState(char c) const
     case '*':
         state = ASTERISK;
         break;
+    case '/':
+        state = SLASH;  
+        break;
     case '\n':
         state = NEW_LINE;
         break;
@@ -293,7 +299,6 @@ State TransitionMatrix::getState(char c) const
                 break;
             }
         }
-        state = UNKNOWN; // invalid character
     }
     }
 
@@ -306,7 +311,6 @@ Token * TransitionMatrix::getTransition(char c, bool &reset) {
     State state = this->getState(c);
     int next = this->matrix[this->state][state];
     Token * (**sa)(TransitionMatrix *t, char &c) = this->matrix_sa[this->state][state];
-
     if (sa != NULL){
         Token * token = (*sa)(this, c);
         if (token != NULL){

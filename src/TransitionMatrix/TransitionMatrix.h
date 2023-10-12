@@ -38,8 +38,8 @@ enum State {
 class TransitionMatrix {
     private:
         const static int STATES = 19; //cantidad de estados
-        int matrix[STATES][UNKNOWN];
-        Token * (**matrix_sa[STATES][UNKNOWN])(TransitionMatrix * t, char & c);
+        int matrix[STATES + 1][UNKNOWN + 1];
+        Token * (**matrix_sa[STATES + 1][UNKNOWN + 1])(TransitionMatrix * t, char & c);
         int state = 0;
         string lexeme = "";
         map<string,int> reserved_words;

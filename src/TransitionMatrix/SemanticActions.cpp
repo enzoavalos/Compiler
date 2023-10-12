@@ -135,6 +135,8 @@ Token * SemanticActions::end_op(TransitionMatrix *t, char &c) {
         return new Token(TOKEN_PLUS, "", t->getLine());
     case '*':
         return new Token(TOKEN_MULTIPLY, "", t->getLine());
+    case '/':
+        return new Token(TOKEN_SLASH, "", t->getLine());
     case '-':
         return new Token(TOKEN_MINUS, "", t->getLine());
     case '=':
