@@ -1,0 +1,14 @@
+{
+    DOUBLE mi_variable ,
+    SHORT abcdefghijklmnoprstuvwxyz ,
+    
+    UINT my/variable ,
+
+    RETURN ,
+    return ,
+
+    * Comentario mal escrito
+
+    # hola
+    mundo #
+}

@@ -189,7 +189,7 @@ void TransitionMatrix::setTransition(int row, int column, int value, Token * (**
 
 State TransitionMatrix::getState(char c) const
 {
-    State state;
+    State state = UNKNOWN;
 
     switch (c)
     {
@@ -333,7 +333,6 @@ Token * TransitionMatrix::getTransition(char c, bool &reset) {
         this->state = 0;
         this->resetLexeme();
         this->deleteChar();
-
     } else
         this->state = next;
 

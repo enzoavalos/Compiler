@@ -12,14 +12,12 @@ class SyntacticActions {
     public:
         static int lastType;
         static void check_division_by_zero(char* key);
-        static void checkLimitsDouble(char* key);
-        static void checkLimitsShort(char* key);
-        static void checkLimitsUint(char* key);
         static void addNegativeConstant(char* key);
+        static bool checkLimits(string key);
     private:
         static Token * getSymbolToken(char* key);
 };
 
-int SyntacticActions::lastType = 0;
+int SyntacticActions::lastType = -1;
 
 #endif //SYNTACTIC_ACTIONS_H

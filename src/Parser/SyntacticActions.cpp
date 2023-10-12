@@ -22,45 +22,50 @@ void SyntacticActions::check_division_by_zero(char* key){
         }
 }
 
-void SyntacticActions::checkLimitsDouble(char* key){
-    Token * token = getSymbolToken(key);
-    try
-    {
-        double value = std::stod(token->getLexeme());
-    }
-    catch(const std::exception& e){
-        Logger::logError("constante de tipo DOUBLE fuera de rango");
-    }
-}
-
-void SyntacticActions::checkLimitsShort(char* key){
-    Token * token = getSymbolToken(key);
-    try
-    {
-        int value = std::stod(token->getLexeme());
-        if (value < -128 || value > 127)
-            throw std::out_of_range("");
-    }
-    catch(const std::exception& e){
-        Logger::logError("constante de tipo SHORT fuera de rango");
-    }
-}
-
-void SyntacticActions::checkLimitsUint(char* key){
-    Token * token = getSymbolToken(key);
-    try
-    {
-        unsigned int value = std::stod(token->getLexeme());
-    }
-    catch(const std::exception& e){
-        Logger::logError("constante de tipo UINT fuera de rango");
-    }
-}
-
 void SyntacticActions::addNegativeConstant(char* key){
     int line = Lexer::symbolTable->getSymbol(key)->getLine();
-    Lexer::symbolTable->deleteSymbol(key);
     string lex = "-";
-    lex.append(key);
-    Lexer::symbolTable->addSymbol(new Token(lastType, lex, line));
+    lex.append(Lexer::symbolTable->getSymbol(key)->getLexeme());
+    Lexer::symbolTable->deleteSymbol(key);
+    if(checkLimits(lex))
+        Lexer::symbolTable->addSymbol(new Token(lastType, lex, line));
+}
+
+bool SyntacticActions::checkLimits(string key){
+    string type = "";
+
+    try{
+        switch(SyntacticActions::lastType){
+        case CTE_SHORT: {
+            type = "SHORT";
+            key.resize(key.size() -2);
+            int value = std::stoi(key);
+            if (value < -128 || value > 127)
+                throw std::out_of_range("");
+            break;
+        }
+        case CTE_UINT: {
+            type = "UINT";
+            // Una variable de tipo UINT nunca puede ser negativa
+            throw std::out_of_range("");
+            break;
+        }
+        case CTE_DOUBLE: {
+            type = "DOUBLE";
+            int index = key.find('D');
+            if(index == string::npos)
+                index = key.find('d');
+            if(index != string::npos)
+                key = key.replace(index, 1, "e");
+            double value = stod(key);
+            break;
+        }
+    }
+    }catch(const std::exception& e){
+        string msg = "constante de tipo " + type + " fuera de rango";
+        Logger::logError(msg);
+        return false;
+    }
+
+    return true;
 }

@@ -50,6 +50,8 @@
         } ,
     } ,
 
+    **Este es un comentario
+
     INTERFACE z {
         VOID q () ,
     } ,

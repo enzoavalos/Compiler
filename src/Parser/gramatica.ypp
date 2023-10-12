@@ -142,6 +142,7 @@ asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion si
                 | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo") }
                 | ID asignador  { Logger::logError("Asignacion vacia") }
                 | ID '.' ID asignador    { Logger::logError("Asignacion vacia") }
+                | ID asignador '-'       { Logger::logError("Asignacion vacia") }
                 ;
 
 asignador       : '='
@@ -223,7 +224,7 @@ termino         : factor
                 ;
 
 factor          : ID
-                | '-' constante { SyntacticActions::addNegativeConstant($2); }
+                | '-' constante { SyntacticActions::addNegativeConstant($2) }
                 | constante
                 ;
 
