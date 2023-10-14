@@ -114,7 +114,7 @@ Token *SemanticActions::end_short(TransitionMatrix *t, char &c)
 
     try{
         int value = stoi(number);
-        if (value < -128 || value > 127)
+        if (value > 128)
             throw std::out_of_range("");
         return new Token(CTE_SHORT, t->getLexeme(), t->getLine());
     } catch(const std::invalid_argument& e){

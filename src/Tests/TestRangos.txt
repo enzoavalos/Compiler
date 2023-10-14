@@ -1,16 +1,23 @@
 {
+    ** Uso de variables de todos los tipos soportados con el primer y ultimo valor dentro dle rango
     a = 127_s ,
-    b = -127_s ,
-    c = -129_s ,
-    d = 130_s ,
-    
+    b = -128_s ,
+
     d = 1.7976931348623157D+308 ,
     e = -2.2250738585072014D-308 ,
-    f = 4.d+320 ,
-    g = -3.5d-320 ,
 
     j = 4294967295_ui ,
     k = 0_ui ,
+
+    ** Siguientes constantes se deben detectar como fuera de rango, e informar del error
+    ** Ademas, como no es posible reconocer la constante, la asignacion no tendra una expresion en su lado izquierdo
+    ** y esto se informara como un error de asignacion vacia
+    c = -129_s ,
+    d = 128_s ,
+    
+    f = 4.d+320 ,
+    g = -3.5d-320 ,
+
     l = -1_ui ,
     m = 4300000000_ui ,
 }

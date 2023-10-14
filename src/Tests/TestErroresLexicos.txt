@@ -1,5 +1,5 @@
 {
-    DOUBLE mi_variable ,
+    ** El identificador siguiente debe ser truncado para tener una longitud de 20 caracteres
     SHORT abcdefghijklmnoprstuvwxyz ,
     
     UINT my/variable ,

@@ -42,10 +42,9 @@ Token *Lexer::scanToken()
     while (token == NULL && !this->isAtEnd())
     {
         char c = advance();
-        if (c == '\0') {
-            token = new Token(0, "", this->current);
-            break;
-        }
+        if (c == '\0') 
+            return new Token(0, "", TransitionMatrix::getLine());
+        
         token = this->transitionMatrix.getTransition(c, reset);
 
         if (token != NULL)
