@@ -2,6 +2,7 @@
 // Declaraciones de código C si es necesario
 #include "SyntacticActions.h"
 #include "gramatica.tab.hpp"
+#include "../IntermediateCodeGenerator/IntermediateCodeGenerator.h"
 %}
 
 %token SHORT UINT DOUBLE VOID CLASS INTERFACE IMPLEMENT IMPL
@@ -52,15 +53,16 @@ ejecutable      : asignacion
                 | print
                 | bucle_for
                 | acceso_atributo
-                | retorno
+                | retorno       { SyntacticActions::checkReturnScope() }
                 ;
 
 declaracion_variables   : tipo lista_variables
-                        //| lista_variables       { Logger::logError("Falta especificar el tipo de las variables") }
+                        | error lista_variables       { Logger::logError("Falta especificar el tipo de las variables") }
                         ;
 
-lista_variables : lista_variables ';' ID
-                | ID
+lista_variables : lista_variables ';' ID        { IntermediateCodeGenerator::setVarScope($3) }
+                | ID                            { IntermediateCodeGenerator::setVarScope($1) }
+                | ID error ','    { Logger::logError("declaracion de variables invalida") }
                 ;
 
 clase_declaration       : CLASS ID '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase") }
@@ -73,7 +75,11 @@ interface_metodos       : interface_metodos interface_metodo_declaration
                         |
                         ;
 
-interface_metodo_declaration    : VOID ID '(' parametro ')' ',' { Logger::infoMsg("Declaracion de metodo de interfaz") }
+encabezado_funcion      : VOID ID       { IntermediateCodeGenerator::addScope($2); }
+                        ;
+
+interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { Logger::infoMsg("Declaracion de metodo de interfaz");
+                                                                                IntermediateCodeGenerator::onScopeFinished() }
                                 ;
 
 implement_declaration   : CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz") }
@@ -93,7 +99,8 @@ metodos_clase   : metodos_clase metodo_declaration
 metodo_declaration      : funcion_declaration ',' { Logger::infoMsg("Declaracion de metodo") }
                         ;
 
-funcion_declaration     : VOID ID '(' parametro ')' '{' sentencias_metodo '}' { Logger::infoMsg("Declaracion de funcion") }
+funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' { Logger::infoMsg("Declaracion de funcion");
+                                                                                                IntermediateCodeGenerator::onScopeFinished() }
                         |
                         ;
 
@@ -107,7 +114,8 @@ sentencias_metodo       : sentencias_metodo declaracion_variables ','
                         |
                         ;
 
-local_function_declaration      : VOID ID '(' parametro ')' '{' sentencias_funcion_local '}' { Logger::infoMsg("Declaracion de funcion local") }
+local_function_declaration      :  encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' { Logger::infoMsg("Declaracion de funcion local");
+                                                                                                                IntermediateCodeGenerator::onScopeFinished() }
                                 ;
 
 sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','
@@ -225,7 +233,7 @@ termino         : factor
 
 factor          : ID
                 | '-' constante { SyntacticActions::addNegativeConstant($2) }
-                | constante
+                | constante     { SyntacticActions::checkLimits($1) }
                 ;
 
 constante       : CTE_SHORT     { $$ = $1; SyntacticActions::lastType = CTE_SHORT; }

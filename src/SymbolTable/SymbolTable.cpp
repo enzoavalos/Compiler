@@ -39,3 +39,13 @@ void SymbolTable::deleteSymbol(string lexeme){
             this->symbols.erase(lexeme);
     }
 }
+
+void SymbolTable::setScope(string lexeme, string scope){
+    Token * token = this->getSymbol(lexeme);
+    if(token != NULL){
+        string varName = token->getLexeme();
+        varName += ":" + scope;
+        cout << "DENTRO SET SCOPE TABLA SIMBOLOS, nombre " << varName << endl;
+        token->setLexeme(varName);
+    }
+}

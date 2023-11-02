@@ -7,6 +7,7 @@
 #include "src/TransitionMatrix/TransitionMatrix.cpp"
 #include "src/TransitionMatrix/SemanticActions.cpp"
 #include "src/Token.cpp"
+#include "src/IntermediateCodeGenerator/IntermediateCodeGenerator.cpp"
 
 using namespace std;
 int yylex();
@@ -64,12 +65,12 @@ int yylex() {
     Token *token = lexer->scanToken();
     string lex = token->getLexeme();
 
-    printf("Linea %d: token: %d\n",token->getLine(), token->getType());
+    printf("Linea %d: token: %d\n",token->getLine(), token->getTokenType());
     if(lex != "")
         printf("Lexema: %s\n", lex.c_str());
 
     char *cstr = new char[lex.length() + 1];
     strcpy(cstr, lex.c_str());
     yylval.string = cstr;
-    return token->getType();
+    return token->getTokenType();
 }

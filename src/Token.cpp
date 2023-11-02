@@ -1,20 +1,22 @@
 #include "Token.h"
 
-Token::Token(int type, string lexeme, int line)
+Token::Token(int tokenType, string lexeme, int line)
 {
-    this->type = type;
+    this->tokenType = tokenType;
     this->lexeme = lexeme;
     this->line = line;
     this->references = 1;
+    this->type = "no-type";
+    this->type = "unused";
 }
 
 Token::~Token() {
     
 }
 
-int Token::getType()
+int Token::getTokenType()
 {
-    return this->type;
+    return this->tokenType;
 }
 
 string Token::getLexeme()
@@ -37,4 +39,8 @@ void Token::decreaseReferences(){
 
 int Token::getReferences() const{
     return this->references;
+}
+
+void Token::setLexeme(string newLexeme){
+    this->lexeme = newLexeme;
 }

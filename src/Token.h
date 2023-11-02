@@ -29,20 +29,29 @@ enum Type {
 class Token
 {
     private:
-        int type;
+        int tokenType;
         string lexeme;
         int line;
         int references;
+        
+        string use;
+        string type;
 
     public:
-        Token(int type, string lexeme, int line);
+        Token(int tokenType, string lexeme, int line);
         ~Token();
-        int getType();
+        int getTokenType();
         string getLexeme();
         int getLine();
         void increaseReferences();
         void decreaseReferences();
         int getReferences() const;
+        void setLexeme(string);
+        
+        void setType(string);
+        void setUse(string);
+        string getUse();
+        string getType();
 };
 
 #endif // TOKEN_H

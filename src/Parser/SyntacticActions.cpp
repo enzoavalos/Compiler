@@ -11,7 +11,7 @@ void SyntacticActions::check_division_by_zero(char* key){
         Token * token = getSymbolToken(key);
         try
         {
-            if(token->getType() == ID)
+            if(token->getTokenType() == ID)
                 return;
             double value = std::stod(token->getLexeme());
             if(value == 0.0)
@@ -46,8 +46,11 @@ bool SyntacticActions::checkLimits(string key){
         }
         case CTE_UINT: {
             type = "UINT";
-            // Una variable de tipo UINT nunca puede ser negativa
-            throw std::out_of_range("");
+            key.resize(key.size() -3);
+            // Chequea si la constante es negativa, un entero sin signo jamas puede ser negativo
+            if(key.rfind("-", 0) == 0)
+                throw std::out_of_range("");
+            unsigned int uivalue = stoul(key);
             break;
         }
         case CTE_DOUBLE: {
@@ -68,4 +71,9 @@ bool SyntacticActions::checkLimits(string key){
     }
 
     return true;
+}
+
+void SyntacticActions::checkReturnScope(){
+    if(IntermediateCodeGenerator::scope == IntermediateCodeGenerator::initialScope)
+        Logger::logError("Sentencia RETURN fuera del cuerpo de una funcion");
 }

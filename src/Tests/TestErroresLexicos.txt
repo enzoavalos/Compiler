@@ -2,10 +2,10 @@
     ** El identificador siguiente debe ser truncado para tener una longitud de 20 caracteres
     SHORT abcdefghijklmnoprstuvwxyz ,
     
-    UINT my/variable ,
-
     RETURN ,
     return ,
+
+    UINT my/variable ,
 
     * Comentario mal escrito
 

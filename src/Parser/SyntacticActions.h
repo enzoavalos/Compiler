@@ -5,6 +5,7 @@
 #include "../Lexer.h"
 #include "../Token.h"
 #include <iostream>
+#include "../IntermediateCodeGenerator/IntermediateCodeGenerator.h"
 
 using namespace std;
 
@@ -13,7 +14,9 @@ class SyntacticActions {
         static int lastType;
         static void check_division_by_zero(char* key);
         static void addNegativeConstant(char* key);
+        // REVISAR SI DEBE SER BOOL
         static bool checkLimits(string key);
+        static void checkReturnScope();
     private:
         static Token * getSymbolToken(char* key);
 };
