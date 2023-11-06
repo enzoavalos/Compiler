@@ -1,0 +1,46 @@
+#include "IntermediateCodeGenerator.h"
+#include "..\Logger.cpp"
+
+void IntermediateCodeGenerator::addScope(char* newScope){
+    string aux = newScope;
+    scope += ":" + aux;
+}
+
+void IntermediateCodeGenerator::onScopeFinished(){
+    size_t lastScope = scope.rfind(":");
+    if(lastScope != string::npos)
+        scope = scope.substr(0, lastScope);
+}
+
+void IntermediateCodeGenerator::setVarScope(char *key){
+    Logger::infoMsg("DENTRO SET SCOPE");
+    string lexeme = key;
+    Lexer::symbolTable->setScope(lexeme, scope);
+}
+
+void IntermediateCodeGenerator::addTerceto(Terceto terceto){
+    tercetos[tercetoCount] = terceto;
+    tercetoCount++;
+}
+
+void IntermediateCodeGenerator::addTerceto(string op, string op1, string op2){
+    Terceto terceto(op, op1, op2);
+    tercetos[tercetoCount] = terceto;
+    tercetoCount++;
+}
+
+void IntermediateCodeGenerator::completeTerceto(int tercetoNumber, string op){
+    tercetos[tercetoNumber].setOp(op);
+}
+
+void IntermediateCodeGenerator::removeTerceto(int tercetoNumber){
+    tercetos.erase(tercetoNumber);
+}
+
+void IntermediateCodeGenerator::addStack(int tercetoNumber){
+    pila.push(tercetoNumber);
+}
+
+void IntermediateCodeGenerator::removeStack(){
+    pila.pop();
+}

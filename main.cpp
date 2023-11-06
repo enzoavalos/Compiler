@@ -1,18 +1,32 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include "src/Parser/SyntacticActions.cpp"
 #include "src/Lexer.cpp"
 #include "src/SymbolTable/SymbolTable.cpp"
 #include "src/TransitionMatrix/TransitionMatrix.cpp"
 #include "src/TransitionMatrix/SemanticActions.cpp"
 #include "src/Token.cpp"
+#include "src/IntermediateCodeGenerator/IntermediateCodeGenerator.cpp"
 
 using namespace std;
 int yylex();
+void yyerror(const char *);
+#include "src/Parser/gramatica.tab.cpp"
 Lexer *lexer;
+
+#if YYDEBUG
+    extern int yydebug;
+#else
+    static int yydebug = 0;
+#endif
+
+SymbolTable table = SymbolTable();
+SymbolTable * Lexer::symbolTable = &table;
 
 int main(int argc, char* argv[])
 {
+    yydebug = 0;
 	if (argc < 2)
 	{
 		cout << "Ingrese un nombre de archivo" << endl;
@@ -36,19 +50,27 @@ int main(int argc, char* argv[])
     }
     src += '\0';
 
-    SymbolTable table = SymbolTable();
-    lexer = new Lexer(src, &table);
+    lexer = new Lexer(src);
+    yyparse();
 
-    lexer->run();
+    table.printTable();
+}
+
+void yyerror(const char * text)
+{
+    cout << text << endl;
 }
 
 int yylex() {
     Token *token = lexer->scanToken();
-
     string lex = token->getLexeme();
+
+    printf("Linea %d: token: %d\n",token->getLine(), token->getTokenType());
+    if(lex != "")
+        printf("Lexema: %s\n", lex.c_str());
 
     char *cstr = new char[lex.length() + 1];
     strcpy(cstr, lex.c_str());
-    // yylval = cstr; Define later
-    return token->getType();
+    yylval.string = cstr;
+    return token->getTokenType();
 }

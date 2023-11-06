@@ -1,7 +1,0 @@
-42942954_ui
-123_s
-_mivariable
-.funcion_suma
-algo+=5_s
-#string#
-funcion_suma

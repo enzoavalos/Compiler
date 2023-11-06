@@ -1,0 +1,14 @@
+{
+    ** El identificador siguiente debe ser truncado para tener una longitud de 20 caracteres
+    SHORT abcdefghijklmnoprstuvwxyz ,
+    
+    RETURN ,
+    return ,
+
+    UINT my/variable ,
+
+    * Comentario mal escrito
+
+    # hola
+    mundo #
+}

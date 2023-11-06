@@ -1,0 +1,88 @@
+{
+    a = 4_s,
+    b = 4_s,
+    c = -4_s,
+
+    c = (a + 45_ui) - (c * d) ,
+
+    a = .7d+32 ,
+    b = 1.6D-1 ,
+    c = -1.D-45 ,
+    
+    clase.objeto = algo ,
+    clase.objeto() ,
+    
+    q(-7_s),
+    q(a+b),
+
+    SHORT int1 ; int2 ,
+    int1 = 43_s / 0_s ,
+
+    VOID funcion ( DOUBLE arg ){
+        SHORT x ,
+        x = arg ,
+        RETURN ,
+    } ,
+
+    VOID funcion ( ){
+        SHORT y ,
+        RETURN ,
+    } ,
+
+    IF ( int1 >= int2 ){
+        DOUBLE d1 ,
+        d1 += int1 ,
+    } ELSE
+        d1 = int2 ,
+    END_IF ,
+
+    IF ( int1 !! int2 )
+        SHORT aux ,
+    END_IF ,
+
+    IF ( int1 <= int2 )
+        PRINT #hola mundo# ,
+    END_IF ,
+
+    IMPL FOR clase : {
+        VOID p (){
+            DOUBLE s ,
+        } ,
+    } ,
+
+    **Este es un comentario
+
+    INTERFACE z {
+        VOID q () ,
+    } ,
+
+    CLASS clase IMPLEMENT z {
+        VOID q (){
+            int1 = 45_s * 45.d+21 ,
+            IF (int1 == 14_ui)
+                RETURN ,
+            END_IF ,
+        } ,
+        ca ,
+    } ,
+
+    FOR i IN RANGE (2_s; 10_s; 1_s)
+        int1 += i ,
+    ,
+
+    FOR i IN RANGE (2_s; 10_s; 1_s){
+        int1 = i,
+        q(34_s),
+    } ,
+
+    CLASS clase {
+        SHORT a ,
+        VOID m() {
+            SHORT s ,
+            VOID funcion1(){
+                DOUBLE zz ,
+                zz = 45_s - zz ,
+            } ,
+        } ,
+    } ,
+}

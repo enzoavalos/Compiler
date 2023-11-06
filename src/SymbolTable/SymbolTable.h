@@ -14,6 +14,7 @@ class SymbolTable{
         Token * getSymbol(string) const;
         void printTable() const;
         void deleteSymbol(string);
+        void setScope(string, string);
 };
 
 #endif

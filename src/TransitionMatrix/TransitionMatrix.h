@@ -15,7 +15,7 @@ enum State {
     MINUS,
     SLASH,
     PLUS,
-    EQUAL,
+    EQUALEQUAL,
     LESS_THAN,
     GREATER_THAN,
     EXCLAMATION,
@@ -31,19 +31,19 @@ enum State {
     UPPERCASE_D,
     DIGIT,
     UNDERSCORE,
-    UNKNOWN,
+    UNKNOWN, // 24
     FINAL = -1,
 };
 
 class TransitionMatrix {
     private:
         const static int STATES = 19; //cantidad de estados
-        int matrix[STATES][UNKNOWN];
-        Token * (**matrix_sa[STATES][UNKNOWN])(TransitionMatrix * t, char & c);
-        int line = 1;
+        int matrix[STATES + 1][UNKNOWN + 1];
+        Token * (**matrix_sa[STATES + 1][UNKNOWN + 1])(TransitionMatrix * t, char & c);
         int state = 0;
         string lexeme = "";
-        map<string,Type> reserved_words;
+        map<string,int> reserved_words;
+        static int line;
         /*Variable usada para denotar cuando un token termina de leerse con un caracter inesperado, con lo que hay que tenerlo en cuenta
         para cuando se analice el proximo token*/
         bool read_last = false;
@@ -61,13 +61,15 @@ class TransitionMatrix {
         Token * (*SA11)(TransitionMatrix*, char &) = &SemanticActions::end_op; // Es operador simple
         Token * (*SA12)(TransitionMatrix*, char &) = &SemanticActions::end_complex_op; // Es operador compuesto
         Token * (*SA13)(TransitionMatrix*, char &) = &SemanticActions::end_symbol; // Es simbolo
+        Token * (*SA14)(TransitionMatrix*, char &) = &SemanticActions::lexicError; // Error lexico
 
         State getState(char) const;
         void setTransition(int, int, int, Token * (**sa)(TransitionMatrix * t, char & c));
-        int next(char c);
         void deleteChar();
 
     public:
+        static int getLine();
+
         TransitionMatrix();
         ~TransitionMatrix();
         void resetLexeme();
@@ -75,9 +77,9 @@ class TransitionMatrix {
         void setReadLast(bool);
         string getLexeme() const;
         Token * getTransition(char c, bool &reset);
-        void printMatrix() const;
-        int getLine() const;
         Token * getReservedWord(string) const;
 };
+
+int TransitionMatrix::line = 1;
 
 #endif
