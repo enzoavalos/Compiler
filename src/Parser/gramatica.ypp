@@ -8,18 +8,21 @@
 %token SHORT UINT DOUBLE VOID CLASS INTERFACE IMPLEMENT IMPL
 %token IF ELSE END_IF PRINT FOR IN RANGE RETURN
 
-%token LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL // Operadores de comparación
 
-%left '=' PLUS_EQUAL  // Asociatividad izquierda para asignación y asignación con adición
-%left '.'  // Asociatividad izquierda para acceso a atributos y métodos
+
+
 
 %union {
         int number = 0;
         char *string;
 }
 
+%token <string> LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL // Operadores de comparación
 %token <string> ID STRING CTE_SHORT CTE_UINT CTE_DOUBLE
-%type <string> factor constante
+%type <string> factor constante expresion asignador termino expresion_parentesis comparador condicion bloque_sentencias asignacion seleccion bloque_else bloque_if argumento_bucle_for
+
+%left '=' PLUS_EQUAL  // Asociatividad izquierda para asignación y asignación con adición
+%left '.'  // Asociatividad izquierda para acceso a atributos y métodos
 
 %start programa
 
@@ -146,15 +149,30 @@ lista_objetos           : lista_objetos ';' objeto
 objeto          : ID
                 ;
 
-asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple") }
-                | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo") }
+asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple"); IntermediateCodeGenerator::addTerceto($2, $1, $3) }
+                | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo");
+                char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
+                sprintf(aux, "%s.%s", $1, $3);
+                IntermediateCodeGenerator::addTerceto($4, aux, $5);
+                }
                 | ID asignador  { Logger::logError("Asignacion vacia") }
                 | ID '.' ID asignador    { Logger::logError("Asignacion vacia") }
                 | ID asignador '-'       { Logger::logError("Asignacion vacia") }
                 ;
 
-asignador       : '='
-                | PLUS_EQUAL
+asignador       : '=' { 
+                        char *aux = (char*) malloc(sizeof(char) * 2);
+                        aux[0] = '=';
+                        aux[1] = '\0';
+                        $$ = aux;
+                }
+                | PLUS_EQUAL { 
+                        char *aux = (char*) malloc(sizeof(char) * 3);
+                        aux[0] = '+';
+                        aux[1] = '=';
+                        aux[2] = '\0';
+                        $$ = aux;
+                 }
                 ;
 
 invocacion      : ID '(' argumentos ')' { Logger::infoMsg("Invocacion de funcion") }
@@ -166,43 +184,81 @@ argumentos      : expresion
                 |
                 ;
 
-seleccion       : IF '(' condicion ')' bloque_sentencias ELSE bloque_sentencias END_IF  { Logger::infoMsg("Sentencia IF completa") }
-                | IF '(' condicion ')' bloque_sentencias END_IF { Logger::infoMsg("Sentencia IF sin ELSE") }
-                | IF '(' condicion ')' bloque_sentencias { Logger::logError("Falta sentencia END_IF") }
-                | IF '(' condicion ')' bloque_sentencias ELSE bloque_sentencias { Logger::logError("Falta sentencia END_IF") }
+seleccion       : IF '(' condicion ')' bloque_if ELSE bloque_else END_IF  { Logger::infoMsg("Sentencia IF completa"); IntermediateCodeGenerator::ifElseExpression($3, $5, $7); }
+                | IF '(' condicion ')' bloque_if END_IF { Logger::infoMsg("Sentencia IF sin ELSE"); IntermediateCodeGenerator::ifExpression($3, $5); }
+                | IF '(' condicion ')' bloque_if { Logger::logError("Falta sentencia END_IF") }
+                | IF '(' condicion ')' bloque_if ELSE bloque_else { Logger::logError("Falta sentencia END_IF") }
                 ;
 
-condicion       : expresion comparador expresion        { Logger::infoMsg("Condicion de control") }
+bloque_if       : bloque_sentencias { IntermediateCodeGenerator::addTerceto("BI", "", ""); IntermediateCodeGenerator::addStack(IntermediateCodeGenerator::lastTerceto); $$ = IntermediateCodeGenerator::getLastTerceto() }
+
+bloque_else     : bloque_sentencias
+
+condicion       : expresion comparador expresion        { Logger::infoMsg("Condicion de control");  IntermediateCodeGenerator::addTerceto($2, $1, $3); IntermediateCodeGenerator::endCondition(); $$ = IntermediateCodeGenerator::getLastTerceto();}
                 | expresion comparador          { Logger::logError("Se esperaba expresion en lado derecho de comparacion") }
                 | comparador expresion          { Logger::logError("Se esperaba expresion en lado izquierdo de comparacion") }
                 | expresion                     { Logger::logError("Se esperaba un operador de comparacion") }
                 ;
 
-comparador      : '<'
-                | '>'
-                | LESS_EQUAL
-                | GREATER_EQUAL
-                | EQUAL
-                | NOT_EQUAL
+comparador      : '<' { 
+                        char *aux = (char*) malloc(sizeof(char) * 2);
+                        aux[0] = '<';
+                        aux[1] = '\0';
+                        $$ = aux;
+                }
+                | '>' {
+                        char *aux = (char*) malloc(sizeof(char) * 2);
+                        aux[0] = '>';
+                        aux[1] = '\0';
+                        $$ = aux;
+                }
+                | LESS_EQUAL {
+                        char *aux = (char*) malloc(sizeof(char) * 3);
+                        aux[0] = '<';
+                        aux[1] = '=';
+                        aux[2] = '\0';
+                        $$ = aux;
+                }
+                | GREATER_EQUAL {
+                        char *aux = (char*) malloc(sizeof(char) * 3);
+                        aux[0] = '>';
+                        aux[1] = '=';
+                        aux[2] = '\0';
+                        $$ = aux;
+                }
+                | EQUAL {
+                        char *aux = (char*) malloc(sizeof(char) * 3);
+                        aux[0] = '=';
+                        aux[1] = '=';
+                        aux[2] = '\0';
+                        $$ = aux;
+                }
+                | NOT_EQUAL {
+                        char *aux = (char*) malloc(sizeof(char) * 3);
+                        aux[0] = '!';
+                        aux[1] = '=';
+                        aux[2] = '\0';
+                        $$ = aux;
+                }
                 ;
         
-bloque_sentencias       : sentencia
-                        | '{' sentencias '}'
+bloque_sentencias       : sentencia { $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                        | '{' sentencias '}' { $$ = IntermediateCodeGenerator::getLastTerceto(); }
                         ;
 
-print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT") }
+print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT"); IntermediateCodeGenerator::addTerceto("PRINT", $2, ""); }
         | PRINT         { Logger::logError("Se esperaba cadena para imprimir") }
         | STRING        { Logger::logError("Falta sentencia PRINT") }
         ;
 
-bucle_for       : FOR ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias { Logger::infoMsg("Sentencia FOR") }
+bucle_for       : FOR ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias { Logger::infoMsg("Sentencia FOR"); IntermediateCodeGenerator::forBlock($2, $8) }
                 | ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia FOR") }
                 | FOR IN RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Se esperaba una variable") }
                 | FOR ID IN '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia RANGE") }
                 | FOR ID RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia IN") }
                 ;
 
-argumento_bucle_for     : constante ';' constante ';' constante
+argumento_bucle_for     : constante ';' constante ';' constante { IntermediateCodeGenerator::forArguments($1, $3, $5) }
                         | constante ';' constante { Logger::logError("Sentencia FOR recibe 3 parametros, 2 encontrados") }
                         | constante { Logger::logError("Sentencia FOR recibe 3 parametros, 1 encontrados") }
                         |       { Logger::logError("Sentencia FOR recibe 3 parametros, ninguno encontrado") }
@@ -211,14 +267,16 @@ argumento_bucle_for     : constante ';' constante ';' constante
 acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo") }
                 ;
 
-expresion       : expresion '+' termino
-                | expresion '-' termino
+expresion       : expresion '+' termino { IntermediateCodeGenerator::addTerceto("+", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                | expresion '-' termino { IntermediateCodeGenerator::addTerceto("-", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
                 | tipo '(' expresion ')' { Logger::logError("Conversion explicita no permitida") }
-                | expresion '+' '(' expresion_parentesis ')'
-                | expresion '-' '(' expresion_parentesis ')'
-                | '(' expresion_parentesis ')'
-                | termino
+                | expresion '+' '(' expresion_parentesis ')' { IntermediateCodeGenerator::addTerceto("+", $1, $4); $$ = IntermediateCodeGenerator::getLastTerceto();}
+                | expresion '-' '(' expresion_parentesis ')' { IntermediateCodeGenerator::addTerceto("-", $1, $4); $$ = IntermediateCodeGenerator::getLastTerceto();}
+                | '(' expresion_parentesis ')' { $$ = $2; }
+                | termino { $$ = $1; }
                 ;
+
+
 
 expresion_parentesis    : '(' expresion_parentesis ')' { Logger::logError("Anidamiento de expresiones con parentesis no permitida") }
                         | termino '+' termino
@@ -226,14 +284,14 @@ expresion_parentesis    : '(' expresion_parentesis ')' { Logger::logError("Anida
                         | termino
                         ;
 
-termino         : factor
-                | termino '*' factor
-                | termino '/' factor { SyntacticActions::check_division_by_zero($3) }
+termino         : factor { $$ = $1; }
+                | termino '*' factor { IntermediateCodeGenerator::addTerceto("*", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                | termino '/' factor { SyntacticActions::check_division_by_zero($3); IntermediateCodeGenerator::addTerceto("/", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
                 ;
 
-factor          : ID
+factor          : ID { $$ = $1; }
                 | '-' constante { SyntacticActions::addNegativeConstant($2) }
-                | constante     { SyntacticActions::checkLimits($1) }
+                | constante     { SyntacticActions::checkLimits($1); $$ = $1; }
                 ;
 
 constante       : CTE_SHORT     { $$ = $1; SyntacticActions::lastType = CTE_SHORT; }

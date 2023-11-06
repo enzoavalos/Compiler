@@ -7,6 +7,7 @@
 #include "src/TransitionMatrix/TransitionMatrix.cpp"
 #include "src/TransitionMatrix/SemanticActions.cpp"
 #include "src/Token.cpp"
+#include "src/IntermediateCodeGenerator/Terceto.cpp"
 #include "src/IntermediateCodeGenerator/IntermediateCodeGenerator.cpp"
 
 using namespace std;
@@ -54,6 +55,8 @@ int main(int argc, char* argv[])
     yyparse();
 
     table.printTable();
+
+    IntermediateCodeGenerator::printTercetos();
 }
 
 void yyerror(const char * text)
