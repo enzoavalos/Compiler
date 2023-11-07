@@ -14,11 +14,11 @@ class IntermediateCodeGenerator{
         static string scope;
         static int lastTerceto;
         const static string initialScope;
+        const static int stackEmpty;
 
         static void addScope(char*);
-        static void onScopeFinished();
+        static void onScopeFinished(char*);
         static void setVarScope(char*);
-
 
         static void addTerceto(Terceto);
         static void addTerceto(string, string, string);
@@ -31,30 +31,36 @@ class IntermediateCodeGenerator{
         static void assignTerceto(char*, char*, char*);
         static void modifyLastTercetoOperator(char*);
 
+        static void printTercetos();
+        static char* getLastTerceto();
+
+        // Sentencias de control
+        static void endCondition();
         static void ifElseExpression(char*, char*, char*);
         static void ifExpression(char*, char*);
 
         static void forArguments(char*, char*, char*);
         static void forBlock(char*, char*);
 
-        static void endCondition();
-
-
-        static void printTercetos();
-
-        static char* getLastTerceto();
+        static void returnStatement();
     
     private:
         static map<int, Terceto> tercetos;
+        // Pila usada para backpatching de tercetos de sentencias de control
         static stack<int> pila;
-
+        // Pila usada para backpatching de tercetos de sentencias de retorno
+        static stack<int> returnStack;
         static int tercetoCount;
+
+        static void finishReturnStatement(char*);
 };
 
 string IntermediateCodeGenerator::scope = "main";
 const string IntermediateCodeGenerator::initialScope = "main";
+const int IntermediateCodeGenerator::stackEmpty = -1;
 int IntermediateCodeGenerator::lastTerceto = -1;
 map<int, Terceto> IntermediateCodeGenerator::tercetos = map<int, Terceto>();
 stack<int> IntermediateCodeGenerator::pila = stack<int>();
+stack<int> IntermediateCodeGenerator::returnStack = stack<int>();
 
 #endif

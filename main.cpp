@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <cstring>
 #include "src/Parser/SyntacticActions.cpp"
 #include "src/Lexer.cpp"
 #include "src/SymbolTable/SymbolTable.cpp"
@@ -55,7 +56,6 @@ int main(int argc, char* argv[])
     yyparse();
 
     table.printTable();
-
     IntermediateCodeGenerator::printTercetos();
 }
 
@@ -68,9 +68,9 @@ int yylex() {
     Token *token = lexer->scanToken();
     string lex = token->getLexeme();
 
-    printf("Linea %d: token: %d\n",token->getLine(), token->getTokenType());
+    /*printf("Linea %d: token: %d\n",token->getLine(), token->getTokenType());
     if(lex != "")
-        printf("Lexema: %s\n", lex.c_str());
+        printf("Lexema: %s\n", lex.c_str());*/
 
     char *cstr = new char[lex.length() + 1];
     strcpy(cstr, lex.c_str());

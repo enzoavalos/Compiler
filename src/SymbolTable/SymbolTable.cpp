@@ -27,7 +27,8 @@ Token * SymbolTable::getSymbol(string lexeme) const{
 void SymbolTable::printTable() const{
     cout << "\nTabla de simbolos\n";
     for(auto& pair: this->symbols)
-        cout << pair.first << " referencias: " << pair.second->getReferences() << endl;
+        cout << pair.second->getLexeme() << " - referencias: " << pair.second->getReferences()
+        << " - tipo: " << pair.second->getType() << " - uso: " << pair.second->getUse() << endl;
 }
 
 void SymbolTable::deleteSymbol(string lexeme){
@@ -45,7 +46,6 @@ void SymbolTable::setScope(string lexeme, string scope){
     if(token != NULL){
         string varName = token->getLexeme();
         varName += ":" + scope;
-        cout << "DENTRO SET SCOPE TABLA SIMBOLOS, nombre " << varName << endl;
         token->setLexeme(varName);
     }
 }

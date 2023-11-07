@@ -7,8 +7,10 @@ void IntermediateCodeGenerator::addScope(char *newScope)
     scope += ":" + aux;
 }
 
-void IntermediateCodeGenerator::onScopeFinished()
+void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
 {
+    finishReturnStatement(end);
+    
     size_t lastScope = scope.rfind(":");
     if (lastScope != string::npos)
         scope = scope.substr(0, lastScope);
@@ -16,7 +18,6 @@ void IntermediateCodeGenerator::onScopeFinished()
 
 void IntermediateCodeGenerator::setVarScope(char *key)
 {
-    Logger::infoMsg("DENTRO SET SCOPE");
     string lexeme = key;
     Lexer::symbolTable->setScope(lexeme, scope);
 }
@@ -24,6 +25,7 @@ void IntermediateCodeGenerator::setVarScope(char *key)
 void IntermediateCodeGenerator::addTerceto(Terceto terceto)
 {
     lastTerceto++;
+    terceto.setLine(TransitionMatrix::getLine());
     tercetos[lastTerceto] = terceto;
 }
 
@@ -31,6 +33,7 @@ void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string opera
 {
     Terceto terceto = Terceto(operatorTercerto, operand1, operand2);
     lastTerceto++;
+    terceto.setLine(TransitionMatrix::getLine());
     tercetos[lastTerceto] = terceto;
 }
 
@@ -51,6 +54,8 @@ void IntermediateCodeGenerator::addStack(int tercetoNumber)
 
 int IntermediateCodeGenerator::removeStack()
 {
+    if(pila.empty())
+        return stackEmpty;
     int value = pila.top();
     pila.pop();
     return value;
@@ -72,10 +77,12 @@ void IntermediateCodeGenerator::modifyLastTercetoOperator(char *op)
 
 void IntermediateCodeGenerator::printTercetos()
 {
+    cout << endl;
     map<int, Terceto>::iterator it;
     for (it = tercetos.begin(); it != tercetos.end(); it++)
     {
-        cout << it->first << ": " << it->second.getOp() << " " << it->second.getOp1() << " " << it->second.getOp2() << endl;
+        cout << "Linea " << it->second.getLine() << " => " << it->first << ": " << it->second.getOp() << " " << it->second.getOp1() <<
+            " " << it->second.getOp2() << endl;
     }
 }
 
@@ -103,8 +110,13 @@ void IntermediateCodeGenerator::ifElseExpression(char *cond, char *first, char *
 
 void IntermediateCodeGenerator::ifExpression(char *cond, char *first)
 {
-    cout << "ifExpression" << endl;
-    cout << "first: " << first << endl;
+    int firstInt = atoi(first);
+    // Unconditional bifurcation not needed, thus its removed
+    int aux = removeStack();
+    removeTerceto(aux);
+
+    int tercetoNumber = removeStack();
+    tercetos[tercetoNumber].setOp2(to_string(firstInt + 1));
 }
 
 void IntermediateCodeGenerator::endCondition()
@@ -124,25 +136,25 @@ void IntermediateCodeGenerator::forArguments(char *inic, char *end, char *inc)
     addTerceto("=", "", inicString);
     addStack(lastTerceto);
 
+    // Primero se chequea la condicion y despues se actualiza la variable
+    addTerceto("<", "", endString);
+    addStack(lastTerceto);
+
     addTerceto("+", "", incString);
     addStack(lastTerceto);
 
-    addTerceto("<=", "", endString);
-    addStack(lastTerceto);
-
-    addTerceto("BF", to_string(lastTerceto), "");
+    addTerceto("BF", to_string(lastTerceto -1), "-");
     addStack(lastTerceto);
 }
 
 void IntermediateCodeGenerator::forBlock(char *id, char *block)
 {
-
     int tercetoNumber = pila.top();
     int blockInt = atoi(block);
     pila.pop();
 
     // Seteo el terceto de BF con el numero del terceto posterior al bloque
-    tercetos[tercetoNumber].setOp2(to_string(blockInt + 1));
+    tercetos[tercetoNumber].setOp2(to_string(blockInt + 2));
 
     string idString = id;
     // Asigno el identificador a los tercetos de asignacion, suma y comparacion
@@ -158,4 +170,27 @@ void IntermediateCodeGenerator::forBlock(char *id, char *block)
     // Asignacion inicial
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
+}
+
+void IntermediateCodeGenerator::returnStatement(){
+    string ret = "RETURN:" + scope;
+    addTerceto(ret, "", "-");
+    returnStack.push(lastTerceto);
+}
+
+void IntermediateCodeGenerator::finishReturnStatement(char *end){
+    if(end != nullptr){
+        bool done = false;
+        while(!returnStack.empty() && !done){
+            int tercetoNumber = returnStack.top();
+            size_t found = tercetos[tercetoNumber].getOp().find(scope);
+            if(found != string::npos){
+                returnStack.pop();
+                int functionEnd = atoi(end);
+                tercetos[tercetoNumber].setOp1(to_string(functionEnd +1));
+                tercetos[tercetoNumber].setOp("RETURN");
+            }else
+                done = true;
+        }
+    }
 }

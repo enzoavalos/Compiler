@@ -18,7 +18,11 @@ class Terceto{
         void setOp2(string op2);
 
         static void completarTerceto(int numeroTerceto); // Completar terceto incompleto, backpatching
+
+        void setLine(int);
+        int getLine();
     private:
+        int line = 1;
         string op;
         string op1; // Operador 1, puede ser otro terceto
         string op2;

@@ -8,10 +8,6 @@
 %token SHORT UINT DOUBLE VOID CLASS INTERFACE IMPLEMENT IMPL
 %token IF ELSE END_IF PRINT FOR IN RANGE RETURN
 
-
-
-
-
 %union {
         int number = 0;
         char *string;
@@ -19,7 +15,8 @@
 
 %token <string> LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL // Operadores de comparación
 %token <string> ID STRING CTE_SHORT CTE_UINT CTE_DOUBLE
-%type <string> factor constante expresion asignador termino expresion_parentesis comparador condicion bloque_sentencias asignacion seleccion bloque_else bloque_if argumento_bucle_for
+%type <string> factor constante expresion asignador termino expresion_parentesis comparador condicion bloque_sentencias asignacion seleccion
+%type <string> bloque_else bloque_if argumento_bucle_for acceso_atributo encabezado_funcion sentencias_metodo sentencias_funcion_local
 
 %left '=' PLUS_EQUAL  // Asociatividad izquierda para asignación y asignación con adición
 %left '.'  // Asociatividad izquierda para acceso a atributos y métodos
@@ -56,36 +53,45 @@ ejecutable      : asignacion
                 | print
                 | bucle_for
                 | acceso_atributo
-                | retorno       { SyntacticActions::checkReturnScope() }
+                | retorno       { if(SyntacticActions::checkReturnScope()) IntermediateCodeGenerator::returnStatement(); }
                 ;
 
 declaracion_variables   : tipo lista_variables
                         | error lista_variables       { Logger::logError("Falta especificar el tipo de las variables") }
                         ;
 
-lista_variables : lista_variables ';' ID        { IntermediateCodeGenerator::setVarScope($3) }
-                | ID                            { IntermediateCodeGenerator::setVarScope($1) }
+lista_variables : lista_variables ';' ID        { IntermediateCodeGenerator::setVarScope($3);
+                                                SyntacticActions::setIdType($3);
+                                                SyntacticActions::setIdUse($3, "variable");}
+                | ID                            { IntermediateCodeGenerator::setVarScope($1);
+                                                SyntacticActions::setIdType($1);
+                                                SyntacticActions::setIdUse($1, "variable"); }
                 | ID error ','    { Logger::logError("declaracion de variables invalida") }
                 ;
 
-clase_declaration       : CLASS ID '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase") }
+clase_declaration       : CLASS ID '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
+                                                                                        SyntacticActions::setIdUse($2, "nombre-clase"); }
                         ;
 
-interface_declaration   : INTERFACE ID '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz") }
+interface_declaration   : INTERFACE ID '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz");
+                                                                SyntacticActions::setIdUse($2, "nombre-interfaz"); }
                         ;
 
 interface_metodos       : interface_metodos interface_metodo_declaration
                         |
                         ;
 
-encabezado_funcion      : VOID ID       { IntermediateCodeGenerator::addScope($2); }
+encabezado_funcion      : VOID ID       { IntermediateCodeGenerator::addScope($2);
+                                        $$ = $2;
+                                        SyntacticActions::setIdUse($2, "nombre-funcion");}
                         ;
 
 interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { Logger::infoMsg("Declaracion de metodo de interfaz");
                                                                                 IntermediateCodeGenerator::onScopeFinished() }
                                 ;
 
-implement_declaration   : CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz") }
+implement_declaration   : CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz");
+                                                                                                SyntacticActions::setIdUse($2, "nombre-clase"); }
                         ;
 
 atributos               : atributos atributo_declaration
@@ -103,31 +109,33 @@ metodo_declaration      : funcion_declaration ',' { Logger::infoMsg("Declaracion
                         ;
 
 funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' { Logger::infoMsg("Declaracion de funcion");
-                                                                                                IntermediateCodeGenerator::onScopeFinished() }
+                                                                                        IntermediateCodeGenerator::onScopeFinished($6); }
                         |
                         ;
 
-herencia_composicion    : herencia_composicion ID ','   { Logger::infoMsg("Herencia por composicion") }
+herencia_composicion    : herencia_composicion ID ','   { Logger::infoMsg("Herencia por composicion"); }
                         |
                         ;
 
-sentencias_metodo       : sentencias_metodo declaracion_variables ','
-                        | sentencias_metodo ejecutable ','
-                        | sentencias_metodo local_function_declaration ','
-                        |
+sentencias_metodo       : sentencias_metodo declaracion_variables ','   { $$ = IntermediateCodeGenerator::getLastTerceto() }
+                        | sentencias_metodo ejecutable ','              { $$ = IntermediateCodeGenerator::getLastTerceto() }
+                        | sentencias_metodo local_function_declaration ','      { $$ = IntermediateCodeGenerator::getLastTerceto() }
+                        |                                               { $$ = IntermediateCodeGenerator::getLastTerceto() }
                         ;
 
 local_function_declaration      :  encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' { Logger::infoMsg("Declaracion de funcion local");
-                                                                                                                IntermediateCodeGenerator::onScopeFinished() }
+                                                                                                                IntermediateCodeGenerator::onScopeFinished($6) }
                                 ;
 
-sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','
-                                | sentencias_funcion_local ejecutable ','
-                                | sentencias_funcion_local local_function_declaration ',' { Logger::logError("No se permite anidamiento multiple de funciones locales") }
-                                |
+sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','    { $$ = IntermediateCodeGenerator::getLastTerceto() }
+                                | sentencias_funcion_local ejecutable ','               { $$ = IntermediateCodeGenerator::getLastTerceto() }
+                                | sentencias_funcion_local local_function_declaration ',' { Logger::logError("No se permite anidamiento multiple de funciones locales");
+                                                                                                $$ = IntermediateCodeGenerator::getLastTerceto() }
+                                |                                                       { $$ = IntermediateCodeGenerator::getLastTerceto() }
                                 ;
 
-parametro       : tipo ID
+parametro       : tipo ID       { SyntacticActions::setIdType($2);
+                                SyntacticActions::setIdUse($2, "parametro"); }
                 | ID                    { Logger::logError("Falta el tipo del argumento") }
                 | parametro ';' tipo ID { Logger::logError("Solo se permite un parametro en declaracion de funcion") }
                 |
@@ -139,17 +147,19 @@ distributed_method_implementation       : IMPL FOR ID ':' '{' metodos_clase '}' 
 retorno                 : RETURN
                         ;
 
-objeto_declaration      : ID lista_objetos
+objeto_declaration      : ID lista_objetos      { SyntacticActions::lastType = $1 }
                         ;
 
 lista_objetos           : lista_objetos ';' objeto
                         | objeto
                         ;
 
-objeto          : ID
+objeto          : ID    { SyntacticActions::setIdType($1);
+                        SyntacticActions::setIdUse($1, "variable-objeto"); }
                 ;
 
-asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple"); IntermediateCodeGenerator::addTerceto($2, $1, $3) }
+asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple");
+                                                IntermediateCodeGenerator::addTerceto($2, $1, $3) }
                 | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo");
                 char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
                 sprintf(aux, "%s.%s", $1, $3);
@@ -175,8 +185,12 @@ asignador       : '=' {
                  }
                 ;
 
-invocacion      : ID '(' argumentos ')' { Logger::infoMsg("Invocacion de funcion") }
-                | ID '.' ID '(' argumentos ')'  { Logger::infoMsg("Invocacion de metodo") }
+invocacion      : ID '(' argumentos ')' { Logger::infoMsg("Invocacion de funcion"); IntermediateCodeGenerator::addTerceto("INVOKE", $1, "-"); }
+                | ID '.' ID '(' argumentos ')'  { Logger::infoMsg("Invocacion de metodo");
+                        char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
+                        sprintf(aux, "%s.%s", $1, $3);
+                        IntermediateCodeGenerator::addTerceto("INVOKE", aux, "-");
+                        }
                 ;
 
 argumentos      : expresion
@@ -190,7 +204,7 @@ seleccion       : IF '(' condicion ')' bloque_if ELSE bloque_else END_IF  { Logg
                 | IF '(' condicion ')' bloque_if ELSE bloque_else { Logger::logError("Falta sentencia END_IF") }
                 ;
 
-bloque_if       : bloque_sentencias { IntermediateCodeGenerator::addTerceto("BI", "", ""); IntermediateCodeGenerator::addStack(IntermediateCodeGenerator::lastTerceto); $$ = IntermediateCodeGenerator::getLastTerceto() }
+bloque_if       : bloque_sentencias { IntermediateCodeGenerator::addTerceto("BI", "", "-"); IntermediateCodeGenerator::addStack(IntermediateCodeGenerator::lastTerceto); $$ = IntermediateCodeGenerator::getLastTerceto() }
 
 bloque_else     : bloque_sentencias
 
@@ -246,16 +260,25 @@ bloque_sentencias       : sentencia { $$ = IntermediateCodeGenerator::getLastTer
                         | '{' sentencias '}' { $$ = IntermediateCodeGenerator::getLastTerceto(); }
                         ;
 
-print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT"); IntermediateCodeGenerator::addTerceto("PRINT", $2, ""); }
+print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT");
+                        IntermediateCodeGenerator::addTerceto("PRINT", $2, "-"); }
         | PRINT         { Logger::logError("Se esperaba cadena para imprimir") }
         | STRING        { Logger::logError("Falta sentencia PRINT") }
         ;
 
-bucle_for       : FOR ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias { Logger::infoMsg("Sentencia FOR"); IntermediateCodeGenerator::forBlock($2, $8) }
-                | ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia FOR") }
+bucle_for       : FOR ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias { Logger::infoMsg("Sentencia FOR");
+                                                                                IntermediateCodeGenerator::forBlock($2, $8);
+                                                                                SyntacticActions::setIdUse($2, "variable"); }
+                | ID IN RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia FOR");
+                                                                                IntermediateCodeGenerator::forBlock($1, $7);
+                                                                                SyntacticActions::setIdUse($1, "variable"); }
                 | FOR IN RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Se esperaba una variable") }
-                | FOR ID IN '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia RANGE") }
-                | FOR ID RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia IN") }
+                | FOR ID IN '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia RANGE");
+                                                                                IntermediateCodeGenerator::forBlock($2, $7);
+                                                                                SyntacticActions::setIdUse($2, "variable"); }
+                | FOR ID RANGE '(' argumento_bucle_for ')' bloque_sentencias    { Logger::logError("Falta sentencia IN");
+                                                                                IntermediateCodeGenerator::forBlock($2, $7);
+                                                                                SyntacticActions::setIdUse($2, "variable"); }
                 ;
 
 argumento_bucle_for     : constante ';' constante ';' constante { IntermediateCodeGenerator::forArguments($1, $3, $5) }
@@ -264,7 +287,10 @@ argumento_bucle_for     : constante ';' constante ';' constante { IntermediateCo
                         |       { Logger::logError("Sentencia FOR recibe 3 parametros, ninguno encontrado") }
                         ;
 
-acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo") }
+acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo");
+                                char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
+                                sprintf(aux, "%s.%s", $1, $3);
+                                $$ = aux; }
                 ;
 
 expresion       : expresion '+' termino { IntermediateCodeGenerator::addTerceto("+", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
@@ -290,16 +316,19 @@ termino         : factor { $$ = $1; }
                 ;
 
 factor          : ID { $$ = $1; }
-                | '-' constante { SyntacticActions::addNegativeConstant($2) }
+                | '-' constante { SyntacticActions::addNegativeConstant($2);
+                                char *aux = (char*) malloc(sizeof($2) + 2);
+                                sprintf(aux, "-%s", $2);
+                                $$ = aux; }
                 | constante     { SyntacticActions::checkLimits($1); $$ = $1; }
                 ;
 
-constante       : CTE_SHORT     { $$ = $1; SyntacticActions::lastType = CTE_SHORT; }
-                | CTE_DOUBLE    { $$ = $1; SyntacticActions::lastType = CTE_DOUBLE; }
-                | CTE_UINT      { $$ = $1; SyntacticActions::lastType = CTE_UINT; }
+constante       : CTE_SHORT     { SyntacticActions::lastType = "short"; }
+                | CTE_DOUBLE    { SyntacticActions::lastType = "double"; }
+                | CTE_UINT      { SyntacticActions::lastType = "uint"; }
                 ;
 
-tipo    : SHORT
-        | UINT
-        | DOUBLE
+tipo    : SHORT         { SyntacticActions::lastType = "short"; }
+        | UINT          { SyntacticActions::lastType = "uint"; }
+        | DOUBLE        { SyntacticActions::lastType = "double"; }
         ;

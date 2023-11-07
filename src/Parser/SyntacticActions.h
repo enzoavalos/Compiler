@@ -11,16 +11,17 @@ using namespace std;
 
 class SyntacticActions {
     public:
-        static int lastType;
+        static string lastType;
         static void check_division_by_zero(char* key);
         static void addNegativeConstant(char* key);
-        // REVISAR SI DEBE SER BOOL
         static bool checkLimits(string key);
-        static void checkReturnScope();
+        static bool checkReturnScope();
+        static void setIdType(char*, char*);
+        static void setIdUse(char*, string);
     private:
         static Token * getSymbolToken(char* key);
 };
 
-int SyntacticActions::lastType = -1;
+string SyntacticActions::lastType = "no-type";
 
 #endif //SYNTACTIC_ACTIONS_H
