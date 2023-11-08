@@ -10,7 +10,7 @@ class SymbolTable{
     public:
         SymbolTable();
         ~SymbolTable();
-        void addSymbol(Token *);
+        void addSymbol(Token *, string);
         Token * getSymbol(string) const;
         void printTable() const;
         void deleteSymbol(string);

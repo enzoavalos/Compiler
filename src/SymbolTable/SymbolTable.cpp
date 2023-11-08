@@ -6,14 +6,14 @@ SymbolTable::SymbolTable(){
 SymbolTable::~SymbolTable(){
 }
 
-void SymbolTable::addSymbol(Token * token){
-    Token * _token = this->getSymbol(token->getLexeme());
+void SymbolTable::addSymbol(Token * token, string lexeme){
+    Token * _token = this->getSymbol(lexeme);
     if(_token != NULL){
         _token->increaseReferences();
         return;
     }
 
-    this->symbols.insert(pair<string,Token*>(token->getLexeme(),token));
+    this->symbols.insert(pair<string,Token*>(lexeme, token));
 }
 
 Token * SymbolTable::getSymbol(string lexeme) const{
@@ -27,7 +27,7 @@ Token * SymbolTable::getSymbol(string lexeme) const{
 void SymbolTable::printTable() const{
     cout << "\nTabla de simbolos\n";
     for(auto& pair: this->symbols)
-        cout << pair.second->getLexeme() << " - referencias: " << pair.second->getReferences()
+        cout << pair.first << " - referencias: " << pair.second->getReferences()
         << " - tipo: " << pair.second->getType() << " - uso: " << pair.second->getUse() << endl;
 }
 
@@ -43,9 +43,13 @@ void SymbolTable::deleteSymbol(string lexeme){
 
 void SymbolTable::setScope(string lexeme, string scope){
     Token * token = this->getSymbol(lexeme);
+
     if(token != NULL){
-        string varName = token->getLexeme();
-        varName += ":" + scope;
-        token->setLexeme(varName);
+        string lexeme = token->getLexeme();
+        string varName = lexeme + ":" + scope;
+        Token * _token = token->copy();
+        this->addSymbol(_token, varName);
+
+        this->deleteSymbol(lexeme);
     }
 }

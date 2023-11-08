@@ -1,0 +1,16 @@
+{
+    SHORT int1 ,
+
+    VOID q (DOUBLE x){
+        RETURN ,
+    } ,
+    
+    FOR i IN RANGE (2_s; 10_s; 1_s)
+        int1 += i ,
+    ,
+
+    FOR i IN RANGE (2_s; 10_s; 1_s){
+        int1 = i,
+        q(34_s),
+    } ,
+}

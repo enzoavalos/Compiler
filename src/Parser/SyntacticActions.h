@@ -18,8 +18,12 @@ class SyntacticActions {
         static bool checkReturnScope();
         static void setIdType(char*, char*);
         static void setIdUse(char*, string);
+        static bool checkDeclaredVar(char*, bool);
+        static bool checkDeclaredMethod(char*, bool);
+        static bool checkDeclaredClass(char*);
     private:
         static Token * getSymbolToken(char* key);
+        static Token * getSymbolToken(string key);
 };
 
 string SyntacticActions::lastType = "no-type";

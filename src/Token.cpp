@@ -14,6 +14,11 @@ Token::~Token() {
     
 }
 
+Token* Token::copy(){
+    Token* newToken = new Token(tokenType, lexeme, line);
+    return newToken;
+}
+
 int Token::getTokenType()
 {
     return this->tokenType;

@@ -7,6 +7,10 @@ Token * SyntacticActions::getSymbolToken(char* key){
     return Lexer::symbolTable->getSymbol(aux);
 }
 
+Token * SyntacticActions::getSymbolToken(string key){
+    return Lexer::symbolTable->getSymbol(key);
+}
+
 void SyntacticActions::check_division_by_zero(char* key){
         Token * token = getSymbolToken(key);
         try
@@ -41,7 +45,7 @@ void SyntacticActions::addNegativeConstant(char* key){
 
         Token* token = new Token(aux, lex, line);
         token->setType(type);
-        Lexer::symbolTable->addSymbol(token);
+        Lexer::symbolTable->addSymbol(token, lex);
     }
 }
 
@@ -85,6 +89,7 @@ bool SyntacticActions::checkLimits(string key){
 
 bool SyntacticActions::checkReturnScope(){
     if(IntermediateCodeGenerator::scope == IntermediateCodeGenerator::initialScope){
+        cout << IntermediateCodeGenerator::scope << " - " << IntermediateCodeGenerator::initialScope << endl;
         Logger::logError("Sentencia RETURN fuera del cuerpo de una funcion");
         return false;
     }
@@ -92,7 +97,10 @@ bool SyntacticActions::checkReturnScope(){
 }
 
 void SyntacticActions::setIdType(char* id, char* type = nullptr){
-    Token * token = getSymbolToken(id);
+    string lexeme = id;
+    lexeme += ":" + IntermediateCodeGenerator::scope;
+    Token * token = getSymbolToken(lexeme);
+
     if(token == NULL)
         return;
 
@@ -115,6 +123,61 @@ void SyntacticActions::setIdType(char* id, char* type = nullptr){
 }
 
 void SyntacticActions::setIdUse(char* key, string use){
-    Token* token = getSymbolToken(key);
-    token->setUse(use);
+    string lexeme = key;
+    lexeme += ":" + IntermediateCodeGenerator::scope;
+    Token * token = getSymbolToken(lexeme);
+
+    if(token != NULL)
+        token->setUse(use);
+}
+
+// TODO 2 Buscar en ambitos superiores en caso de no encontrarla en el ambito actual
+bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
+    string lexeme = key;
+    string errorMsg = "Variable " + lexeme + " no declarada";
+
+    string scope = IntermediateCodeGenerator::scope;
+    size_t lastScope = scope.rfind(":");
+    if (lastScope != string::npos)
+        scope = scope.substr(0, lastScope);
+    lexeme += ":" + IntermediateCodeGenerator::scope;
+    Token * token = getSymbolToken(lexeme);
+
+    if(token == NULL){
+        if(showMsg)
+            Logger::logError(errorMsg);
+        return false;
+    }
+
+    return true;
+}
+
+bool SyntacticActions::checkDeclaredMethod(char* key, bool showMsg = true){
+    string lexeme = key;
+    string errorMsg = "Funcion " + lexeme + " no declarada";
+    lexeme += ":" + IntermediateCodeGenerator::scope;
+    Token * token = getSymbolToken(lexeme);
+
+    if(token == NULL){
+        if(showMsg)
+            Logger::logError(errorMsg);
+        return false;
+    }
+
+    return true;
+}
+
+bool SyntacticActions::checkDeclaredClass(char* key){
+    string lexeme = key;
+    string errorMsg = "Tipo " + lexeme + " no declarado";
+    // Clases e interfaces solo pueden ser declaradas en un ambito global
+    lexeme += ":" + IntermediateCodeGenerator::initialScope;
+    Token * token = getSymbolToken(lexeme);
+
+    if(token == NULL || (token->getUse() != "nombre-clase" && token->getUse() != "nombre-interfaz")){
+        Logger::logError(errorMsg);
+        return false;
+    }
+
+    return true;
 }

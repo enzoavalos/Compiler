@@ -40,6 +40,8 @@ class Token
     public:
         Token(int tokenType, string lexeme, int line);
         ~Token();
+        Token* copy();
+
         int getTokenType();
         string getLexeme();
         int getLine();
