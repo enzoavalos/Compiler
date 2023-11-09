@@ -87,8 +87,9 @@ encabezado_clase        : CLASS ID      {
                                         if (SyntacticActions::checkDeclaredClass($2, false)) {
                                                 string aux = $2;
                                                 Logger::logError("Redeclaracion de clase " + aux);
+                                                IntermediateCodeGenerator::isInvalidScope = true;
                                                 char* remove = (char*) malloc(sizeof(char) * 7);
-                                                remove[0] = 'b'; remove[1] = 'o'; remove[2] = 'r'; remove[3] = 'r'; remove[4] = 'a'; remove[5] = 'r'; remove[6] = '\0';
+                                                remove[0] = 'r'; remove[1] = 'e'; remove[2] = 'm'; remove[3] = 'o'; remove[4] = 'v'; remove[5] = 'e'; remove[6] = '\0';
                                                 IntermediateCodeGenerator::addScope(remove);
                                         } else {
                                                 IntermediateCodeGenerator::setVarScope($2);

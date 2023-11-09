@@ -3,7 +3,8 @@
 
 void IntermediateCodeGenerator::addScope(char *newScope)
 {
-    IntermediateCodeGenerator::lastValidTerceto = IntermediateCodeGenerator::lastTerceto;
+    if (!IntermediateCodeGenerator::isInvalidScope)
+        IntermediateCodeGenerator::lastValidTerceto = IntermediateCodeGenerator::lastTerceto;
     string aux = newScope;
     scope += ":" + aux;
 }
@@ -19,12 +20,14 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
 
     // Solucion dudosa pero anda
     // No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
-    if (lastScopeString == "borrar") {
+    if (IntermediateCodeGenerator::isInvalidScope && lastScopeString == "remove") {
+        cout << "Invalid scope: " << lastScopeString << endl;
         // Borro todas las variables del scope
         string *symbols = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
 
-        for (int i = 0; i < Lexer::symbolTable->getSymbolsSize(); i++) {
+        for (int i = 0; i <= Lexer::symbolTable->getSymbolsSize(); i++) {
             if (symbols[i] != "") {
+                cout << "Deleted symbol: " << symbols[i] << endl;
                 Lexer::symbolTable->deleteSymbol(symbols[i]);
             }
         }
@@ -33,6 +36,8 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
         for (int i = lastValidTerceto + 1; i <= lastTerceto; i++) {
             removeTerceto(i);
         }
+
+        IntermediateCodeGenerator::isInvalidScope = false;
 
     }
 }
