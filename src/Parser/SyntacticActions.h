@@ -20,10 +20,12 @@ class SyntacticActions {
         static void setIdUse(char*, string);
         static bool checkDeclaredVar(char*, bool);
         static bool checkDeclaredMethod(char*, bool);
-        static bool checkDeclaredClass(char*);
+        static bool checkDeclaredClass(char*, bool);
+        static bool checkDeclaredClassMember(char*, char*);
     private:
         static Token * getSymbolToken(char* key);
         static Token * getSymbolToken(string key);
+        static bool findId(string key);
 };
 
 string SyntacticActions::lastType = "no-type";

@@ -89,7 +89,6 @@ bool SyntacticActions::checkLimits(string key){
 
 bool SyntacticActions::checkReturnScope(){
     if(IntermediateCodeGenerator::scope == IntermediateCodeGenerator::initialScope){
-        cout << IntermediateCodeGenerator::scope << " - " << IntermediateCodeGenerator::initialScope << endl;
         Logger::logError("Sentencia RETURN fuera del cuerpo de una funcion");
         return false;
     }
@@ -131,34 +130,46 @@ void SyntacticActions::setIdUse(char* key, string use){
         token->setUse(use);
 }
 
-// TODO 2 Buscar en ambitos superiores en caso de no encontrarla en el ambito actual
+// TODO 2 Se debe permitir declaracion de variables de = nombre pero en distinto ambito
 bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Variable " + lexeme + " no declarada";
 
-    string scope = IntermediateCodeGenerator::scope;
-    size_t lastScope = scope.rfind(":");
-    if (lastScope != string::npos)
-        scope = scope.substr(0, lastScope);
-    lexeme += ":" + IntermediateCodeGenerator::scope;
-    Token * token = getSymbolToken(lexeme);
-
-    if(token == NULL){
+    if(!findId(lexeme)){
         if(showMsg)
             Logger::logError(errorMsg);
         return false;
     }
 
     return true;
+}
+
+bool SyntacticActions::findId(string id){
+    string lexeme = id;
+    string scope = IntermediateCodeGenerator::scope;
+    Token* token = NULL;
+    bool end = false;
+
+    do{
+        lexeme = id;
+        lexeme += ":" + scope;
+        token = getSymbolToken(lexeme);
+
+        end = (scope == IntermediateCodeGenerator::initialScope);
+        size_t lastScope = scope.rfind(":");
+        if (lastScope != string::npos)
+            scope = scope.substr(0, lastScope);
+        
+    }while(token == NULL && !end);
+
+    return (token != NULL);
 }
 
 bool SyntacticActions::checkDeclaredMethod(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Funcion " + lexeme + " no declarada";
-    lexeme += ":" + IntermediateCodeGenerator::scope;
-    Token * token = getSymbolToken(lexeme);
 
-    if(token == NULL){
+    if(!findId(lexeme)){
         if(showMsg)
             Logger::logError(errorMsg);
         return false;
@@ -167,7 +178,7 @@ bool SyntacticActions::checkDeclaredMethod(char* key, bool showMsg = true){
     return true;
 }
 
-bool SyntacticActions::checkDeclaredClass(char* key){
+bool SyntacticActions::checkDeclaredClass(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Tipo " + lexeme + " no declarado";
     // Clases e interfaces solo pueden ser declaradas en un ambito global
@@ -175,6 +186,20 @@ bool SyntacticActions::checkDeclaredClass(char* key){
     Token * token = getSymbolToken(lexeme);
 
     if(token == NULL || (token->getUse() != "nombre-clase" && token->getUse() != "nombre-interfaz")){
+        if(showMsg)
+            Logger::logError(errorMsg);
+        return false;
+    }
+
+    return true;
+}
+
+bool SyntacticActions::checkDeclaredClassMember(char* key, char* _class){
+    string lexeme = key;
+    string className = _class;
+    string errorMsg = "Miembro " + lexeme + " de clase " + className +" no declarado";
+
+    if(!findId(lexeme)){
         Logger::logError(errorMsg);
         return false;
     }

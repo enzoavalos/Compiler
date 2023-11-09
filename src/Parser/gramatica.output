@@ -35,200 +35,206 @@ Gramática
    25                | ID
    26                | ID error ','
 
-   27 clase_declaration: CLASS ID '{' atributos metodos_clase herencia_composicion '}'
+   27 encabezado_clase: CLASS ID
 
-   28 interface_declaration: INTERFACE ID '{' interface_metodos '}'
+   28 clase_declaration: encabezado_clase '{' atributos metodos_clase herencia_composicion '}'
 
-   29 interface_metodos: interface_metodos interface_metodo_declaration
-   30                  | /* vacío */
+   29 encabezado_interfaz: INTERFACE ID
 
-   31 encabezado_funcion: VOID ID
+   30 interface_declaration: encabezado_interfaz '{' interface_metodos '}'
 
-   32 interface_metodo_declaration: encabezado_funcion '(' parametro ')' ','
+   31 interface_metodos: interface_metodos interface_metodo_declaration
+   32                  | /* vacío */
 
-   33 implement_declaration: CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}'
+   33 encabezado_funcion: VOID ID
 
-   34 atributos: atributos atributo_declaration
-   35          | /* vacío */
+   34 interface_metodo_declaration: encabezado_funcion '(' parametro ')' ','
 
-   36 atributo_declaration: declaracion_variables ','
+   35 encabezado_implement: CLASS ID IMPLEMENT ID
 
-   37 metodos_clase: metodos_clase metodo_declaration
-   38              | /* vacío */
+   36 implement_declaration: encabezado_implement '{' metodos_clase herencia_composicion '}'
 
-   39 metodo_declaration: funcion_declaration ','
+   37 atributos: atributos atributo_declaration
+   38          | /* vacío */
 
-   40 funcion_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}'
-   41                    | /* vacío */
+   39 atributo_declaration: declaracion_variables ','
 
-   42 herencia_composicion: herencia_composicion ID ','
-   43                     | /* vacío */
+   40 metodos_clase: metodos_clase metodo_declaration
+   41              | /* vacío */
 
-   44 sentencias_metodo: sentencias_metodo declaracion_variables ','
-   45                  | sentencias_metodo ejecutable ','
-   46                  | sentencias_metodo local_function_declaration ','
-   47                  | /* vacío */
+   42 metodo_declaration: funcion_declaration ','
 
-   48 local_function_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}'
+   43 funcion_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}'
+   44                    | /* vacío */
 
-   49 sentencias_funcion_local: sentencias_funcion_local declaracion_variables ','
-   50                         | sentencias_funcion_local ejecutable ','
-   51                         | sentencias_funcion_local local_function_declaration ','
-   52                         | /* vacío */
+   45 herencia_composicion: herencia_composicion ID ','
+   46                     | /* vacío */
 
-   53 parametro: tipo ID
-   54          | ID
-   55          | parametro ';' tipo ID
-   56          | /* vacío */
+   47 sentencias_metodo: sentencias_metodo declaracion_variables ','
+   48                  | sentencias_metodo ejecutable ','
+   49                  | sentencias_metodo local_function_declaration ','
+   50                  | /* vacío */
 
-   57 distributed_method_implementation: IMPL FOR ID ':' '{' metodos_clase '}'
+   51 local_function_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}'
 
-   58 retorno: RETURN
+   52 sentencias_funcion_local: sentencias_funcion_local declaracion_variables ','
+   53                         | sentencias_funcion_local ejecutable ','
+   54                         | sentencias_funcion_local local_function_declaration ','
+   55                         | /* vacío */
 
-   59 objeto_declaration: ID lista_objetos
+   56 parametro: tipo ID
+   57          | ID
+   58          | parametro ';' tipo ID
+   59          | /* vacío */
 
-   60 lista_objetos: lista_objetos ';' objeto
-   61              | objeto
+   60 distributed_method_implementation: IMPL FOR ID ':' '{' metodos_clase '}'
 
-   62 objeto: ID
+   61 retorno: RETURN
 
-   63 asignacion: ID asignador expresion
-   64           | ID '.' ID asignador expresion
-   65           | ID asignador
-   66           | ID '.' ID asignador
-   67           | ID asignador '-'
+   62 objeto_declaration: ID lista_objetos
 
-   68 asignador: '='
-   69          | PLUS_EQUAL
+   63 lista_objetos: lista_objetos ';' objeto
+   64              | objeto
 
-   70 invocacion: ID '(' argumentos ')'
-   71           | ID '.' ID '(' argumentos ')'
+   65 objeto: ID
 
-   72 argumentos: expresion
-   73           | argumentos ';' expresion
-   74           | /* vacío */
+   66 asignacion: ID asignador expresion
+   67           | ID '.' ID asignador expresion
+   68           | ID asignador
+   69           | ID '.' ID asignador
+   70           | ID asignador '-'
 
-   75 seleccion: IF '(' condicion ')' bloque_if ELSE bloque_else END_IF
-   76          | IF '(' condicion ')' bloque_if END_IF
-   77          | IF '(' condicion ')' bloque_if
-   78          | IF '(' condicion ')' bloque_if ELSE bloque_else
+   71 asignador: '='
+   72          | PLUS_EQUAL
 
-   79 bloque_if: bloque_sentencias
+   73 invocacion: ID '(' argumentos ')'
+   74           | ID '.' ID '(' argumentos ')'
 
-   80 bloque_else: bloque_sentencias
+   75 argumentos: expresion
+   76           | argumentos ';' expresion
+   77           | /* vacío */
 
-   81 condicion: expresion comparador expresion
-   82          | expresion comparador
-   83          | comparador expresion
-   84          | expresion
+   78 seleccion: IF '(' condicion ')' bloque_if ELSE bloque_else END_IF
+   79          | IF '(' condicion ')' bloque_if END_IF
+   80          | IF '(' condicion ')' bloque_if
+   81          | IF '(' condicion ')' bloque_if ELSE bloque_else
 
-   85 comparador: '<'
-   86           | '>'
-   87           | LESS_EQUAL
-   88           | GREATER_EQUAL
-   89           | EQUAL
-   90           | NOT_EQUAL
+   82 bloque_if: bloque_sentencias
 
-   91 bloque_sentencias: sentencia
-   92                  | '{' sentencias '}'
+   83 bloque_else: bloque_sentencias
 
-   93 print: PRINT STRING
-   94      | PRINT
-   95      | STRING
+   84 condicion: expresion comparador expresion
+   85          | expresion comparador
+   86          | comparador expresion
+   87          | expresion
 
-   96 bucle_for: encabezado_for '(' argumento_bucle_for ')' bloque_sentencias
-   97          | encabezado_for '(' argumento_bucle_for bloque_sentencias
-   98          | encabezado_for argumento_bucle_for ')' bloque_sentencias
+   88 comparador: '<'
+   89           | '>'
+   90           | LESS_EQUAL
+   91           | GREATER_EQUAL
+   92           | EQUAL
+   93           | NOT_EQUAL
 
-   99 encabezado_for: FOR ID IN RANGE
-  100               | ID IN RANGE
-  101               | FOR IN RANGE
-  102               | FOR ID IN
-  103               | FOR ID RANGE
+   94 bloque_sentencias: sentencia
+   95                  | '{' sentencias '}'
 
-  104 argumento_bucle_for: constante ';' constante ';' constante
-  105                    | constante ';' constante
-  106                    | constante
-  107                    | /* vacío */
+   96 print: PRINT STRING
+   97      | PRINT
+   98      | STRING
 
-  108 acceso_atributo: ID '.' ID
+   99 bucle_for: encabezado_for '(' argumento_bucle_for ')' bloque_sentencias
+  100          | encabezado_for '(' argumento_bucle_for bloque_sentencias
+  101          | encabezado_for argumento_bucle_for ')' bloque_sentencias
 
-  109 expresion: expresion '+' termino
-  110          | expresion '-' termino
-  111          | tipo '(' expresion ')'
-  112          | expresion '+' '(' expresion_parentesis ')'
-  113          | expresion '-' '(' expresion_parentesis ')'
-  114          | '(' expresion_parentesis ')'
-  115          | termino
+  102 encabezado_for: FOR ID IN RANGE
+  103               | ID IN RANGE
+  104               | FOR IN RANGE
+  105               | FOR ID IN
+  106               | FOR ID RANGE
 
-  116 expresion_parentesis: '(' expresion_parentesis ')'
-  117                     | termino '+' termino
-  118                     | termino '-' termino
-  119                     | termino
+  107 argumento_bucle_for: constante ';' constante ';' constante
+  108                    | constante ';' constante
+  109                    | constante
+  110                    | /* vacío */
 
-  120 termino: factor
-  121        | termino '*' factor
-  122        | termino '/' factor
+  111 acceso_atributo: ID '.' ID
 
-  123 factor: ID
-  124       | '-' constante
-  125       | constante
+  112 expresion: expresion '+' termino
+  113          | expresion '-' termino
+  114          | tipo '(' expresion ')'
+  115          | expresion '+' '(' expresion_parentesis ')'
+  116          | expresion '-' '(' expresion_parentesis ')'
+  117          | '(' expresion_parentesis ')'
+  118          | termino
 
-  126 constante: CTE_SHORT
-  127          | CTE_DOUBLE
-  128          | CTE_UINT
+  119 expresion_parentesis: '(' expresion_parentesis ')'
+  120                     | termino '+' termino
+  121                     | termino '-' termino
+  122                     | termino
 
-  129 tipo: SHORT
-  130     | UINT
-  131     | DOUBLE
+  123 termino: factor
+  124        | termino '*' factor
+  125        | termino '/' factor
+
+  126 factor: ID
+  127       | '-' constante
+  128       | constante
+
+  129 constante: CTE_SHORT
+  130          | CTE_DOUBLE
+  131          | CTE_UINT
+
+  132 tipo: SHORT
+  133     | UINT
+  134     | DOUBLE
 
 
 Terminales con las reglas donde aparecen
 
 $end (0) 0
-'(' (40) 32 40 48 70 71 75 76 77 78 96 97 111 112 113 114 116
-')' (41) 32 40 48 70 71 75 76 77 78 96 98 111 112 113 114 116
-'*' (42) 121
-'+' (43) 109 112 117
-',' (44) 6 7 26 32 36 39 42 44 45 46 49 50 51
-'-' (45) 67 110 113 118 124
-'.' (46) 64 66 71 108
-'/' (47) 122
-':' (58) 57
-';' (59) 24 55 60 73 104 105
-'<' (60) 85
-'=' (61) 68
-'>' (62) 86
-'{' (123) 1 2 27 28 33 40 48 57 92
-'}' (125) 1 3 27 28 33 40 48 57 92
+'(' (40) 34 43 51 73 74 78 79 80 81 99 100 114 115 116 117 119
+')' (41) 34 43 51 73 74 78 79 80 81 99 101 114 115 116 117 119
+'*' (42) 124
+'+' (43) 112 115 120
+',' (44) 6 7 26 34 39 42 45 47 48 49 52 53 54
+'-' (45) 70 113 116 121 127
+'.' (46) 67 69 74 111
+'/' (47) 125
+':' (58) 60
+';' (59) 24 58 63 76 107 108
+'<' (60) 88
+'=' (61) 71
+'>' (62) 89
+'{' (123) 1 2 28 30 36 43 51 60 95
+'}' (125) 1 3 28 30 36 43 51 60 95
 error (256) 23 26
-SHORT (258) 129
-UINT (259) 130
-DOUBLE (260) 131
-VOID (261) 31
-CLASS (262) 27 33
-INTERFACE (263) 28
-IMPLEMENT (264) 33
-IMPL (265) 57
-IF (266) 75 76 77 78
-ELSE (267) 75 78
-END_IF (268) 75 76
-PRINT (269) 93 94
-FOR (270) 57 99 101 102 103
-IN (271) 99 100 101 102
-RANGE (272) 99 100 101 103
-RETURN (273) 58
-LESS_EQUAL (274) 87
-GREATER_EQUAL (275) 88
-EQUAL (276) 89
-NOT_EQUAL (277) 90
-PLUS_EQUAL (278) 69
-ID (279) 24 25 26 27 28 31 33 42 53 54 55 57 59 62 63 64 65 66 67 70
-    71 99 100 102 103 108 123
-STRING (280) 93 95
-CTE_SHORT (281) 126
-CTE_UINT (282) 128
-CTE_DOUBLE (283) 127
+SHORT (258) 132
+UINT (259) 133
+DOUBLE (260) 134
+VOID (261) 33
+CLASS (262) 27 35
+INTERFACE (263) 29
+IMPLEMENT (264) 35
+IMPL (265) 60
+IF (266) 78 79 80 81
+ELSE (267) 78 81
+END_IF (268) 78 79
+PRINT (269) 96 97
+FOR (270) 60 102 104 105 106
+IN (271) 102 103 104 105
+RANGE (272) 102 103 104 106
+RETURN (273) 61
+LESS_EQUAL (274) 90
+GREATER_EQUAL (275) 91
+EQUAL (276) 92
+NOT_EQUAL (277) 93
+PLUS_EQUAL (278) 72
+ID (279) 24 25 26 27 29 33 35 45 56 57 58 60 62 65 66 67 68 69 70 73
+    74 102 103 105 106 111 126
+STRING (280) 96 98
+CTE_SHORT (281) 129
+CTE_UINT (282) 131
+CTE_DOUBLE (283) 130
 
 
 No terminales con las reglas donde aparecen
@@ -238,103 +244,109 @@ $accept (44)
 programa (45)
     en la izquierda: 1 2 3, en la derecha: 0
 sentencias (46)
-    en la izquierda: 4 5, en la derecha: 1 2 3 5 92
+    en la izquierda: 4 5, en la derecha: 1 2 3 5 95
 sentencia (47)
-    en la izquierda: 6 7, en la derecha: 4 5 91
+    en la izquierda: 6 7, en la derecha: 4 5 94
 declarativa (48)
     en la izquierda: 8 9 10 11 12 13 14, en la derecha: 6
 ejecutable (49)
-    en la izquierda: 15 16 17 18 19 20 21, en la derecha: 7 45 50
+    en la izquierda: 15 16 17 18 19 20 21, en la derecha: 7 48 53
 declaracion_variables (50)
-    en la izquierda: 22 23, en la derecha: 8 36 44 49
+    en la izquierda: 22 23, en la derecha: 8 39 47 52
 lista_variables (51)
     en la izquierda: 24 25 26, en la derecha: 22 23 24
-clase_declaration (52)
-    en la izquierda: 27, en la derecha: 9
-interface_declaration (53)
-    en la izquierda: 28, en la derecha: 11
-interface_metodos (54)
-    en la izquierda: 29 30, en la derecha: 28 29
-encabezado_funcion (55)
-    en la izquierda: 31, en la derecha: 32 40 48
-interface_metodo_declaration (56)
-    en la izquierda: 32, en la derecha: 29
-implement_declaration (57)
-    en la izquierda: 33, en la derecha: 12
-atributos (58)
-    en la izquierda: 34 35, en la derecha: 27 34
-atributo_declaration (59)
-    en la izquierda: 36, en la derecha: 34
-metodos_clase (60)
-    en la izquierda: 37 38, en la derecha: 27 33 37 57
-metodo_declaration (61)
+encabezado_clase (52)
+    en la izquierda: 27, en la derecha: 28
+clase_declaration (53)
+    en la izquierda: 28, en la derecha: 9
+encabezado_interfaz (54)
+    en la izquierda: 29, en la derecha: 30
+interface_declaration (55)
+    en la izquierda: 30, en la derecha: 11
+interface_metodos (56)
+    en la izquierda: 31 32, en la derecha: 30 31
+encabezado_funcion (57)
+    en la izquierda: 33, en la derecha: 34 43 51
+interface_metodo_declaration (58)
+    en la izquierda: 34, en la derecha: 31
+encabezado_implement (59)
+    en la izquierda: 35, en la derecha: 36
+implement_declaration (60)
+    en la izquierda: 36, en la derecha: 12
+atributos (61)
+    en la izquierda: 37 38, en la derecha: 28 37
+atributo_declaration (62)
     en la izquierda: 39, en la derecha: 37
-funcion_declaration (62)
-    en la izquierda: 40 41, en la derecha: 14 39
-herencia_composicion (63)
-    en la izquierda: 42 43, en la derecha: 27 33 42
-sentencias_metodo (64)
-    en la izquierda: 44 45 46 47, en la derecha: 40 44 45 46
-local_function_declaration (65)
-    en la izquierda: 48, en la derecha: 46 51
-sentencias_funcion_local (66)
-    en la izquierda: 49 50 51 52, en la derecha: 48 49 50 51
-parametro (67)
-    en la izquierda: 53 54 55 56, en la derecha: 32 40 48 55
-distributed_method_implementation (68)
-    en la izquierda: 57, en la derecha: 13
-retorno (69)
-    en la izquierda: 58, en la derecha: 21
-objeto_declaration (70)
-    en la izquierda: 59, en la derecha: 10
-lista_objetos (71)
-    en la izquierda: 60 61, en la derecha: 59 60
-objeto (72)
-    en la izquierda: 62, en la derecha: 60 61
-asignacion (73)
-    en la izquierda: 63 64 65 66 67, en la derecha: 15
-asignador (74)
-    en la izquierda: 68 69, en la derecha: 63 64 65 66 67
-invocacion (75)
-    en la izquierda: 70 71, en la derecha: 16
-argumentos (76)
-    en la izquierda: 72 73 74, en la derecha: 70 71 73
-seleccion (77)
-    en la izquierda: 75 76 77 78, en la derecha: 17
-bloque_if (78)
-    en la izquierda: 79, en la derecha: 75 76 77 78
-bloque_else (79)
-    en la izquierda: 80, en la derecha: 75 78
-condicion (80)
-    en la izquierda: 81 82 83 84, en la derecha: 75 76 77 78
-comparador (81)
-    en la izquierda: 85 86 87 88 89 90, en la derecha: 81 82 83
-bloque_sentencias (82)
-    en la izquierda: 91 92, en la derecha: 79 80 96 97 98
-print (83)
-    en la izquierda: 93 94 95, en la derecha: 18
-bucle_for (84)
-    en la izquierda: 96 97 98, en la derecha: 19
-encabezado_for (85)
-    en la izquierda: 99 100 101 102 103, en la derecha: 96 97 98
-argumento_bucle_for (86)
-    en la izquierda: 104 105 106 107, en la derecha: 96 97 98
-acceso_atributo (87)
-    en la izquierda: 108, en la derecha: 20
-expresion (88)
-    en la izquierda: 109 110 111 112 113 114 115, en la derecha: 63
-    64 72 73 81 82 83 84 109 110 111 112 113
-expresion_parentesis (89)
-    en la izquierda: 116 117 118 119, en la derecha: 112 113 114 116
-termino (90)
-    en la izquierda: 120 121 122, en la derecha: 109 110 115 117 118
-    119 121 122
-factor (91)
-    en la izquierda: 123 124 125, en la derecha: 120 121 122
-constante (92)
-    en la izquierda: 126 127 128, en la derecha: 104 105 106 124 125
-tipo (93)
-    en la izquierda: 129 130 131, en la derecha: 22 53 55 111
+metodos_clase (63)
+    en la izquierda: 40 41, en la derecha: 28 36 40 60
+metodo_declaration (64)
+    en la izquierda: 42, en la derecha: 40
+funcion_declaration (65)
+    en la izquierda: 43 44, en la derecha: 14 42
+herencia_composicion (66)
+    en la izquierda: 45 46, en la derecha: 28 36 45
+sentencias_metodo (67)
+    en la izquierda: 47 48 49 50, en la derecha: 43 47 48 49
+local_function_declaration (68)
+    en la izquierda: 51, en la derecha: 49 54
+sentencias_funcion_local (69)
+    en la izquierda: 52 53 54 55, en la derecha: 51 52 53 54
+parametro (70)
+    en la izquierda: 56 57 58 59, en la derecha: 34 43 51 58
+distributed_method_implementation (71)
+    en la izquierda: 60, en la derecha: 13
+retorno (72)
+    en la izquierda: 61, en la derecha: 21
+objeto_declaration (73)
+    en la izquierda: 62, en la derecha: 10
+lista_objetos (74)
+    en la izquierda: 63 64, en la derecha: 62 63
+objeto (75)
+    en la izquierda: 65, en la derecha: 63 64
+asignacion (76)
+    en la izquierda: 66 67 68 69 70, en la derecha: 15
+asignador (77)
+    en la izquierda: 71 72, en la derecha: 66 67 68 69 70
+invocacion (78)
+    en la izquierda: 73 74, en la derecha: 16
+argumentos (79)
+    en la izquierda: 75 76 77, en la derecha: 73 74 76
+seleccion (80)
+    en la izquierda: 78 79 80 81, en la derecha: 17
+bloque_if (81)
+    en la izquierda: 82, en la derecha: 78 79 80 81
+bloque_else (82)
+    en la izquierda: 83, en la derecha: 78 81
+condicion (83)
+    en la izquierda: 84 85 86 87, en la derecha: 78 79 80 81
+comparador (84)
+    en la izquierda: 88 89 90 91 92 93, en la derecha: 84 85 86
+bloque_sentencias (85)
+    en la izquierda: 94 95, en la derecha: 82 83 99 100 101
+print (86)
+    en la izquierda: 96 97 98, en la derecha: 18
+bucle_for (87)
+    en la izquierda: 99 100 101, en la derecha: 19
+encabezado_for (88)
+    en la izquierda: 102 103 104 105 106, en la derecha: 99 100 101
+argumento_bucle_for (89)
+    en la izquierda: 107 108 109 110, en la derecha: 99 100 101
+acceso_atributo (90)
+    en la izquierda: 111, en la derecha: 20
+expresion (91)
+    en la izquierda: 112 113 114 115 116 117 118, en la derecha: 66
+    67 75 76 84 85 86 87 112 113 114 115 116
+expresion_parentesis (92)
+    en la izquierda: 119 120 121 122, en la derecha: 115 116 117 119
+termino (93)
+    en la izquierda: 123 124 125, en la derecha: 112 113 118 120 121
+    122 124 125
+factor (94)
+    en la izquierda: 126 127 128, en la derecha: 123 124 125
+constante (95)
+    en la izquierda: 129 130 131, en la derecha: 107 108 109 127 128
+tipo (96)
+    en la izquierda: 132 133 134, en la derecha: 22 56 58 114
 
 
 estado 0
@@ -357,7 +369,7 @@ estado 0
     STRING     desplazar e ir al estado 14
     '{'        desplazar e ir al estado 15
 
-    ','  reduce usando la regla 41 (funcion_declaration)
+    ','  reduce usando la regla 44 (funcion_declaration)
 
     programa                           ir al estado 16
     sentencias                         ir al estado 17
@@ -365,151 +377,154 @@ estado 0
     declarativa                        ir al estado 19
     ejecutable                         ir al estado 20
     declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
 
 
 estado 1
 
    23 declaracion_variables: error . lista_variables
 
-    ID  desplazar e ir al estado 38
+    ID  desplazar e ir al estado 41
 
-    lista_variables  ir al estado 39
+    lista_variables  ir al estado 42
 
 
 estado 2
 
-  129 tipo: SHORT .
+  132 tipo: SHORT .
 
-    $default  reduce usando la regla 129 (tipo)
+    $default  reduce usando la regla 132 (tipo)
 
 
 estado 3
 
-  130 tipo: UINT .
+  133 tipo: UINT .
 
-    $default  reduce usando la regla 130 (tipo)
+    $default  reduce usando la regla 133 (tipo)
 
 
 estado 4
 
-  131 tipo: DOUBLE .
+  134 tipo: DOUBLE .
 
-    $default  reduce usando la regla 131 (tipo)
+    $default  reduce usando la regla 134 (tipo)
 
 
 estado 5
 
-   31 encabezado_funcion: VOID . ID
+   33 encabezado_funcion: VOID . ID
 
-    ID  desplazar e ir al estado 40
+    ID  desplazar e ir al estado 43
 
 
 estado 6
 
-   27 clase_declaration: CLASS . ID '{' atributos metodos_clase herencia_composicion '}'
-   33 implement_declaration: CLASS . ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}'
+   27 encabezado_clase: CLASS . ID
+   35 encabezado_implement: CLASS . ID IMPLEMENT ID
 
-    ID  desplazar e ir al estado 41
+    ID  desplazar e ir al estado 44
 
 
 estado 7
 
-   28 interface_declaration: INTERFACE . ID '{' interface_metodos '}'
+   29 encabezado_interfaz: INTERFACE . ID
 
-    ID  desplazar e ir al estado 42
+    ID  desplazar e ir al estado 45
 
 
 estado 8
 
-   57 distributed_method_implementation: IMPL . FOR ID ':' '{' metodos_clase '}'
+   60 distributed_method_implementation: IMPL . FOR ID ':' '{' metodos_clase '}'
 
-    FOR  desplazar e ir al estado 43
+    FOR  desplazar e ir al estado 46
 
 
 estado 9
 
-   75 seleccion: IF . '(' condicion ')' bloque_if ELSE bloque_else END_IF
-   76          | IF . '(' condicion ')' bloque_if END_IF
-   77          | IF . '(' condicion ')' bloque_if
-   78          | IF . '(' condicion ')' bloque_if ELSE bloque_else
+   78 seleccion: IF . '(' condicion ')' bloque_if ELSE bloque_else END_IF
+   79          | IF . '(' condicion ')' bloque_if END_IF
+   80          | IF . '(' condicion ')' bloque_if
+   81          | IF . '(' condicion ')' bloque_if ELSE bloque_else
 
-    '('  desplazar e ir al estado 44
+    '('  desplazar e ir al estado 47
 
 
 estado 10
 
-   93 print: PRINT . STRING
-   94      | PRINT .
+   96 print: PRINT . STRING
+   97      | PRINT .
 
-    STRING  desplazar e ir al estado 45
+    STRING  desplazar e ir al estado 48
 
-    $default  reduce usando la regla 94 (print)
+    $default  reduce usando la regla 97 (print)
 
 
 estado 11
 
-   99 encabezado_for: FOR . ID IN RANGE
-  101               | FOR . IN RANGE
-  102               | FOR . ID IN
-  103               | FOR . ID RANGE
+  102 encabezado_for: FOR . ID IN RANGE
+  104               | FOR . IN RANGE
+  105               | FOR . ID IN
+  106               | FOR . ID RANGE
 
-    IN  desplazar e ir al estado 46
-    ID  desplazar e ir al estado 47
+    IN  desplazar e ir al estado 49
+    ID  desplazar e ir al estado 50
 
 
 estado 12
 
-   58 retorno: RETURN .
+   61 retorno: RETURN .
 
-    $default  reduce usando la regla 58 (retorno)
+    $default  reduce usando la regla 61 (retorno)
 
 
 estado 13
 
-   59 objeto_declaration: ID . lista_objetos
-   63 asignacion: ID . asignador expresion
-   64           | ID . '.' ID asignador expresion
-   65           | ID . asignador
-   66           | ID . '.' ID asignador
-   67           | ID . asignador '-'
-   70 invocacion: ID . '(' argumentos ')'
-   71           | ID . '.' ID '(' argumentos ')'
-  100 encabezado_for: ID . IN RANGE
-  108 acceso_atributo: ID . '.' ID
+   62 objeto_declaration: ID . lista_objetos
+   66 asignacion: ID . asignador expresion
+   67           | ID . '.' ID asignador expresion
+   68           | ID . asignador
+   69           | ID . '.' ID asignador
+   70           | ID . asignador '-'
+   73 invocacion: ID . '(' argumentos ')'
+   74           | ID . '.' ID '(' argumentos ')'
+  103 encabezado_for: ID . IN RANGE
+  111 acceso_atributo: ID . '.' ID
 
-    IN          desplazar e ir al estado 48
-    PLUS_EQUAL  desplazar e ir al estado 49
-    ID          desplazar e ir al estado 50
-    '='         desplazar e ir al estado 51
-    '.'         desplazar e ir al estado 52
-    '('         desplazar e ir al estado 53
+    IN          desplazar e ir al estado 51
+    PLUS_EQUAL  desplazar e ir al estado 52
+    ID          desplazar e ir al estado 53
+    '='         desplazar e ir al estado 54
+    '.'         desplazar e ir al estado 55
+    '('         desplazar e ir al estado 56
 
-    lista_objetos  ir al estado 54
-    objeto         ir al estado 55
-    asignador      ir al estado 56
+    lista_objetos  ir al estado 57
+    objeto         ir al estado 58
+    asignador      ir al estado 59
 
 
 estado 14
 
-   95 print: STRING .
+   98 print: STRING .
 
-    $default  reduce usando la regla 95 (print)
+    $default  reduce usando la regla 98 (print)
 
 
 estado 15
@@ -532,36 +547,39 @@ estado 15
     ID         desplazar e ir al estado 13
     STRING     desplazar e ir al estado 14
 
-    ','  reduce usando la regla 41 (funcion_declaration)
+    ','  reduce usando la regla 44 (funcion_declaration)
 
-    sentencias                         ir al estado 57
+    sentencias                         ir al estado 60
     sentencia                          ir al estado 18
     declarativa                        ir al estado 19
     ejecutable                         ir al estado 20
     declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
 
 
 estado 16
 
     0 $accept: programa . $end
 
-    $end  desplazar e ir al estado 58
+    $end  desplazar e ir al estado 61
 
 
 estado 17
@@ -583,30 +601,33 @@ estado 17
     RETURN     desplazar e ir al estado 12
     ID         desplazar e ir al estado 13
     STRING     desplazar e ir al estado 14
-    '}'        desplazar e ir al estado 59
+    '}'        desplazar e ir al estado 62
 
-    ','  reduce usando la regla 41 (funcion_declaration)
+    ','  reduce usando la regla 44 (funcion_declaration)
 
-    sentencia                          ir al estado 60
+    sentencia                          ir al estado 63
     declarativa                        ir al estado 19
     ejecutable                         ir al estado 20
     declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
 
 
 estado 18
@@ -620,14 +641,14 @@ estado 19
 
     6 sentencia: declarativa . ','
 
-    ','  desplazar e ir al estado 61
+    ','  desplazar e ir al estado 64
 
 
 estado 20
 
     7 sentencia: ejecutable . ','
 
-    ','  desplazar e ir al estado 62
+    ','  desplazar e ir al estado 65
 
 
 estado 21
@@ -639,340 +660,362 @@ estado 21
 
 estado 22
 
+   28 clase_declaration: encabezado_clase . '{' atributos metodos_clase herencia_composicion '}'
+
+    '{'  desplazar e ir al estado 66
+
+
+estado 23
+
     9 declarativa: clase_declaration .
 
     $default  reduce usando la regla 9 (declarativa)
 
 
-estado 23
+estado 24
+
+   30 interface_declaration: encabezado_interfaz . '{' interface_metodos '}'
+
+    '{'  desplazar e ir al estado 67
+
+
+estado 25
 
    11 declarativa: interface_declaration .
 
     $default  reduce usando la regla 11 (declarativa)
 
 
-estado 24
+estado 26
 
-   40 funcion_declaration: encabezado_funcion . '(' parametro ')' '{' sentencias_metodo '}'
+   43 funcion_declaration: encabezado_funcion . '(' parametro ')' '{' sentencias_metodo '}'
 
-    '('  desplazar e ir al estado 63
+    '('  desplazar e ir al estado 68
 
 
-estado 25
+estado 27
+
+   36 implement_declaration: encabezado_implement . '{' metodos_clase herencia_composicion '}'
+
+    '{'  desplazar e ir al estado 69
+
+
+estado 28
 
    12 declarativa: implement_declaration .
 
     $default  reduce usando la regla 12 (declarativa)
 
 
-estado 26
+estado 29
 
    14 declarativa: funcion_declaration .
 
     $default  reduce usando la regla 14 (declarativa)
 
 
-estado 27
+estado 30
 
    13 declarativa: distributed_method_implementation .
 
     $default  reduce usando la regla 13 (declarativa)
 
 
-estado 28
+estado 31
 
    21 ejecutable: retorno .
 
     $default  reduce usando la regla 21 (ejecutable)
 
 
-estado 29
+estado 32
 
    10 declarativa: objeto_declaration .
 
     $default  reduce usando la regla 10 (declarativa)
 
 
-estado 30
+estado 33
 
    15 ejecutable: asignacion .
 
     $default  reduce usando la regla 15 (ejecutable)
 
 
-estado 31
+estado 34
 
    16 ejecutable: invocacion .
 
     $default  reduce usando la regla 16 (ejecutable)
 
 
-estado 32
+estado 35
 
    17 ejecutable: seleccion .
 
     $default  reduce usando la regla 17 (ejecutable)
 
 
-estado 33
+estado 36
 
    18 ejecutable: print .
 
     $default  reduce usando la regla 18 (ejecutable)
 
 
-estado 34
+estado 37
 
    19 ejecutable: bucle_for .
 
     $default  reduce usando la regla 19 (ejecutable)
 
 
-estado 35
+estado 38
 
-   96 bucle_for: encabezado_for . '(' argumento_bucle_for ')' bloque_sentencias
-   97          | encabezado_for . '(' argumento_bucle_for bloque_sentencias
-   98          | encabezado_for . argumento_bucle_for ')' bloque_sentencias
+   99 bucle_for: encabezado_for . '(' argumento_bucle_for ')' bloque_sentencias
+  100          | encabezado_for . '(' argumento_bucle_for bloque_sentencias
+  101          | encabezado_for . argumento_bucle_for ')' bloque_sentencias
 
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 67
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 73
 
-    $default  reduce usando la regla 107 (argumento_bucle_for)
+    $default  reduce usando la regla 110 (argumento_bucle_for)
 
-    argumento_bucle_for  ir al estado 68
-    constante            ir al estado 69
+    argumento_bucle_for  ir al estado 74
+    constante            ir al estado 75
 
 
-estado 36
+estado 39
 
    20 ejecutable: acceso_atributo .
 
     $default  reduce usando la regla 20 (ejecutable)
 
 
-estado 37
+estado 40
 
    22 declaracion_variables: tipo . lista_variables
 
-    ID  desplazar e ir al estado 38
+    ID  desplazar e ir al estado 41
 
-    lista_variables  ir al estado 70
+    lista_variables  ir al estado 76
 
 
-estado 38
+estado 41
 
    25 lista_variables: ID .
    26                | ID . error ','
 
-    error  desplazar e ir al estado 71
+    error  desplazar e ir al estado 77
 
     ','  reduce usando la regla 25 (lista_variables)
     ';'  reduce usando la regla 25 (lista_variables)
 
 
-estado 39
+estado 42
 
    23 declaracion_variables: error lista_variables .
    24 lista_variables: lista_variables . ';' ID
 
-    ';'  desplazar e ir al estado 72
+    ';'  desplazar e ir al estado 78
 
     $default  reduce usando la regla 23 (declaracion_variables)
 
 
-estado 40
-
-   31 encabezado_funcion: VOID ID .
-
-    $default  reduce usando la regla 31 (encabezado_funcion)
-
-
-estado 41
-
-   27 clase_declaration: CLASS ID . '{' atributos metodos_clase herencia_composicion '}'
-   33 implement_declaration: CLASS ID . IMPLEMENT ID '{' metodos_clase herencia_composicion '}'
-
-    IMPLEMENT  desplazar e ir al estado 73
-    '{'        desplazar e ir al estado 74
-
-
-estado 42
-
-   28 interface_declaration: INTERFACE ID . '{' interface_metodos '}'
-
-    '{'  desplazar e ir al estado 75
-
-
 estado 43
 
-   57 distributed_method_implementation: IMPL FOR . ID ':' '{' metodos_clase '}'
+   33 encabezado_funcion: VOID ID .
 
-    ID  desplazar e ir al estado 76
+    $default  reduce usando la regla 33 (encabezado_funcion)
 
 
 estado 44
 
-   75 seleccion: IF '(' . condicion ')' bloque_if ELSE bloque_else END_IF
-   76          | IF '(' . condicion ')' bloque_if END_IF
-   77          | IF '(' . condicion ')' bloque_if
-   78          | IF '(' . condicion ')' bloque_if ELSE bloque_else
+   27 encabezado_clase: CLASS ID .
+   35 encabezado_implement: CLASS ID . IMPLEMENT ID
 
-    SHORT          desplazar e ir al estado 2
-    UINT           desplazar e ir al estado 3
-    DOUBLE         desplazar e ir al estado 4
-    LESS_EQUAL     desplazar e ir al estado 77
-    GREATER_EQUAL  desplazar e ir al estado 78
-    EQUAL          desplazar e ir al estado 79
-    NOT_EQUAL      desplazar e ir al estado 80
-    ID             desplazar e ir al estado 81
-    CTE_SHORT      desplazar e ir al estado 64
-    CTE_UINT       desplazar e ir al estado 65
-    CTE_DOUBLE     desplazar e ir al estado 66
-    '('            desplazar e ir al estado 82
-    '-'            desplazar e ir al estado 83
-    '<'            desplazar e ir al estado 84
-    '>'            desplazar e ir al estado 85
+    IMPLEMENT  desplazar e ir al estado 79
 
-    condicion   ir al estado 86
-    comparador  ir al estado 87
-    expresion   ir al estado 88
-    termino     ir al estado 89
-    factor      ir al estado 90
-    constante   ir al estado 91
-    tipo        ir al estado 92
+    $default  reduce usando la regla 27 (encabezado_clase)
 
 
 estado 45
 
-   93 print: PRINT STRING .
+   29 encabezado_interfaz: INTERFACE ID .
 
-    $default  reduce usando la regla 93 (print)
+    $default  reduce usando la regla 29 (encabezado_interfaz)
 
 
 estado 46
 
-  101 encabezado_for: FOR IN . RANGE
+   60 distributed_method_implementation: IMPL FOR . ID ':' '{' metodos_clase '}'
 
-    RANGE  desplazar e ir al estado 93
+    ID  desplazar e ir al estado 80
 
 
 estado 47
 
-   99 encabezado_for: FOR ID . IN RANGE
-  102               | FOR ID . IN
-  103               | FOR ID . RANGE
+   78 seleccion: IF '(' . condicion ')' bloque_if ELSE bloque_else END_IF
+   79          | IF '(' . condicion ')' bloque_if END_IF
+   80          | IF '(' . condicion ')' bloque_if
+   81          | IF '(' . condicion ')' bloque_if ELSE bloque_else
 
-    IN     desplazar e ir al estado 94
-    RANGE  desplazar e ir al estado 95
+    SHORT          desplazar e ir al estado 2
+    UINT           desplazar e ir al estado 3
+    DOUBLE         desplazar e ir al estado 4
+    LESS_EQUAL     desplazar e ir al estado 81
+    GREATER_EQUAL  desplazar e ir al estado 82
+    EQUAL          desplazar e ir al estado 83
+    NOT_EQUAL      desplazar e ir al estado 84
+    ID             desplazar e ir al estado 85
+    CTE_SHORT      desplazar e ir al estado 70
+    CTE_UINT       desplazar e ir al estado 71
+    CTE_DOUBLE     desplazar e ir al estado 72
+    '('            desplazar e ir al estado 86
+    '-'            desplazar e ir al estado 87
+    '<'            desplazar e ir al estado 88
+    '>'            desplazar e ir al estado 89
+
+    condicion   ir al estado 90
+    comparador  ir al estado 91
+    expresion   ir al estado 92
+    termino     ir al estado 93
+    factor      ir al estado 94
+    constante   ir al estado 95
+    tipo        ir al estado 96
 
 
 estado 48
 
-  100 encabezado_for: ID IN . RANGE
+   96 print: PRINT STRING .
 
-    RANGE  desplazar e ir al estado 96
+    $default  reduce usando la regla 96 (print)
 
 
 estado 49
 
-   69 asignador: PLUS_EQUAL .
+  104 encabezado_for: FOR IN . RANGE
 
-    $default  reduce usando la regla 69 (asignador)
+    RANGE  desplazar e ir al estado 97
 
 
 estado 50
 
-   62 objeto: ID .
+  102 encabezado_for: FOR ID . IN RANGE
+  105               | FOR ID . IN
+  106               | FOR ID . RANGE
 
-    $default  reduce usando la regla 62 (objeto)
+    IN     desplazar e ir al estado 98
+    RANGE  desplazar e ir al estado 99
 
 
 estado 51
 
-   68 asignador: '=' .
+  103 encabezado_for: ID IN . RANGE
 
-    $default  reduce usando la regla 68 (asignador)
+    RANGE  desplazar e ir al estado 100
 
 
 estado 52
 
-   64 asignacion: ID '.' . ID asignador expresion
-   66           | ID '.' . ID asignador
-   71 invocacion: ID '.' . ID '(' argumentos ')'
-  108 acceso_atributo: ID '.' . ID
+   72 asignador: PLUS_EQUAL .
 
-    ID  desplazar e ir al estado 97
+    $default  reduce usando la regla 72 (asignador)
 
 
 estado 53
 
-   70 invocacion: ID '(' . argumentos ')'
+   65 objeto: ID .
 
-    SHORT       desplazar e ir al estado 2
-    UINT        desplazar e ir al estado 3
-    DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 83
-
-    $default  reduce usando la regla 74 (argumentos)
-
-    argumentos  ir al estado 98
-    expresion   ir al estado 99
-    termino     ir al estado 89
-    factor      ir al estado 90
-    constante   ir al estado 91
-    tipo        ir al estado 92
+    $default  reduce usando la regla 65 (objeto)
 
 
 estado 54
 
-   59 objeto_declaration: ID lista_objetos .
-   60 lista_objetos: lista_objetos . ';' objeto
+   71 asignador: '=' .
 
-    ';'  desplazar e ir al estado 100
-
-    $default  reduce usando la regla 59 (objeto_declaration)
+    $default  reduce usando la regla 71 (asignador)
 
 
 estado 55
 
-   61 lista_objetos: objeto .
+   67 asignacion: ID '.' . ID asignador expresion
+   69           | ID '.' . ID asignador
+   74 invocacion: ID '.' . ID '(' argumentos ')'
+  111 acceso_atributo: ID '.' . ID
 
-    $default  reduce usando la regla 61 (lista_objetos)
+    ID  desplazar e ir al estado 101
 
 
 estado 56
 
-   63 asignacion: ID asignador . expresion
-   65           | ID asignador .
-   67           | ID asignador . '-'
+   73 invocacion: ID '(' . argumentos ')'
 
     SHORT       desplazar e ir al estado 2
     UINT        desplazar e ir al estado 3
     DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 101
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 87
 
-    $default  reduce usando la regla 65 (asignacion)
+    $default  reduce usando la regla 77 (argumentos)
 
-    expresion  ir al estado 102
-    termino    ir al estado 89
-    factor     ir al estado 90
-    constante  ir al estado 91
-    tipo       ir al estado 92
+    argumentos  ir al estado 102
+    expresion   ir al estado 103
+    termino     ir al estado 93
+    factor      ir al estado 94
+    constante   ir al estado 95
+    tipo        ir al estado 96
 
 
 estado 57
+
+   62 objeto_declaration: ID lista_objetos .
+   63 lista_objetos: lista_objetos . ';' objeto
+
+    ';'  desplazar e ir al estado 104
+
+    $default  reduce usando la regla 62 (objeto_declaration)
+
+
+estado 58
+
+   64 lista_objetos: objeto .
+
+    $default  reduce usando la regla 64 (lista_objetos)
+
+
+estado 59
+
+   66 asignacion: ID asignador . expresion
+   68           | ID asignador .
+   70           | ID asignador . '-'
+
+    SHORT       desplazar e ir al estado 2
+    UINT        desplazar e ir al estado 3
+    DOUBLE      desplazar e ir al estado 4
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 105
+
+    $default  reduce usando la regla 68 (asignacion)
+
+    expresion  ir al estado 106
+    termino    ir al estado 93
+    factor     ir al estado 94
+    constante  ir al estado 95
+    tipo       ir al estado 96
+
+
+estado 60
 
     1 programa: '{' sentencias . '}'
     2         | '{' sentencias .
@@ -992,1571 +1035,1106 @@ estado 57
     RETURN     desplazar e ir al estado 12
     ID         desplazar e ir al estado 13
     STRING     desplazar e ir al estado 14
-    '}'        desplazar e ir al estado 103
+    '}'        desplazar e ir al estado 107
 
     $end  reduce usando la regla 2 (programa)
-    ','   reduce usando la regla 41 (funcion_declaration)
+    ','   reduce usando la regla 44 (funcion_declaration)
 
-    sentencia                          ir al estado 60
+    sentencia                          ir al estado 63
     declarativa                        ir al estado 19
     ejecutable                         ir al estado 20
     declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
 
 
-estado 58
+estado 61
 
     0 $accept: programa $end .
 
     $default  aceptar
 
 
-estado 59
+estado 62
 
     3 programa: sentencias '}' .
 
     $default  reduce usando la regla 3 (programa)
 
 
-estado 60
+estado 63
 
     5 sentencias: sentencias sentencia .
 
     $default  reduce usando la regla 5 (sentencias)
 
 
-estado 61
+estado 64
 
     6 sentencia: declarativa ',' .
 
     $default  reduce usando la regla 6 (sentencia)
 
 
-estado 62
+estado 65
 
     7 sentencia: ejecutable ',' .
 
     $default  reduce usando la regla 7 (sentencia)
 
 
-estado 63
-
-   40 funcion_declaration: encabezado_funcion '(' . parametro ')' '{' sentencias_metodo '}'
-
-    SHORT   desplazar e ir al estado 2
-    UINT    desplazar e ir al estado 3
-    DOUBLE  desplazar e ir al estado 4
-    ID      desplazar e ir al estado 104
-
-    $default  reduce usando la regla 56 (parametro)
-
-    parametro  ir al estado 105
-    tipo       ir al estado 106
-
-
-estado 64
-
-  126 constante: CTE_SHORT .
-
-    $default  reduce usando la regla 126 (constante)
-
-
-estado 65
-
-  128 constante: CTE_UINT .
-
-    $default  reduce usando la regla 128 (constante)
-
-
 estado 66
 
-  127 constante: CTE_DOUBLE .
+   28 clase_declaration: encabezado_clase '{' . atributos metodos_clase herencia_composicion '}'
 
-    $default  reduce usando la regla 127 (constante)
+    $default  reduce usando la regla 38 (atributos)
+
+    atributos  ir al estado 108
 
 
 estado 67
 
-   96 bucle_for: encabezado_for '(' . argumento_bucle_for ')' bloque_sentencias
-   97          | encabezado_for '(' . argumento_bucle_for bloque_sentencias
+   30 interface_declaration: encabezado_interfaz '{' . interface_metodos '}'
 
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
+    $default  reduce usando la regla 32 (interface_metodos)
 
-    $default  reduce usando la regla 107 (argumento_bucle_for)
-
-    argumento_bucle_for  ir al estado 107
-    constante            ir al estado 69
+    interface_metodos  ir al estado 109
 
 
 estado 68
 
-   98 bucle_for: encabezado_for argumento_bucle_for . ')' bloque_sentencias
+   43 funcion_declaration: encabezado_funcion '(' . parametro ')' '{' sentencias_metodo '}'
 
-    ')'  desplazar e ir al estado 108
+    SHORT   desplazar e ir al estado 2
+    UINT    desplazar e ir al estado 3
+    DOUBLE  desplazar e ir al estado 4
+    ID      desplazar e ir al estado 110
+
+    $default  reduce usando la regla 59 (parametro)
+
+    parametro  ir al estado 111
+    tipo       ir al estado 112
 
 
 estado 69
 
-  104 argumento_bucle_for: constante . ';' constante ';' constante
-  105                    | constante . ';' constante
-  106                    | constante .
+   36 implement_declaration: encabezado_implement '{' . metodos_clase herencia_composicion '}'
 
-    ';'  desplazar e ir al estado 109
+    $default  reduce usando la regla 41 (metodos_clase)
 
-    $default  reduce usando la regla 106 (argumento_bucle_for)
+    metodos_clase  ir al estado 113
 
 
 estado 70
 
-   22 declaracion_variables: tipo lista_variables .
-   24 lista_variables: lista_variables . ';' ID
+  129 constante: CTE_SHORT .
 
-    ';'  desplazar e ir al estado 72
-
-    $default  reduce usando la regla 22 (declaracion_variables)
+    $default  reduce usando la regla 129 (constante)
 
 
 estado 71
 
-   26 lista_variables: ID error . ','
+  131 constante: CTE_UINT .
 
-    ','  desplazar e ir al estado 110
+    $default  reduce usando la regla 131 (constante)
 
 
 estado 72
 
-   24 lista_variables: lista_variables ';' . ID
+  130 constante: CTE_DOUBLE .
 
-    ID  desplazar e ir al estado 111
+    $default  reduce usando la regla 130 (constante)
 
 
 estado 73
 
-   33 implement_declaration: CLASS ID IMPLEMENT . ID '{' metodos_clase herencia_composicion '}'
+   99 bucle_for: encabezado_for '(' . argumento_bucle_for ')' bloque_sentencias
+  100          | encabezado_for '(' . argumento_bucle_for bloque_sentencias
 
-    ID  desplazar e ir al estado 112
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+
+    $default  reduce usando la regla 110 (argumento_bucle_for)
+
+    argumento_bucle_for  ir al estado 114
+    constante            ir al estado 75
 
 
 estado 74
 
-   27 clase_declaration: CLASS ID '{' . atributos metodos_clase herencia_composicion '}'
+  101 bucle_for: encabezado_for argumento_bucle_for . ')' bloque_sentencias
 
-    $default  reduce usando la regla 35 (atributos)
-
-    atributos  ir al estado 113
+    ')'  desplazar e ir al estado 115
 
 
 estado 75
 
-   28 interface_declaration: INTERFACE ID '{' . interface_metodos '}'
+  107 argumento_bucle_for: constante . ';' constante ';' constante
+  108                    | constante . ';' constante
+  109                    | constante .
 
-    $default  reduce usando la regla 30 (interface_metodos)
+    ';'  desplazar e ir al estado 116
 
-    interface_metodos  ir al estado 114
+    $default  reduce usando la regla 109 (argumento_bucle_for)
 
 
 estado 76
 
-   57 distributed_method_implementation: IMPL FOR ID . ':' '{' metodos_clase '}'
+   22 declaracion_variables: tipo lista_variables .
+   24 lista_variables: lista_variables . ';' ID
 
-    ':'  desplazar e ir al estado 115
+    ';'  desplazar e ir al estado 78
+
+    $default  reduce usando la regla 22 (declaracion_variables)
 
 
 estado 77
 
-   87 comparador: LESS_EQUAL .
+   26 lista_variables: ID error . ','
 
-    $default  reduce usando la regla 87 (comparador)
+    ','  desplazar e ir al estado 117
 
 
 estado 78
 
-   88 comparador: GREATER_EQUAL .
+   24 lista_variables: lista_variables ';' . ID
 
-    $default  reduce usando la regla 88 (comparador)
+    ID  desplazar e ir al estado 118
 
 
 estado 79
 
-   89 comparador: EQUAL .
+   35 encabezado_implement: CLASS ID IMPLEMENT . ID
 
-    $default  reduce usando la regla 89 (comparador)
+    ID  desplazar e ir al estado 119
 
 
 estado 80
 
-   90 comparador: NOT_EQUAL .
+   60 distributed_method_implementation: IMPL FOR ID . ':' '{' metodos_clase '}'
 
-    $default  reduce usando la regla 90 (comparador)
+    ':'  desplazar e ir al estado 120
 
 
 estado 81
 
-  123 factor: ID .
+   90 comparador: LESS_EQUAL .
 
-    $default  reduce usando la regla 123 (factor)
+    $default  reduce usando la regla 90 (comparador)
 
 
 estado 82
 
-  114 expresion: '(' . expresion_parentesis ')'
+   91 comparador: GREATER_EQUAL .
 
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 116
-    '-'         desplazar e ir al estado 83
-
-    expresion_parentesis  ir al estado 117
-    termino               ir al estado 118
-    factor                ir al estado 90
-    constante             ir al estado 91
+    $default  reduce usando la regla 91 (comparador)
 
 
 estado 83
 
-  124 factor: '-' . constante
+   92 comparador: EQUAL .
 
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-
-    constante  ir al estado 119
+    $default  reduce usando la regla 92 (comparador)
 
 
 estado 84
 
-   85 comparador: '<' .
+   93 comparador: NOT_EQUAL .
 
-    $default  reduce usando la regla 85 (comparador)
+    $default  reduce usando la regla 93 (comparador)
 
 
 estado 85
 
-   86 comparador: '>' .
+  126 factor: ID .
 
-    $default  reduce usando la regla 86 (comparador)
+    $default  reduce usando la regla 126 (factor)
 
 
 estado 86
 
-   75 seleccion: IF '(' condicion . ')' bloque_if ELSE bloque_else END_IF
-   76          | IF '(' condicion . ')' bloque_if END_IF
-   77          | IF '(' condicion . ')' bloque_if
-   78          | IF '(' condicion . ')' bloque_if ELSE bloque_else
+  117 expresion: '(' . expresion_parentesis ')'
 
-    ')'  desplazar e ir al estado 120
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 121
+    '-'         desplazar e ir al estado 87
+
+    expresion_parentesis  ir al estado 122
+    termino               ir al estado 123
+    factor                ir al estado 94
+    constante             ir al estado 95
 
 
 estado 87
 
-   83 condicion: comparador . expresion
+  127 factor: '-' . constante
 
-    SHORT       desplazar e ir al estado 2
-    UINT        desplazar e ir al estado 3
-    DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 83
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
 
-    expresion  ir al estado 121
-    termino    ir al estado 89
-    factor     ir al estado 90
-    constante  ir al estado 91
-    tipo       ir al estado 92
+    constante  ir al estado 124
 
 
 estado 88
 
-   81 condicion: expresion . comparador expresion
-   82          | expresion . comparador
-   84          | expresion .
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
+   88 comparador: '<' .
 
-    LESS_EQUAL     desplazar e ir al estado 77
-    GREATER_EQUAL  desplazar e ir al estado 78
-    EQUAL          desplazar e ir al estado 79
-    NOT_EQUAL      desplazar e ir al estado 80
-    '-'            desplazar e ir al estado 122
-    '<'            desplazar e ir al estado 84
-    '>'            desplazar e ir al estado 85
-    '+'            desplazar e ir al estado 123
-
-    $default  reduce usando la regla 84 (condicion)
-
-    comparador  ir al estado 124
+    $default  reduce usando la regla 88 (comparador)
 
 
 estado 89
 
-  115 expresion: termino .
-  121 termino: termino . '*' factor
-  122        | termino . '/' factor
+   89 comparador: '>' .
 
-    '*'  desplazar e ir al estado 125
-    '/'  desplazar e ir al estado 126
-
-    $default  reduce usando la regla 115 (expresion)
+    $default  reduce usando la regla 89 (comparador)
 
 
 estado 90
 
-  120 termino: factor .
+   78 seleccion: IF '(' condicion . ')' bloque_if ELSE bloque_else END_IF
+   79          | IF '(' condicion . ')' bloque_if END_IF
+   80          | IF '(' condicion . ')' bloque_if
+   81          | IF '(' condicion . ')' bloque_if ELSE bloque_else
 
-    $default  reduce usando la regla 120 (termino)
+    ')'  desplazar e ir al estado 125
 
 
 estado 91
 
-  125 factor: constante .
+   86 condicion: comparador . expresion
 
-    $default  reduce usando la regla 125 (factor)
+    SHORT       desplazar e ir al estado 2
+    UINT        desplazar e ir al estado 3
+    DOUBLE      desplazar e ir al estado 4
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 87
+
+    expresion  ir al estado 126
+    termino    ir al estado 93
+    factor     ir al estado 94
+    constante  ir al estado 95
+    tipo       ir al estado 96
 
 
 estado 92
 
-  111 expresion: tipo . '(' expresion ')'
+   84 condicion: expresion . comparador expresion
+   85          | expresion . comparador
+   87          | expresion .
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
 
-    '('  desplazar e ir al estado 127
+    LESS_EQUAL     desplazar e ir al estado 81
+    GREATER_EQUAL  desplazar e ir al estado 82
+    EQUAL          desplazar e ir al estado 83
+    NOT_EQUAL      desplazar e ir al estado 84
+    '-'            desplazar e ir al estado 127
+    '<'            desplazar e ir al estado 88
+    '>'            desplazar e ir al estado 89
+    '+'            desplazar e ir al estado 128
+
+    $default  reduce usando la regla 87 (condicion)
+
+    comparador  ir al estado 129
 
 
 estado 93
 
-  101 encabezado_for: FOR IN RANGE .
+  118 expresion: termino .
+  124 termino: termino . '*' factor
+  125        | termino . '/' factor
 
-    $default  reduce usando la regla 101 (encabezado_for)
+    '*'  desplazar e ir al estado 130
+    '/'  desplazar e ir al estado 131
+
+    $default  reduce usando la regla 118 (expresion)
 
 
 estado 94
 
-   99 encabezado_for: FOR ID IN . RANGE
-  102               | FOR ID IN .
+  123 termino: factor .
 
-    RANGE  desplazar e ir al estado 128
-
-    $default  reduce usando la regla 102 (encabezado_for)
+    $default  reduce usando la regla 123 (termino)
 
 
 estado 95
 
-  103 encabezado_for: FOR ID RANGE .
+  128 factor: constante .
 
-    $default  reduce usando la regla 103 (encabezado_for)
+    $default  reduce usando la regla 128 (factor)
 
 
 estado 96
 
-  100 encabezado_for: ID IN RANGE .
+  114 expresion: tipo . '(' expresion ')'
 
-    $default  reduce usando la regla 100 (encabezado_for)
+    '('  desplazar e ir al estado 132
 
 
 estado 97
 
-   64 asignacion: ID '.' ID . asignador expresion
-   66           | ID '.' ID . asignador
-   71 invocacion: ID '.' ID . '(' argumentos ')'
-  108 acceso_atributo: ID '.' ID .
+  104 encabezado_for: FOR IN RANGE .
 
-    PLUS_EQUAL  desplazar e ir al estado 49
-    '='         desplazar e ir al estado 51
-    '('         desplazar e ir al estado 129
-
-    $default  reduce usando la regla 108 (acceso_atributo)
-
-    asignador  ir al estado 130
+    $default  reduce usando la regla 104 (encabezado_for)
 
 
 estado 98
 
-   70 invocacion: ID '(' argumentos . ')'
-   73 argumentos: argumentos . ';' expresion
+  102 encabezado_for: FOR ID IN . RANGE
+  105               | FOR ID IN .
 
-    ';'  desplazar e ir al estado 131
-    ')'  desplazar e ir al estado 132
+    RANGE  desplazar e ir al estado 133
+
+    $default  reduce usando la regla 105 (encabezado_for)
 
 
 estado 99
 
-   72 argumentos: expresion .
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
+  106 encabezado_for: FOR ID RANGE .
 
-    '-'  desplazar e ir al estado 122
-    '+'  desplazar e ir al estado 123
-
-    $default  reduce usando la regla 72 (argumentos)
+    $default  reduce usando la regla 106 (encabezado_for)
 
 
 estado 100
 
-   60 lista_objetos: lista_objetos ';' . objeto
+  103 encabezado_for: ID IN RANGE .
 
-    ID  desplazar e ir al estado 50
-
-    objeto  ir al estado 133
+    $default  reduce usando la regla 103 (encabezado_for)
 
 
 estado 101
 
-   67 asignacion: ID asignador '-' .
-  124 factor: '-' . constante
+   67 asignacion: ID '.' ID . asignador expresion
+   69           | ID '.' ID . asignador
+   74 invocacion: ID '.' ID . '(' argumentos ')'
+  111 acceso_atributo: ID '.' ID .
 
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
+    PLUS_EQUAL  desplazar e ir al estado 52
+    '='         desplazar e ir al estado 54
+    '('         desplazar e ir al estado 134
 
-    $default  reduce usando la regla 67 (asignacion)
+    $default  reduce usando la regla 111 (acceso_atributo)
 
-    constante  ir al estado 119
+    asignador  ir al estado 135
 
 
 estado 102
 
-   63 asignacion: ID asignador expresion .
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
+   73 invocacion: ID '(' argumentos . ')'
+   76 argumentos: argumentos . ';' expresion
 
-    '-'  desplazar e ir al estado 122
-    '+'  desplazar e ir al estado 123
-
-    $default  reduce usando la regla 63 (asignacion)
+    ';'  desplazar e ir al estado 136
+    ')'  desplazar e ir al estado 137
 
 
 estado 103
+
+   75 argumentos: expresion .
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
+
+    '-'  desplazar e ir al estado 127
+    '+'  desplazar e ir al estado 128
+
+    $default  reduce usando la regla 75 (argumentos)
+
+
+estado 104
+
+   63 lista_objetos: lista_objetos ';' . objeto
+
+    ID  desplazar e ir al estado 53
+
+    objeto  ir al estado 138
+
+
+estado 105
+
+   70 asignacion: ID asignador '-' .
+  127 factor: '-' . constante
+
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+
+    $default  reduce usando la regla 70 (asignacion)
+
+    constante  ir al estado 124
+
+
+estado 106
+
+   66 asignacion: ID asignador expresion .
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
+
+    '-'  desplazar e ir al estado 127
+    '+'  desplazar e ir al estado 128
+
+    $default  reduce usando la regla 66 (asignacion)
+
+
+estado 107
 
     1 programa: '{' sentencias '}' .
 
     $default  reduce usando la regla 1 (programa)
 
 
-estado 104
-
-   54 parametro: ID .
-
-    $default  reduce usando la regla 54 (parametro)
-
-
-estado 105
-
-   40 funcion_declaration: encabezado_funcion '(' parametro . ')' '{' sentencias_metodo '}'
-   55 parametro: parametro . ';' tipo ID
-
-    ';'  desplazar e ir al estado 134
-    ')'  desplazar e ir al estado 135
-
-
-estado 106
-
-   53 parametro: tipo . ID
-
-    ID  desplazar e ir al estado 136
-
-
-estado 107
-
-   96 bucle_for: encabezado_for '(' argumento_bucle_for . ')' bloque_sentencias
-   97          | encabezado_for '(' argumento_bucle_for . bloque_sentencias
-
-    error      desplazar e ir al estado 1
-    SHORT      desplazar e ir al estado 2
-    UINT       desplazar e ir al estado 3
-    DOUBLE     desplazar e ir al estado 4
-    VOID       desplazar e ir al estado 5
-    CLASS      desplazar e ir al estado 6
-    INTERFACE  desplazar e ir al estado 7
-    IMPL       desplazar e ir al estado 8
-    IF         desplazar e ir al estado 9
-    PRINT      desplazar e ir al estado 10
-    FOR        desplazar e ir al estado 11
-    RETURN     desplazar e ir al estado 12
-    ID         desplazar e ir al estado 13
-    STRING     desplazar e ir al estado 14
-    '{'        desplazar e ir al estado 137
-    ')'        desplazar e ir al estado 138
-
-    ','  reduce usando la regla 41 (funcion_declaration)
-
-    sentencia                          ir al estado 139
-    declarativa                        ir al estado 19
-    ejecutable                         ir al estado 20
-    declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    bloque_sentencias                  ir al estado 140
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
-
-
 estado 108
 
-   98 bucle_for: encabezado_for argumento_bucle_for ')' . bloque_sentencias
+   28 clase_declaration: encabezado_clase '{' atributos . metodos_clase herencia_composicion '}'
+   37 atributos: atributos . atributo_declaration
 
-    error      desplazar e ir al estado 1
-    SHORT      desplazar e ir al estado 2
-    UINT       desplazar e ir al estado 3
-    DOUBLE     desplazar e ir al estado 4
-    VOID       desplazar e ir al estado 5
-    CLASS      desplazar e ir al estado 6
-    INTERFACE  desplazar e ir al estado 7
-    IMPL       desplazar e ir al estado 8
-    IF         desplazar e ir al estado 9
-    PRINT      desplazar e ir al estado 10
-    FOR        desplazar e ir al estado 11
-    RETURN     desplazar e ir al estado 12
-    ID         desplazar e ir al estado 13
-    STRING     desplazar e ir al estado 14
-    '{'        desplazar e ir al estado 137
+    error   desplazar e ir al estado 1
+    SHORT   desplazar e ir al estado 2
+    UINT    desplazar e ir al estado 3
+    DOUBLE  desplazar e ir al estado 4
 
-    ','  reduce usando la regla 41 (funcion_declaration)
+    VOID  reduce usando la regla 41 (metodos_clase)
+    ID    reduce usando la regla 41 (metodos_clase)
+    '}'   reduce usando la regla 41 (metodos_clase)
+    ','   reduce usando la regla 41 (metodos_clase)
 
-    sentencia                          ir al estado 139
-    declarativa                        ir al estado 19
-    ejecutable                         ir al estado 20
-    declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    bloque_sentencias                  ir al estado 141
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    declaracion_variables  ir al estado 139
+    atributo_declaration   ir al estado 140
+    metodos_clase          ir al estado 141
+    tipo                   ir al estado 40
 
 
 estado 109
 
-  104 argumento_bucle_for: constante ';' . constante ';' constante
-  105                    | constante ';' . constante
+   30 interface_declaration: encabezado_interfaz '{' interface_metodos . '}'
+   31 interface_metodos: interface_metodos . interface_metodo_declaration
 
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
+    VOID  desplazar e ir al estado 5
+    '}'   desplazar e ir al estado 142
 
-    constante  ir al estado 142
+    encabezado_funcion            ir al estado 143
+    interface_metodo_declaration  ir al estado 144
 
 
 estado 110
+
+   57 parametro: ID .
+
+    $default  reduce usando la regla 57 (parametro)
+
+
+estado 111
+
+   43 funcion_declaration: encabezado_funcion '(' parametro . ')' '{' sentencias_metodo '}'
+   58 parametro: parametro . ';' tipo ID
+
+    ';'  desplazar e ir al estado 145
+    ')'  desplazar e ir al estado 146
+
+
+estado 112
+
+   56 parametro: tipo . ID
+
+    ID  desplazar e ir al estado 147
+
+
+estado 113
+
+   36 implement_declaration: encabezado_implement '{' metodos_clase . herencia_composicion '}'
+   40 metodos_clase: metodos_clase . metodo_declaration
+
+    VOID  desplazar e ir al estado 5
+
+    ','       reduce usando la regla 44 (funcion_declaration)
+    $default  reduce usando la regla 46 (herencia_composicion)
+
+    encabezado_funcion    ir al estado 26
+    metodo_declaration    ir al estado 148
+    funcion_declaration   ir al estado 149
+    herencia_composicion  ir al estado 150
+
+
+estado 114
+
+   99 bucle_for: encabezado_for '(' argumento_bucle_for . ')' bloque_sentencias
+  100          | encabezado_for '(' argumento_bucle_for . bloque_sentencias
+
+    error      desplazar e ir al estado 1
+    SHORT      desplazar e ir al estado 2
+    UINT       desplazar e ir al estado 3
+    DOUBLE     desplazar e ir al estado 4
+    VOID       desplazar e ir al estado 5
+    CLASS      desplazar e ir al estado 6
+    INTERFACE  desplazar e ir al estado 7
+    IMPL       desplazar e ir al estado 8
+    IF         desplazar e ir al estado 9
+    PRINT      desplazar e ir al estado 10
+    FOR        desplazar e ir al estado 11
+    RETURN     desplazar e ir al estado 12
+    ID         desplazar e ir al estado 13
+    STRING     desplazar e ir al estado 14
+    '{'        desplazar e ir al estado 151
+    ')'        desplazar e ir al estado 152
+
+    ','  reduce usando la regla 44 (funcion_declaration)
+
+    sentencia                          ir al estado 153
+    declarativa                        ir al estado 19
+    ejecutable                         ir al estado 20
+    declaracion_variables              ir al estado 21
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    bloque_sentencias                  ir al estado 154
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
+
+
+estado 115
+
+  101 bucle_for: encabezado_for argumento_bucle_for ')' . bloque_sentencias
+
+    error      desplazar e ir al estado 1
+    SHORT      desplazar e ir al estado 2
+    UINT       desplazar e ir al estado 3
+    DOUBLE     desplazar e ir al estado 4
+    VOID       desplazar e ir al estado 5
+    CLASS      desplazar e ir al estado 6
+    INTERFACE  desplazar e ir al estado 7
+    IMPL       desplazar e ir al estado 8
+    IF         desplazar e ir al estado 9
+    PRINT      desplazar e ir al estado 10
+    FOR        desplazar e ir al estado 11
+    RETURN     desplazar e ir al estado 12
+    ID         desplazar e ir al estado 13
+    STRING     desplazar e ir al estado 14
+    '{'        desplazar e ir al estado 151
+
+    ','  reduce usando la regla 44 (funcion_declaration)
+
+    sentencia                          ir al estado 153
+    declarativa                        ir al estado 19
+    ejecutable                         ir al estado 20
+    declaracion_variables              ir al estado 21
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    bloque_sentencias                  ir al estado 155
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
+
+
+estado 116
+
+  107 argumento_bucle_for: constante ';' . constante ';' constante
+  108                    | constante ';' . constante
+
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+
+    constante  ir al estado 156
+
+
+estado 117
 
    26 lista_variables: ID error ',' .
 
     $default  reduce usando la regla 26 (lista_variables)
 
 
-estado 111
+estado 118
 
    24 lista_variables: lista_variables ';' ID .
 
     $default  reduce usando la regla 24 (lista_variables)
 
 
-estado 112
-
-   33 implement_declaration: CLASS ID IMPLEMENT ID . '{' metodos_clase herencia_composicion '}'
-
-    '{'  desplazar e ir al estado 143
-
-
-estado 113
-
-   27 clase_declaration: CLASS ID '{' atributos . metodos_clase herencia_composicion '}'
-   34 atributos: atributos . atributo_declaration
-
-    error   desplazar e ir al estado 1
-    SHORT   desplazar e ir al estado 2
-    UINT    desplazar e ir al estado 3
-    DOUBLE  desplazar e ir al estado 4
-
-    VOID  reduce usando la regla 38 (metodos_clase)
-    ID    reduce usando la regla 38 (metodos_clase)
-    '}'   reduce usando la regla 38 (metodos_clase)
-    ','   reduce usando la regla 38 (metodos_clase)
-
-    declaracion_variables  ir al estado 144
-    atributo_declaration   ir al estado 145
-    metodos_clase          ir al estado 146
-    tipo                   ir al estado 37
-
-
-estado 114
-
-   28 interface_declaration: INTERFACE ID '{' interface_metodos . '}'
-   29 interface_metodos: interface_metodos . interface_metodo_declaration
-
-    VOID  desplazar e ir al estado 5
-    '}'   desplazar e ir al estado 147
-
-    encabezado_funcion            ir al estado 148
-    interface_metodo_declaration  ir al estado 149
-
-
-estado 115
-
-   57 distributed_method_implementation: IMPL FOR ID ':' . '{' metodos_clase '}'
-
-    '{'  desplazar e ir al estado 150
-
-
-estado 116
-
-  116 expresion_parentesis: '(' . expresion_parentesis ')'
-
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 116
-    '-'         desplazar e ir al estado 83
-
-    expresion_parentesis  ir al estado 151
-    termino               ir al estado 118
-    factor                ir al estado 90
-    constante             ir al estado 91
-
-
-estado 117
-
-  114 expresion: '(' expresion_parentesis . ')'
-
-    ')'  desplazar e ir al estado 152
-
-
-estado 118
-
-  117 expresion_parentesis: termino . '+' termino
-  118                     | termino . '-' termino
-  119                     | termino .
-  121 termino: termino . '*' factor
-  122        | termino . '/' factor
-
-    '-'  desplazar e ir al estado 153
-    '+'  desplazar e ir al estado 154
-    '*'  desplazar e ir al estado 125
-    '/'  desplazar e ir al estado 126
-
-    $default  reduce usando la regla 119 (expresion_parentesis)
-
-
 estado 119
 
-  124 factor: '-' constante .
+   35 encabezado_implement: CLASS ID IMPLEMENT ID .
 
-    $default  reduce usando la regla 124 (factor)
+    $default  reduce usando la regla 35 (encabezado_implement)
 
 
 estado 120
 
-   75 seleccion: IF '(' condicion ')' . bloque_if ELSE bloque_else END_IF
-   76          | IF '(' condicion ')' . bloque_if END_IF
-   77          | IF '(' condicion ')' . bloque_if
-   78          | IF '(' condicion ')' . bloque_if ELSE bloque_else
+   60 distributed_method_implementation: IMPL FOR ID ':' . '{' metodos_clase '}'
 
-    error      desplazar e ir al estado 1
-    SHORT      desplazar e ir al estado 2
-    UINT       desplazar e ir al estado 3
-    DOUBLE     desplazar e ir al estado 4
-    VOID       desplazar e ir al estado 5
-    CLASS      desplazar e ir al estado 6
-    INTERFACE  desplazar e ir al estado 7
-    IMPL       desplazar e ir al estado 8
-    IF         desplazar e ir al estado 9
-    PRINT      desplazar e ir al estado 10
-    FOR        desplazar e ir al estado 11
-    RETURN     desplazar e ir al estado 12
-    ID         desplazar e ir al estado 13
-    STRING     desplazar e ir al estado 14
-    '{'        desplazar e ir al estado 137
-
-    ','  reduce usando la regla 41 (funcion_declaration)
-
-    sentencia                          ir al estado 139
-    declarativa                        ir al estado 19
-    ejecutable                         ir al estado 20
-    declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    bloque_if                          ir al estado 155
-    bloque_sentencias                  ir al estado 156
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    '{'  desplazar e ir al estado 157
 
 
 estado 121
 
-   83 condicion: comparador expresion .
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
+  119 expresion_parentesis: '(' . expresion_parentesis ')'
 
-    '-'  desplazar e ir al estado 122
-    '+'  desplazar e ir al estado 123
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 121
+    '-'         desplazar e ir al estado 87
 
-    $default  reduce usando la regla 83 (condicion)
+    expresion_parentesis  ir al estado 158
+    termino               ir al estado 123
+    factor                ir al estado 94
+    constante             ir al estado 95
 
 
 estado 122
 
-  110 expresion: expresion '-' . termino
-  113          | expresion '-' . '(' expresion_parentesis ')'
+  117 expresion: '(' expresion_parentesis . ')'
 
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 157
-    '-'         desplazar e ir al estado 83
-
-    termino    ir al estado 158
-    factor     ir al estado 90
-    constante  ir al estado 91
+    ')'  desplazar e ir al estado 159
 
 
 estado 123
 
-  109 expresion: expresion '+' . termino
-  112          | expresion '+' . '(' expresion_parentesis ')'
+  120 expresion_parentesis: termino . '+' termino
+  121                     | termino . '-' termino
+  122                     | termino .
+  124 termino: termino . '*' factor
+  125        | termino . '/' factor
 
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 159
-    '-'         desplazar e ir al estado 83
+    '-'  desplazar e ir al estado 160
+    '+'  desplazar e ir al estado 161
+    '*'  desplazar e ir al estado 130
+    '/'  desplazar e ir al estado 131
 
-    termino    ir al estado 160
-    factor     ir al estado 90
-    constante  ir al estado 91
+    $default  reduce usando la regla 122 (expresion_parentesis)
 
 
 estado 124
 
-   81 condicion: expresion comparador . expresion
-   82          | expresion comparador .
+  127 factor: '-' constante .
 
-    SHORT       desplazar e ir al estado 2
-    UINT        desplazar e ir al estado 3
-    DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 83
-
-    $default  reduce usando la regla 82 (condicion)
-
-    expresion  ir al estado 161
-    termino    ir al estado 89
-    factor     ir al estado 90
-    constante  ir al estado 91
-    tipo       ir al estado 92
+    $default  reduce usando la regla 127 (factor)
 
 
 estado 125
 
-  121 termino: termino '*' . factor
+   78 seleccion: IF '(' condicion ')' . bloque_if ELSE bloque_else END_IF
+   79          | IF '(' condicion ')' . bloque_if END_IF
+   80          | IF '(' condicion ')' . bloque_if
+   81          | IF '(' condicion ')' . bloque_if ELSE bloque_else
 
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '-'         desplazar e ir al estado 83
+    error      desplazar e ir al estado 1
+    SHORT      desplazar e ir al estado 2
+    UINT       desplazar e ir al estado 3
+    DOUBLE     desplazar e ir al estado 4
+    VOID       desplazar e ir al estado 5
+    CLASS      desplazar e ir al estado 6
+    INTERFACE  desplazar e ir al estado 7
+    IMPL       desplazar e ir al estado 8
+    IF         desplazar e ir al estado 9
+    PRINT      desplazar e ir al estado 10
+    FOR        desplazar e ir al estado 11
+    RETURN     desplazar e ir al estado 12
+    ID         desplazar e ir al estado 13
+    STRING     desplazar e ir al estado 14
+    '{'        desplazar e ir al estado 151
 
-    factor     ir al estado 162
-    constante  ir al estado 91
+    ','  reduce usando la regla 44 (funcion_declaration)
+
+    sentencia                          ir al estado 153
+    declarativa                        ir al estado 19
+    ejecutable                         ir al estado 20
+    declaracion_variables              ir al estado 21
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    bloque_if                          ir al estado 162
+    bloque_sentencias                  ir al estado 163
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
 
 
 estado 126
 
-  122 termino: termino '/' . factor
+   86 condicion: comparador expresion .
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
 
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '-'         desplazar e ir al estado 83
+    '-'  desplazar e ir al estado 127
+    '+'  desplazar e ir al estado 128
 
-    factor     ir al estado 163
-    constante  ir al estado 91
+    $default  reduce usando la regla 86 (condicion)
 
 
 estado 127
 
-  111 expresion: tipo '(' . expresion ')'
+  113 expresion: expresion '-' . termino
+  116          | expresion '-' . '(' expresion_parentesis ')'
 
-    SHORT       desplazar e ir al estado 2
-    UINT        desplazar e ir al estado 3
-    DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 83
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 164
+    '-'         desplazar e ir al estado 87
 
-    expresion  ir al estado 164
-    termino    ir al estado 89
-    factor     ir al estado 90
-    constante  ir al estado 91
-    tipo       ir al estado 92
+    termino    ir al estado 165
+    factor     ir al estado 94
+    constante  ir al estado 95
 
 
 estado 128
 
-   99 encabezado_for: FOR ID IN RANGE .
+  112 expresion: expresion '+' . termino
+  115          | expresion '+' . '(' expresion_parentesis ')'
 
-    $default  reduce usando la regla 99 (encabezado_for)
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 166
+    '-'         desplazar e ir al estado 87
+
+    termino    ir al estado 167
+    factor     ir al estado 94
+    constante  ir al estado 95
 
 
 estado 129
 
-   71 invocacion: ID '.' ID '(' . argumentos ')'
+   84 condicion: expresion comparador . expresion
+   85          | expresion comparador .
 
     SHORT       desplazar e ir al estado 2
     UINT        desplazar e ir al estado 3
     DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 83
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 87
 
-    $default  reduce usando la regla 74 (argumentos)
+    $default  reduce usando la regla 85 (condicion)
 
-    argumentos  ir al estado 165
-    expresion   ir al estado 99
-    termino     ir al estado 89
-    factor      ir al estado 90
-    constante   ir al estado 91
-    tipo        ir al estado 92
+    expresion  ir al estado 168
+    termino    ir al estado 93
+    factor     ir al estado 94
+    constante  ir al estado 95
+    tipo       ir al estado 96
 
 
 estado 130
 
-   64 asignacion: ID '.' ID asignador . expresion
-   66           | ID '.' ID asignador .
+  124 termino: termino '*' . factor
 
-    SHORT       desplazar e ir al estado 2
-    UINT        desplazar e ir al estado 3
-    DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 83
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '-'         desplazar e ir al estado 87
 
-    $default  reduce usando la regla 66 (asignacion)
-
-    expresion  ir al estado 166
-    termino    ir al estado 89
-    factor     ir al estado 90
-    constante  ir al estado 91
-    tipo       ir al estado 92
+    factor     ir al estado 169
+    constante  ir al estado 95
 
 
 estado 131
 
-   73 argumentos: argumentos ';' . expresion
+  125 termino: termino '/' . factor
 
-    SHORT       desplazar e ir al estado 2
-    UINT        desplazar e ir al estado 3
-    DOUBLE      desplazar e ir al estado 4
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 82
-    '-'         desplazar e ir al estado 83
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '-'         desplazar e ir al estado 87
 
-    expresion  ir al estado 167
-    termino    ir al estado 89
-    factor     ir al estado 90
-    constante  ir al estado 91
-    tipo       ir al estado 92
+    factor     ir al estado 170
+    constante  ir al estado 95
 
 
 estado 132
 
-   70 invocacion: ID '(' argumentos ')' .
+  114 expresion: tipo '(' . expresion ')'
 
-    $default  reduce usando la regla 70 (invocacion)
+    SHORT       desplazar e ir al estado 2
+    UINT        desplazar e ir al estado 3
+    DOUBLE      desplazar e ir al estado 4
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 87
+
+    expresion  ir al estado 171
+    termino    ir al estado 93
+    factor     ir al estado 94
+    constante  ir al estado 95
+    tipo       ir al estado 96
 
 
 estado 133
 
-   60 lista_objetos: lista_objetos ';' objeto .
+  102 encabezado_for: FOR ID IN RANGE .
 
-    $default  reduce usando la regla 60 (lista_objetos)
+    $default  reduce usando la regla 102 (encabezado_for)
 
 
 estado 134
 
-   55 parametro: parametro ';' . tipo ID
+   74 invocacion: ID '.' ID '(' . argumentos ')'
 
-    SHORT   desplazar e ir al estado 2
-    UINT    desplazar e ir al estado 3
-    DOUBLE  desplazar e ir al estado 4
+    SHORT       desplazar e ir al estado 2
+    UINT        desplazar e ir al estado 3
+    DOUBLE      desplazar e ir al estado 4
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 87
 
-    tipo  ir al estado 168
+    $default  reduce usando la regla 77 (argumentos)
+
+    argumentos  ir al estado 172
+    expresion   ir al estado 103
+    termino     ir al estado 93
+    factor      ir al estado 94
+    constante   ir al estado 95
+    tipo        ir al estado 96
 
 
 estado 135
 
-   40 funcion_declaration: encabezado_funcion '(' parametro ')' . '{' sentencias_metodo '}'
+   67 asignacion: ID '.' ID asignador . expresion
+   69           | ID '.' ID asignador .
 
-    '{'  desplazar e ir al estado 169
+    SHORT       desplazar e ir al estado 2
+    UINT        desplazar e ir al estado 3
+    DOUBLE      desplazar e ir al estado 4
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 87
+
+    $default  reduce usando la regla 69 (asignacion)
+
+    expresion  ir al estado 173
+    termino    ir al estado 93
+    factor     ir al estado 94
+    constante  ir al estado 95
+    tipo       ir al estado 96
 
 
 estado 136
 
-   53 parametro: tipo ID .
+   76 argumentos: argumentos ';' . expresion
 
-    $default  reduce usando la regla 53 (parametro)
+    SHORT       desplazar e ir al estado 2
+    UINT        desplazar e ir al estado 3
+    DOUBLE      desplazar e ir al estado 4
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 86
+    '-'         desplazar e ir al estado 87
+
+    expresion  ir al estado 174
+    termino    ir al estado 93
+    factor     ir al estado 94
+    constante  ir al estado 95
+    tipo       ir al estado 96
 
 
 estado 137
 
-   92 bloque_sentencias: '{' . sentencias '}'
+   73 invocacion: ID '(' argumentos ')' .
 
-    error      desplazar e ir al estado 1
-    SHORT      desplazar e ir al estado 2
-    UINT       desplazar e ir al estado 3
-    DOUBLE     desplazar e ir al estado 4
-    VOID       desplazar e ir al estado 5
-    CLASS      desplazar e ir al estado 6
-    INTERFACE  desplazar e ir al estado 7
-    IMPL       desplazar e ir al estado 8
-    IF         desplazar e ir al estado 9
-    PRINT      desplazar e ir al estado 10
-    FOR        desplazar e ir al estado 11
-    RETURN     desplazar e ir al estado 12
-    ID         desplazar e ir al estado 13
-    STRING     desplazar e ir al estado 14
-
-    ','  reduce usando la regla 41 (funcion_declaration)
-
-    sentencias                         ir al estado 170
-    sentencia                          ir al estado 18
-    declarativa                        ir al estado 19
-    ejecutable                         ir al estado 20
-    declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    $default  reduce usando la regla 73 (invocacion)
 
 
 estado 138
 
-   96 bucle_for: encabezado_for '(' argumento_bucle_for ')' . bloque_sentencias
+   63 lista_objetos: lista_objetos ';' objeto .
 
-    error      desplazar e ir al estado 1
-    SHORT      desplazar e ir al estado 2
-    UINT       desplazar e ir al estado 3
-    DOUBLE     desplazar e ir al estado 4
-    VOID       desplazar e ir al estado 5
-    CLASS      desplazar e ir al estado 6
-    INTERFACE  desplazar e ir al estado 7
-    IMPL       desplazar e ir al estado 8
-    IF         desplazar e ir al estado 9
-    PRINT      desplazar e ir al estado 10
-    FOR        desplazar e ir al estado 11
-    RETURN     desplazar e ir al estado 12
-    ID         desplazar e ir al estado 13
-    STRING     desplazar e ir al estado 14
-    '{'        desplazar e ir al estado 137
-
-    ','  reduce usando la regla 41 (funcion_declaration)
-
-    sentencia                          ir al estado 139
-    declarativa                        ir al estado 19
-    ejecutable                         ir al estado 20
-    declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    bloque_sentencias                  ir al estado 171
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    $default  reduce usando la regla 63 (lista_objetos)
 
 
 estado 139
 
-   91 bloque_sentencias: sentencia .
+   39 atributo_declaration: declaracion_variables . ','
 
-    $default  reduce usando la regla 91 (bloque_sentencias)
+    ','  desplazar e ir al estado 175
 
 
 estado 140
 
-   97 bucle_for: encabezado_for '(' argumento_bucle_for bloque_sentencias .
+   37 atributos: atributos atributo_declaration .
 
-    $default  reduce usando la regla 97 (bucle_for)
+    $default  reduce usando la regla 37 (atributos)
 
 
 estado 141
 
-   98 bucle_for: encabezado_for argumento_bucle_for ')' bloque_sentencias .
+   28 clase_declaration: encabezado_clase '{' atributos metodos_clase . herencia_composicion '}'
+   40 metodos_clase: metodos_clase . metodo_declaration
 
-    $default  reduce usando la regla 98 (bucle_for)
+    VOID  desplazar e ir al estado 5
+
+    ','       reduce usando la regla 44 (funcion_declaration)
+    $default  reduce usando la regla 46 (herencia_composicion)
+
+    encabezado_funcion    ir al estado 26
+    metodo_declaration    ir al estado 148
+    funcion_declaration   ir al estado 149
+    herencia_composicion  ir al estado 176
 
 
 estado 142
 
-  104 argumento_bucle_for: constante ';' constante . ';' constante
-  105                    | constante ';' constante .
+   30 interface_declaration: encabezado_interfaz '{' interface_metodos '}' .
 
-    ';'  desplazar e ir al estado 172
-
-    $default  reduce usando la regla 105 (argumento_bucle_for)
+    $default  reduce usando la regla 30 (interface_declaration)
 
 
 estado 143
 
-   33 implement_declaration: CLASS ID IMPLEMENT ID '{' . metodos_clase herencia_composicion '}'
+   34 interface_metodo_declaration: encabezado_funcion . '(' parametro ')' ','
 
-    $default  reduce usando la regla 38 (metodos_clase)
-
-    metodos_clase  ir al estado 173
+    '('  desplazar e ir al estado 177
 
 
 estado 144
 
-   36 atributo_declaration: declaracion_variables . ','
+   31 interface_metodos: interface_metodos interface_metodo_declaration .
 
-    ','  desplazar e ir al estado 174
+    $default  reduce usando la regla 31 (interface_metodos)
 
 
 estado 145
 
-   34 atributos: atributos atributo_declaration .
-
-    $default  reduce usando la regla 34 (atributos)
-
-
-estado 146
-
-   27 clase_declaration: CLASS ID '{' atributos metodos_clase . herencia_composicion '}'
-   37 metodos_clase: metodos_clase . metodo_declaration
-
-    VOID  desplazar e ir al estado 5
-
-    ','       reduce usando la regla 41 (funcion_declaration)
-    $default  reduce usando la regla 43 (herencia_composicion)
-
-    encabezado_funcion    ir al estado 24
-    metodo_declaration    ir al estado 175
-    funcion_declaration   ir al estado 176
-    herencia_composicion  ir al estado 177
-
-
-estado 147
-
-   28 interface_declaration: INTERFACE ID '{' interface_metodos '}' .
-
-    $default  reduce usando la regla 28 (interface_declaration)
-
-
-estado 148
-
-   32 interface_metodo_declaration: encabezado_funcion . '(' parametro ')' ','
-
-    '('  desplazar e ir al estado 178
-
-
-estado 149
-
-   29 interface_metodos: interface_metodos interface_metodo_declaration .
-
-    $default  reduce usando la regla 29 (interface_metodos)
-
-
-estado 150
-
-   57 distributed_method_implementation: IMPL FOR ID ':' '{' . metodos_clase '}'
-
-    $default  reduce usando la regla 38 (metodos_clase)
-
-    metodos_clase  ir al estado 179
-
-
-estado 151
-
-  116 expresion_parentesis: '(' expresion_parentesis . ')'
-
-    ')'  desplazar e ir al estado 180
-
-
-estado 152
-
-  114 expresion: '(' expresion_parentesis ')' .
-
-    $default  reduce usando la regla 114 (expresion)
-
-
-estado 153
-
-  118 expresion_parentesis: termino '-' . termino
-
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '-'         desplazar e ir al estado 83
-
-    termino    ir al estado 181
-    factor     ir al estado 90
-    constante  ir al estado 91
-
-
-estado 154
-
-  117 expresion_parentesis: termino '+' . termino
-
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '-'         desplazar e ir al estado 83
-
-    termino    ir al estado 182
-    factor     ir al estado 90
-    constante  ir al estado 91
-
-
-estado 155
-
-   75 seleccion: IF '(' condicion ')' bloque_if . ELSE bloque_else END_IF
-   76          | IF '(' condicion ')' bloque_if . END_IF
-   77          | IF '(' condicion ')' bloque_if .
-   78          | IF '(' condicion ')' bloque_if . ELSE bloque_else
-
-    ELSE    desplazar e ir al estado 183
-    END_IF  desplazar e ir al estado 184
-
-    $default  reduce usando la regla 77 (seleccion)
-
-
-estado 156
-
-   79 bloque_if: bloque_sentencias .
-
-    $default  reduce usando la regla 79 (bloque_if)
-
-
-estado 157
-
-  113 expresion: expresion '-' '(' . expresion_parentesis ')'
-
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 116
-    '-'         desplazar e ir al estado 83
-
-    expresion_parentesis  ir al estado 185
-    termino               ir al estado 118
-    factor                ir al estado 90
-    constante             ir al estado 91
-
-
-estado 158
-
-  110 expresion: expresion '-' termino .
-  121 termino: termino . '*' factor
-  122        | termino . '/' factor
-
-    '*'  desplazar e ir al estado 125
-    '/'  desplazar e ir al estado 126
-
-    $default  reduce usando la regla 110 (expresion)
-
-
-estado 159
-
-  112 expresion: expresion '+' '(' . expresion_parentesis ')'
-
-    ID          desplazar e ir al estado 81
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-    '('         desplazar e ir al estado 116
-    '-'         desplazar e ir al estado 83
-
-    expresion_parentesis  ir al estado 186
-    termino               ir al estado 118
-    factor                ir al estado 90
-    constante             ir al estado 91
-
-
-estado 160
-
-  109 expresion: expresion '+' termino .
-  121 termino: termino . '*' factor
-  122        | termino . '/' factor
-
-    '*'  desplazar e ir al estado 125
-    '/'  desplazar e ir al estado 126
-
-    $default  reduce usando la regla 109 (expresion)
-
-
-estado 161
-
-   81 condicion: expresion comparador expresion .
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
-
-    '-'  desplazar e ir al estado 122
-    '+'  desplazar e ir al estado 123
-
-    $default  reduce usando la regla 81 (condicion)
-
-
-estado 162
-
-  121 termino: termino '*' factor .
-
-    $default  reduce usando la regla 121 (termino)
-
-
-estado 163
-
-  122 termino: termino '/' factor .
-
-    $default  reduce usando la regla 122 (termino)
-
-
-estado 164
-
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  111          | tipo '(' expresion . ')'
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
-
-    ')'  desplazar e ir al estado 187
-    '-'  desplazar e ir al estado 122
-    '+'  desplazar e ir al estado 123
-
-
-estado 165
-
-   71 invocacion: ID '.' ID '(' argumentos . ')'
-   73 argumentos: argumentos . ';' expresion
-
-    ';'  desplazar e ir al estado 131
-    ')'  desplazar e ir al estado 188
-
-
-estado 166
-
-   64 asignacion: ID '.' ID asignador expresion .
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
-
-    '-'  desplazar e ir al estado 122
-    '+'  desplazar e ir al estado 123
-
-    $default  reduce usando la regla 64 (asignacion)
-
-
-estado 167
-
-   73 argumentos: argumentos ';' expresion .
-  109 expresion: expresion . '+' termino
-  110          | expresion . '-' termino
-  112          | expresion . '+' '(' expresion_parentesis ')'
-  113          | expresion . '-' '(' expresion_parentesis ')'
-
-    '-'  desplazar e ir al estado 122
-    '+'  desplazar e ir al estado 123
-
-    $default  reduce usando la regla 73 (argumentos)
-
-
-estado 168
-
-   55 parametro: parametro ';' tipo . ID
-
-    ID  desplazar e ir al estado 189
-
-
-estado 169
-
-   40 funcion_declaration: encabezado_funcion '(' parametro ')' '{' . sentencias_metodo '}'
-
-    $default  reduce usando la regla 47 (sentencias_metodo)
-
-    sentencias_metodo  ir al estado 190
-
-
-estado 170
-
-    5 sentencias: sentencias . sentencia
-   92 bloque_sentencias: '{' sentencias . '}'
-
-    error      desplazar e ir al estado 1
-    SHORT      desplazar e ir al estado 2
-    UINT       desplazar e ir al estado 3
-    DOUBLE     desplazar e ir al estado 4
-    VOID       desplazar e ir al estado 5
-    CLASS      desplazar e ir al estado 6
-    INTERFACE  desplazar e ir al estado 7
-    IMPL       desplazar e ir al estado 8
-    IF         desplazar e ir al estado 9
-    PRINT      desplazar e ir al estado 10
-    FOR        desplazar e ir al estado 11
-    RETURN     desplazar e ir al estado 12
-    ID         desplazar e ir al estado 13
-    STRING     desplazar e ir al estado 14
-    '}'        desplazar e ir al estado 191
-
-    ','  reduce usando la regla 41 (funcion_declaration)
-
-    sentencia                          ir al estado 60
-    declarativa                        ir al estado 19
-    ejecutable                         ir al estado 20
-    declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
-
-
-estado 171
-
-   96 bucle_for: encabezado_for '(' argumento_bucle_for ')' bloque_sentencias .
-
-    $default  reduce usando la regla 96 (bucle_for)
-
-
-estado 172
-
-  104 argumento_bucle_for: constante ';' constante ';' . constante
-
-    CTE_SHORT   desplazar e ir al estado 64
-    CTE_UINT    desplazar e ir al estado 65
-    CTE_DOUBLE  desplazar e ir al estado 66
-
-    constante  ir al estado 192
-
-
-estado 173
-
-   33 implement_declaration: CLASS ID IMPLEMENT ID '{' metodos_clase . herencia_composicion '}'
-   37 metodos_clase: metodos_clase . metodo_declaration
-
-    VOID  desplazar e ir al estado 5
-
-    ','       reduce usando la regla 41 (funcion_declaration)
-    $default  reduce usando la regla 43 (herencia_composicion)
-
-    encabezado_funcion    ir al estado 24
-    metodo_declaration    ir al estado 175
-    funcion_declaration   ir al estado 176
-    herencia_composicion  ir al estado 193
-
-
-estado 174
-
-   36 atributo_declaration: declaracion_variables ',' .
-
-    $default  reduce usando la regla 36 (atributo_declaration)
-
-
-estado 175
-
-   37 metodos_clase: metodos_clase metodo_declaration .
-
-    $default  reduce usando la regla 37 (metodos_clase)
-
-
-estado 176
-
-   39 metodo_declaration: funcion_declaration . ','
-
-    ','  desplazar e ir al estado 194
-
-
-estado 177
-
-   27 clase_declaration: CLASS ID '{' atributos metodos_clase herencia_composicion . '}'
-   42 herencia_composicion: herencia_composicion . ID ','
-
-    ID   desplazar e ir al estado 195
-    '}'  desplazar e ir al estado 196
-
-
-estado 178
-
-   32 interface_metodo_declaration: encabezado_funcion '(' . parametro ')' ','
+   58 parametro: parametro ';' . tipo ID
 
     SHORT   desplazar e ir al estado 2
     UINT    desplazar e ir al estado 3
     DOUBLE  desplazar e ir al estado 4
-    ID      desplazar e ir al estado 104
+
+    tipo  ir al estado 178
+
+
+estado 146
+
+   43 funcion_declaration: encabezado_funcion '(' parametro ')' . '{' sentencias_metodo '}'
+
+    '{'  desplazar e ir al estado 179
+
+
+estado 147
+
+   56 parametro: tipo ID .
 
     $default  reduce usando la regla 56 (parametro)
 
-    parametro  ir al estado 197
-    tipo       ir al estado 106
+
+estado 148
+
+   40 metodos_clase: metodos_clase metodo_declaration .
+
+    $default  reduce usando la regla 40 (metodos_clase)
 
 
-estado 179
+estado 149
 
-   37 metodos_clase: metodos_clase . metodo_declaration
-   57 distributed_method_implementation: IMPL FOR ID ':' '{' metodos_clase . '}'
+   42 metodo_declaration: funcion_declaration . ','
 
-    VOID  desplazar e ir al estado 5
-    '}'   desplazar e ir al estado 198
-
-    $default  reduce usando la regla 41 (funcion_declaration)
-
-    encabezado_funcion   ir al estado 24
-    metodo_declaration   ir al estado 175
-    funcion_declaration  ir al estado 176
+    ','  desplazar e ir al estado 180
 
 
-estado 180
+estado 150
 
-  116 expresion_parentesis: '(' expresion_parentesis ')' .
+   36 implement_declaration: encabezado_implement '{' metodos_clase herencia_composicion . '}'
+   45 herencia_composicion: herencia_composicion . ID ','
 
-    $default  reduce usando la regla 116 (expresion_parentesis)
-
-
-estado 181
-
-  118 expresion_parentesis: termino '-' termino .
-  121 termino: termino . '*' factor
-  122        | termino . '/' factor
-
-    '*'  desplazar e ir al estado 125
-    '/'  desplazar e ir al estado 126
-
-    $default  reduce usando la regla 118 (expresion_parentesis)
+    ID   desplazar e ir al estado 181
+    '}'  desplazar e ir al estado 182
 
 
-estado 182
+estado 151
 
-  117 expresion_parentesis: termino '+' termino .
-  121 termino: termino . '*' factor
-  122        | termino . '/' factor
-
-    '*'  desplazar e ir al estado 125
-    '/'  desplazar e ir al estado 126
-
-    $default  reduce usando la regla 117 (expresion_parentesis)
-
-
-estado 183
-
-   75 seleccion: IF '(' condicion ')' bloque_if ELSE . bloque_else END_IF
-   78          | IF '(' condicion ')' bloque_if ELSE . bloque_else
+   95 bloque_sentencias: '{' . sentencias '}'
 
     error      desplazar e ir al estado 1
     SHORT      desplazar e ir al estado 2
@@ -2572,82 +2150,617 @@ estado 183
     RETURN     desplazar e ir al estado 12
     ID         desplazar e ir al estado 13
     STRING     desplazar e ir al estado 14
-    '{'        desplazar e ir al estado 137
 
-    ','  reduce usando la regla 41 (funcion_declaration)
+    ','  reduce usando la regla 44 (funcion_declaration)
 
-    sentencia                          ir al estado 139
+    sentencias                         ir al estado 183
+    sentencia                          ir al estado 18
     declarativa                        ir al estado 19
     ejecutable                         ir al estado 20
     declaracion_variables              ir al estado 21
-    clase_declaration                  ir al estado 22
-    interface_declaration              ir al estado 23
-    encabezado_funcion                 ir al estado 24
-    implement_declaration              ir al estado 25
-    funcion_declaration                ir al estado 26
-    distributed_method_implementation  ir al estado 27
-    retorno                            ir al estado 28
-    objeto_declaration                 ir al estado 29
-    asignacion                         ir al estado 30
-    invocacion                         ir al estado 31
-    seleccion                          ir al estado 32
-    bloque_else                        ir al estado 199
-    bloque_sentencias                  ir al estado 200
-    print                              ir al estado 33
-    bucle_for                          ir al estado 34
-    encabezado_for                     ir al estado 35
-    acceso_atributo                    ir al estado 36
-    tipo                               ir al estado 37
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
+
+
+estado 152
+
+   99 bucle_for: encabezado_for '(' argumento_bucle_for ')' . bloque_sentencias
+
+    error      desplazar e ir al estado 1
+    SHORT      desplazar e ir al estado 2
+    UINT       desplazar e ir al estado 3
+    DOUBLE     desplazar e ir al estado 4
+    VOID       desplazar e ir al estado 5
+    CLASS      desplazar e ir al estado 6
+    INTERFACE  desplazar e ir al estado 7
+    IMPL       desplazar e ir al estado 8
+    IF         desplazar e ir al estado 9
+    PRINT      desplazar e ir al estado 10
+    FOR        desplazar e ir al estado 11
+    RETURN     desplazar e ir al estado 12
+    ID         desplazar e ir al estado 13
+    STRING     desplazar e ir al estado 14
+    '{'        desplazar e ir al estado 151
+
+    ','  reduce usando la regla 44 (funcion_declaration)
+
+    sentencia                          ir al estado 153
+    declarativa                        ir al estado 19
+    ejecutable                         ir al estado 20
+    declaracion_variables              ir al estado 21
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    bloque_sentencias                  ir al estado 184
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
+
+
+estado 153
+
+   94 bloque_sentencias: sentencia .
+
+    $default  reduce usando la regla 94 (bloque_sentencias)
+
+
+estado 154
+
+  100 bucle_for: encabezado_for '(' argumento_bucle_for bloque_sentencias .
+
+    $default  reduce usando la regla 100 (bucle_for)
+
+
+estado 155
+
+  101 bucle_for: encabezado_for argumento_bucle_for ')' bloque_sentencias .
+
+    $default  reduce usando la regla 101 (bucle_for)
+
+
+estado 156
+
+  107 argumento_bucle_for: constante ';' constante . ';' constante
+  108                    | constante ';' constante .
+
+    ';'  desplazar e ir al estado 185
+
+    $default  reduce usando la regla 108 (argumento_bucle_for)
+
+
+estado 157
+
+   60 distributed_method_implementation: IMPL FOR ID ':' '{' . metodos_clase '}'
+
+    $default  reduce usando la regla 41 (metodos_clase)
+
+    metodos_clase  ir al estado 186
+
+
+estado 158
+
+  119 expresion_parentesis: '(' expresion_parentesis . ')'
+
+    ')'  desplazar e ir al estado 187
+
+
+estado 159
+
+  117 expresion: '(' expresion_parentesis ')' .
+
+    $default  reduce usando la regla 117 (expresion)
+
+
+estado 160
+
+  121 expresion_parentesis: termino '-' . termino
+
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '-'         desplazar e ir al estado 87
+
+    termino    ir al estado 188
+    factor     ir al estado 94
+    constante  ir al estado 95
+
+
+estado 161
+
+  120 expresion_parentesis: termino '+' . termino
+
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '-'         desplazar e ir al estado 87
+
+    termino    ir al estado 189
+    factor     ir al estado 94
+    constante  ir al estado 95
+
+
+estado 162
+
+   78 seleccion: IF '(' condicion ')' bloque_if . ELSE bloque_else END_IF
+   79          | IF '(' condicion ')' bloque_if . END_IF
+   80          | IF '(' condicion ')' bloque_if .
+   81          | IF '(' condicion ')' bloque_if . ELSE bloque_else
+
+    ELSE    desplazar e ir al estado 190
+    END_IF  desplazar e ir al estado 191
+
+    $default  reduce usando la regla 80 (seleccion)
+
+
+estado 163
+
+   82 bloque_if: bloque_sentencias .
+
+    $default  reduce usando la regla 82 (bloque_if)
+
+
+estado 164
+
+  116 expresion: expresion '-' '(' . expresion_parentesis ')'
+
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 121
+    '-'         desplazar e ir al estado 87
+
+    expresion_parentesis  ir al estado 192
+    termino               ir al estado 123
+    factor                ir al estado 94
+    constante             ir al estado 95
+
+
+estado 165
+
+  113 expresion: expresion '-' termino .
+  124 termino: termino . '*' factor
+  125        | termino . '/' factor
+
+    '*'  desplazar e ir al estado 130
+    '/'  desplazar e ir al estado 131
+
+    $default  reduce usando la regla 113 (expresion)
+
+
+estado 166
+
+  115 expresion: expresion '+' '(' . expresion_parentesis ')'
+
+    ID          desplazar e ir al estado 85
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+    '('         desplazar e ir al estado 121
+    '-'         desplazar e ir al estado 87
+
+    expresion_parentesis  ir al estado 193
+    termino               ir al estado 123
+    factor                ir al estado 94
+    constante             ir al estado 95
+
+
+estado 167
+
+  112 expresion: expresion '+' termino .
+  124 termino: termino . '*' factor
+  125        | termino . '/' factor
+
+    '*'  desplazar e ir al estado 130
+    '/'  desplazar e ir al estado 131
+
+    $default  reduce usando la regla 112 (expresion)
+
+
+estado 168
+
+   84 condicion: expresion comparador expresion .
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
+
+    '-'  desplazar e ir al estado 127
+    '+'  desplazar e ir al estado 128
+
+    $default  reduce usando la regla 84 (condicion)
+
+
+estado 169
+
+  124 termino: termino '*' factor .
+
+    $default  reduce usando la regla 124 (termino)
+
+
+estado 170
+
+  125 termino: termino '/' factor .
+
+    $default  reduce usando la regla 125 (termino)
+
+
+estado 171
+
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  114          | tipo '(' expresion . ')'
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
+
+    ')'  desplazar e ir al estado 194
+    '-'  desplazar e ir al estado 127
+    '+'  desplazar e ir al estado 128
+
+
+estado 172
+
+   74 invocacion: ID '.' ID '(' argumentos . ')'
+   76 argumentos: argumentos . ';' expresion
+
+    ';'  desplazar e ir al estado 136
+    ')'  desplazar e ir al estado 195
+
+
+estado 173
+
+   67 asignacion: ID '.' ID asignador expresion .
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
+
+    '-'  desplazar e ir al estado 127
+    '+'  desplazar e ir al estado 128
+
+    $default  reduce usando la regla 67 (asignacion)
+
+
+estado 174
+
+   76 argumentos: argumentos ';' expresion .
+  112 expresion: expresion . '+' termino
+  113          | expresion . '-' termino
+  115          | expresion . '+' '(' expresion_parentesis ')'
+  116          | expresion . '-' '(' expresion_parentesis ')'
+
+    '-'  desplazar e ir al estado 127
+    '+'  desplazar e ir al estado 128
+
+    $default  reduce usando la regla 76 (argumentos)
+
+
+estado 175
+
+   39 atributo_declaration: declaracion_variables ',' .
+
+    $default  reduce usando la regla 39 (atributo_declaration)
+
+
+estado 176
+
+   28 clase_declaration: encabezado_clase '{' atributos metodos_clase herencia_composicion . '}'
+   45 herencia_composicion: herencia_composicion . ID ','
+
+    ID   desplazar e ir al estado 181
+    '}'  desplazar e ir al estado 196
+
+
+estado 177
+
+   34 interface_metodo_declaration: encabezado_funcion '(' . parametro ')' ','
+
+    SHORT   desplazar e ir al estado 2
+    UINT    desplazar e ir al estado 3
+    DOUBLE  desplazar e ir al estado 4
+    ID      desplazar e ir al estado 110
+
+    $default  reduce usando la regla 59 (parametro)
+
+    parametro  ir al estado 197
+    tipo       ir al estado 112
+
+
+estado 178
+
+   58 parametro: parametro ';' tipo . ID
+
+    ID  desplazar e ir al estado 198
+
+
+estado 179
+
+   43 funcion_declaration: encabezado_funcion '(' parametro ')' '{' . sentencias_metodo '}'
+
+    $default  reduce usando la regla 50 (sentencias_metodo)
+
+    sentencias_metodo  ir al estado 199
+
+
+estado 180
+
+   42 metodo_declaration: funcion_declaration ',' .
+
+    $default  reduce usando la regla 42 (metodo_declaration)
+
+
+estado 181
+
+   45 herencia_composicion: herencia_composicion ID . ','
+
+    ','  desplazar e ir al estado 200
+
+
+estado 182
+
+   36 implement_declaration: encabezado_implement '{' metodos_clase herencia_composicion '}' .
+
+    $default  reduce usando la regla 36 (implement_declaration)
+
+
+estado 183
+
+    5 sentencias: sentencias . sentencia
+   95 bloque_sentencias: '{' sentencias . '}'
+
+    error      desplazar e ir al estado 1
+    SHORT      desplazar e ir al estado 2
+    UINT       desplazar e ir al estado 3
+    DOUBLE     desplazar e ir al estado 4
+    VOID       desplazar e ir al estado 5
+    CLASS      desplazar e ir al estado 6
+    INTERFACE  desplazar e ir al estado 7
+    IMPL       desplazar e ir al estado 8
+    IF         desplazar e ir al estado 9
+    PRINT      desplazar e ir al estado 10
+    FOR        desplazar e ir al estado 11
+    RETURN     desplazar e ir al estado 12
+    ID         desplazar e ir al estado 13
+    STRING     desplazar e ir al estado 14
+    '}'        desplazar e ir al estado 201
+
+    ','  reduce usando la regla 44 (funcion_declaration)
+
+    sentencia                          ir al estado 63
+    declarativa                        ir al estado 19
+    ejecutable                         ir al estado 20
+    declaracion_variables              ir al estado 21
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
 
 
 estado 184
 
-   76 seleccion: IF '(' condicion ')' bloque_if END_IF .
+   99 bucle_for: encabezado_for '(' argumento_bucle_for ')' bloque_sentencias .
 
-    $default  reduce usando la regla 76 (seleccion)
+    $default  reduce usando la regla 99 (bucle_for)
 
 
 estado 185
 
-  113 expresion: expresion '-' '(' expresion_parentesis . ')'
+  107 argumento_bucle_for: constante ';' constante ';' . constante
 
-    ')'  desplazar e ir al estado 201
+    CTE_SHORT   desplazar e ir al estado 70
+    CTE_UINT    desplazar e ir al estado 71
+    CTE_DOUBLE  desplazar e ir al estado 72
+
+    constante  ir al estado 202
 
 
 estado 186
 
-  112 expresion: expresion '+' '(' expresion_parentesis . ')'
+   40 metodos_clase: metodos_clase . metodo_declaration
+   60 distributed_method_implementation: IMPL FOR ID ':' '{' metodos_clase . '}'
 
-    ')'  desplazar e ir al estado 202
+    VOID  desplazar e ir al estado 5
+    '}'   desplazar e ir al estado 203
+
+    $default  reduce usando la regla 44 (funcion_declaration)
+
+    encabezado_funcion   ir al estado 26
+    metodo_declaration   ir al estado 148
+    funcion_declaration  ir al estado 149
 
 
 estado 187
 
-  111 expresion: tipo '(' expresion ')' .
+  119 expresion_parentesis: '(' expresion_parentesis ')' .
 
-    $default  reduce usando la regla 111 (expresion)
+    $default  reduce usando la regla 119 (expresion_parentesis)
 
 
 estado 188
 
-   71 invocacion: ID '.' ID '(' argumentos ')' .
+  121 expresion_parentesis: termino '-' termino .
+  124 termino: termino . '*' factor
+  125        | termino . '/' factor
 
-    $default  reduce usando la regla 71 (invocacion)
+    '*'  desplazar e ir al estado 130
+    '/'  desplazar e ir al estado 131
+
+    $default  reduce usando la regla 121 (expresion_parentesis)
 
 
 estado 189
 
-   55 parametro: parametro ';' tipo ID .
+  120 expresion_parentesis: termino '+' termino .
+  124 termino: termino . '*' factor
+  125        | termino . '/' factor
 
-    $default  reduce usando la regla 55 (parametro)
+    '*'  desplazar e ir al estado 130
+    '/'  desplazar e ir al estado 131
+
+    $default  reduce usando la regla 120 (expresion_parentesis)
 
 
 estado 190
 
-   40 funcion_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_metodo . '}'
-   44 sentencias_metodo: sentencias_metodo . declaracion_variables ','
-   45                  | sentencias_metodo . ejecutable ','
-   46                  | sentencias_metodo . local_function_declaration ','
+   78 seleccion: IF '(' condicion ')' bloque_if ELSE . bloque_else END_IF
+   81          | IF '(' condicion ')' bloque_if ELSE . bloque_else
+
+    error      desplazar e ir al estado 1
+    SHORT      desplazar e ir al estado 2
+    UINT       desplazar e ir al estado 3
+    DOUBLE     desplazar e ir al estado 4
+    VOID       desplazar e ir al estado 5
+    CLASS      desplazar e ir al estado 6
+    INTERFACE  desplazar e ir al estado 7
+    IMPL       desplazar e ir al estado 8
+    IF         desplazar e ir al estado 9
+    PRINT      desplazar e ir al estado 10
+    FOR        desplazar e ir al estado 11
+    RETURN     desplazar e ir al estado 12
+    ID         desplazar e ir al estado 13
+    STRING     desplazar e ir al estado 14
+    '{'        desplazar e ir al estado 151
+
+    ','  reduce usando la regla 44 (funcion_declaration)
+
+    sentencia                          ir al estado 153
+    declarativa                        ir al estado 19
+    ejecutable                         ir al estado 20
+    declaracion_variables              ir al estado 21
+    encabezado_clase                   ir al estado 22
+    clase_declaration                  ir al estado 23
+    encabezado_interfaz                ir al estado 24
+    interface_declaration              ir al estado 25
+    encabezado_funcion                 ir al estado 26
+    encabezado_implement               ir al estado 27
+    implement_declaration              ir al estado 28
+    funcion_declaration                ir al estado 29
+    distributed_method_implementation  ir al estado 30
+    retorno                            ir al estado 31
+    objeto_declaration                 ir al estado 32
+    asignacion                         ir al estado 33
+    invocacion                         ir al estado 34
+    seleccion                          ir al estado 35
+    bloque_else                        ir al estado 204
+    bloque_sentencias                  ir al estado 205
+    print                              ir al estado 36
+    bucle_for                          ir al estado 37
+    encabezado_for                     ir al estado 38
+    acceso_atributo                    ir al estado 39
+    tipo                               ir al estado 40
+
+
+estado 191
+
+   79 seleccion: IF '(' condicion ')' bloque_if END_IF .
+
+    $default  reduce usando la regla 79 (seleccion)
+
+
+estado 192
+
+  116 expresion: expresion '-' '(' expresion_parentesis . ')'
+
+    ')'  desplazar e ir al estado 206
+
+
+estado 193
+
+  115 expresion: expresion '+' '(' expresion_parentesis . ')'
+
+    ')'  desplazar e ir al estado 207
+
+
+estado 194
+
+  114 expresion: tipo '(' expresion ')' .
+
+    $default  reduce usando la regla 114 (expresion)
+
+
+estado 195
+
+   74 invocacion: ID '.' ID '(' argumentos ')' .
+
+    $default  reduce usando la regla 74 (invocacion)
+
+
+estado 196
+
+   28 clase_declaration: encabezado_clase '{' atributos metodos_clase herencia_composicion '}' .
+
+    $default  reduce usando la regla 28 (clase_declaration)
+
+
+estado 197
+
+   34 interface_metodo_declaration: encabezado_funcion '(' parametro . ')' ','
+   58 parametro: parametro . ';' tipo ID
+
+    ';'  desplazar e ir al estado 145
+    ')'  desplazar e ir al estado 208
+
+
+estado 198
+
+   58 parametro: parametro ';' tipo ID .
+
+    $default  reduce usando la regla 58 (parametro)
+
+
+estado 199
+
+   43 funcion_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_metodo . '}'
+   47 sentencias_metodo: sentencias_metodo . declaracion_variables ','
+   48                  | sentencias_metodo . ejecutable ','
+   49                  | sentencias_metodo . local_function_declaration ','
 
     error   desplazar e ir al estado 1
     SHORT   desplazar e ir al estado 2
@@ -2658,274 +2771,228 @@ estado 190
     PRINT   desplazar e ir al estado 10
     FOR     desplazar e ir al estado 11
     RETURN  desplazar e ir al estado 12
-    ID      desplazar e ir al estado 203
+    ID      desplazar e ir al estado 209
     STRING  desplazar e ir al estado 14
-    '}'     desplazar e ir al estado 204
+    '}'     desplazar e ir al estado 210
 
-    ejecutable                  ir al estado 205
-    declaracion_variables       ir al estado 206
-    encabezado_funcion          ir al estado 207
-    local_function_declaration  ir al estado 208
-    retorno                     ir al estado 28
-    asignacion                  ir al estado 30
-    invocacion                  ir al estado 31
-    seleccion                   ir al estado 32
-    print                       ir al estado 33
-    bucle_for                   ir al estado 34
-    encabezado_for              ir al estado 35
-    acceso_atributo             ir al estado 36
-    tipo                        ir al estado 37
-
-
-estado 191
-
-   92 bloque_sentencias: '{' sentencias '}' .
-
-    $default  reduce usando la regla 92 (bloque_sentencias)
-
-
-estado 192
-
-  104 argumento_bucle_for: constante ';' constante ';' constante .
-
-    $default  reduce usando la regla 104 (argumento_bucle_for)
-
-
-estado 193
-
-   33 implement_declaration: CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion . '}'
-   42 herencia_composicion: herencia_composicion . ID ','
-
-    ID   desplazar e ir al estado 195
-    '}'  desplazar e ir al estado 209
-
-
-estado 194
-
-   39 metodo_declaration: funcion_declaration ',' .
-
-    $default  reduce usando la regla 39 (metodo_declaration)
-
-
-estado 195
-
-   42 herencia_composicion: herencia_composicion ID . ','
-
-    ','  desplazar e ir al estado 210
-
-
-estado 196
-
-   27 clase_declaration: CLASS ID '{' atributos metodos_clase herencia_composicion '}' .
-
-    $default  reduce usando la regla 27 (clase_declaration)
-
-
-estado 197
-
-   32 interface_metodo_declaration: encabezado_funcion '(' parametro . ')' ','
-   55 parametro: parametro . ';' tipo ID
-
-    ';'  desplazar e ir al estado 134
-    ')'  desplazar e ir al estado 211
-
-
-estado 198
-
-   57 distributed_method_implementation: IMPL FOR ID ':' '{' metodos_clase '}' .
-
-    $default  reduce usando la regla 57 (distributed_method_implementation)
-
-
-estado 199
-
-   75 seleccion: IF '(' condicion ')' bloque_if ELSE bloque_else . END_IF
-   78          | IF '(' condicion ')' bloque_if ELSE bloque_else .
-
-    END_IF  desplazar e ir al estado 212
-
-    $default  reduce usando la regla 78 (seleccion)
+    ejecutable                  ir al estado 211
+    declaracion_variables       ir al estado 212
+    encabezado_funcion          ir al estado 213
+    local_function_declaration  ir al estado 214
+    retorno                     ir al estado 31
+    asignacion                  ir al estado 33
+    invocacion                  ir al estado 34
+    seleccion                   ir al estado 35
+    print                       ir al estado 36
+    bucle_for                   ir al estado 37
+    encabezado_for              ir al estado 38
+    acceso_atributo             ir al estado 39
+    tipo                        ir al estado 40
 
 
 estado 200
 
-   80 bloque_else: bloque_sentencias .
+   45 herencia_composicion: herencia_composicion ID ',' .
 
-    $default  reduce usando la regla 80 (bloque_else)
+    $default  reduce usando la regla 45 (herencia_composicion)
 
 
 estado 201
 
-  113 expresion: expresion '-' '(' expresion_parentesis ')' .
+   95 bloque_sentencias: '{' sentencias '}' .
 
-    $default  reduce usando la regla 113 (expresion)
+    $default  reduce usando la regla 95 (bloque_sentencias)
 
 
 estado 202
 
-  112 expresion: expresion '+' '(' expresion_parentesis ')' .
+  107 argumento_bucle_for: constante ';' constante ';' constante .
 
-    $default  reduce usando la regla 112 (expresion)
+    $default  reduce usando la regla 107 (argumento_bucle_for)
 
 
 estado 203
 
-   63 asignacion: ID . asignador expresion
-   64           | ID . '.' ID asignador expresion
-   65           | ID . asignador
-   66           | ID . '.' ID asignador
-   67           | ID . asignador '-'
-   70 invocacion: ID . '(' argumentos ')'
-   71           | ID . '.' ID '(' argumentos ')'
-  100 encabezado_for: ID . IN RANGE
-  108 acceso_atributo: ID . '.' ID
+   60 distributed_method_implementation: IMPL FOR ID ':' '{' metodos_clase '}' .
 
-    IN          desplazar e ir al estado 48
-    PLUS_EQUAL  desplazar e ir al estado 49
-    '='         desplazar e ir al estado 51
-    '.'         desplazar e ir al estado 52
-    '('         desplazar e ir al estado 53
-
-    asignador  ir al estado 56
+    $default  reduce usando la regla 60 (distributed_method_implementation)
 
 
 estado 204
 
-   40 funcion_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' .
+   78 seleccion: IF '(' condicion ')' bloque_if ELSE bloque_else . END_IF
+   81          | IF '(' condicion ')' bloque_if ELSE bloque_else .
 
-    $default  reduce usando la regla 40 (funcion_declaration)
+    END_IF  desplazar e ir al estado 215
+
+    $default  reduce usando la regla 81 (seleccion)
 
 
 estado 205
 
-   45 sentencias_metodo: sentencias_metodo ejecutable . ','
+   83 bloque_else: bloque_sentencias .
 
-    ','  desplazar e ir al estado 213
+    $default  reduce usando la regla 83 (bloque_else)
 
 
 estado 206
 
-   44 sentencias_metodo: sentencias_metodo declaracion_variables . ','
+  116 expresion: expresion '-' '(' expresion_parentesis ')' .
 
-    ','  desplazar e ir al estado 214
+    $default  reduce usando la regla 116 (expresion)
 
 
 estado 207
 
-   48 local_function_declaration: encabezado_funcion . '(' parametro ')' '{' sentencias_funcion_local '}'
+  115 expresion: expresion '+' '(' expresion_parentesis ')' .
 
-    '('  desplazar e ir al estado 215
+    $default  reduce usando la regla 115 (expresion)
 
 
 estado 208
 
-   46 sentencias_metodo: sentencias_metodo local_function_declaration . ','
+   34 interface_metodo_declaration: encabezado_funcion '(' parametro ')' . ','
 
     ','  desplazar e ir al estado 216
 
 
 estado 209
 
-   33 implement_declaration: CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}' .
+   66 asignacion: ID . asignador expresion
+   67           | ID . '.' ID asignador expresion
+   68           | ID . asignador
+   69           | ID . '.' ID asignador
+   70           | ID . asignador '-'
+   73 invocacion: ID . '(' argumentos ')'
+   74           | ID . '.' ID '(' argumentos ')'
+  103 encabezado_for: ID . IN RANGE
+  111 acceso_atributo: ID . '.' ID
 
-    $default  reduce usando la regla 33 (implement_declaration)
+    IN          desplazar e ir al estado 51
+    PLUS_EQUAL  desplazar e ir al estado 52
+    '='         desplazar e ir al estado 54
+    '.'         desplazar e ir al estado 55
+    '('         desplazar e ir al estado 56
+
+    asignador  ir al estado 59
 
 
 estado 210
 
-   42 herencia_composicion: herencia_composicion ID ',' .
+   43 funcion_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' .
 
-    $default  reduce usando la regla 42 (herencia_composicion)
+    $default  reduce usando la regla 43 (funcion_declaration)
 
 
 estado 211
 
-   32 interface_metodo_declaration: encabezado_funcion '(' parametro ')' . ','
+   48 sentencias_metodo: sentencias_metodo ejecutable . ','
 
     ','  desplazar e ir al estado 217
 
 
 estado 212
 
-   75 seleccion: IF '(' condicion ')' bloque_if ELSE bloque_else END_IF .
+   47 sentencias_metodo: sentencias_metodo declaracion_variables . ','
 
-    $default  reduce usando la regla 75 (seleccion)
+    ','  desplazar e ir al estado 218
 
 
 estado 213
 
-   45 sentencias_metodo: sentencias_metodo ejecutable ',' .
+   51 local_function_declaration: encabezado_funcion . '(' parametro ')' '{' sentencias_funcion_local '}'
 
-    $default  reduce usando la regla 45 (sentencias_metodo)
+    '('  desplazar e ir al estado 219
 
 
 estado 214
 
-   44 sentencias_metodo: sentencias_metodo declaracion_variables ',' .
+   49 sentencias_metodo: sentencias_metodo local_function_declaration . ','
 
-    $default  reduce usando la regla 44 (sentencias_metodo)
+    ','  desplazar e ir al estado 220
 
 
 estado 215
 
-   48 local_function_declaration: encabezado_funcion '(' . parametro ')' '{' sentencias_funcion_local '}'
+   78 seleccion: IF '(' condicion ')' bloque_if ELSE bloque_else END_IF .
 
-    SHORT   desplazar e ir al estado 2
-    UINT    desplazar e ir al estado 3
-    DOUBLE  desplazar e ir al estado 4
-    ID      desplazar e ir al estado 104
-
-    $default  reduce usando la regla 56 (parametro)
-
-    parametro  ir al estado 218
-    tipo       ir al estado 106
+    $default  reduce usando la regla 78 (seleccion)
 
 
 estado 216
 
-   46 sentencias_metodo: sentencias_metodo local_function_declaration ',' .
+   34 interface_metodo_declaration: encabezado_funcion '(' parametro ')' ',' .
 
-    $default  reduce usando la regla 46 (sentencias_metodo)
+    $default  reduce usando la regla 34 (interface_metodo_declaration)
 
 
 estado 217
 
-   32 interface_metodo_declaration: encabezado_funcion '(' parametro ')' ',' .
+   48 sentencias_metodo: sentencias_metodo ejecutable ',' .
 
-    $default  reduce usando la regla 32 (interface_metodo_declaration)
+    $default  reduce usando la regla 48 (sentencias_metodo)
 
 
 estado 218
 
-   48 local_function_declaration: encabezado_funcion '(' parametro . ')' '{' sentencias_funcion_local '}'
-   55 parametro: parametro . ';' tipo ID
+   47 sentencias_metodo: sentencias_metodo declaracion_variables ',' .
 
-    ';'  desplazar e ir al estado 134
-    ')'  desplazar e ir al estado 219
+    $default  reduce usando la regla 47 (sentencias_metodo)
 
 
 estado 219
 
-   48 local_function_declaration: encabezado_funcion '(' parametro ')' . '{' sentencias_funcion_local '}'
+   51 local_function_declaration: encabezado_funcion '(' . parametro ')' '{' sentencias_funcion_local '}'
 
-    '{'  desplazar e ir al estado 220
+    SHORT   desplazar e ir al estado 2
+    UINT    desplazar e ir al estado 3
+    DOUBLE  desplazar e ir al estado 4
+    ID      desplazar e ir al estado 110
+
+    $default  reduce usando la regla 59 (parametro)
+
+    parametro  ir al estado 221
+    tipo       ir al estado 112
 
 
 estado 220
 
-   48 local_function_declaration: encabezado_funcion '(' parametro ')' '{' . sentencias_funcion_local '}'
+   49 sentencias_metodo: sentencias_metodo local_function_declaration ',' .
 
-    $default  reduce usando la regla 52 (sentencias_funcion_local)
-
-    sentencias_funcion_local  ir al estado 221
+    $default  reduce usando la regla 49 (sentencias_metodo)
 
 
 estado 221
 
-   48 local_function_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local . '}'
-   49 sentencias_funcion_local: sentencias_funcion_local . declaracion_variables ','
-   50                         | sentencias_funcion_local . ejecutable ','
-   51                         | sentencias_funcion_local . local_function_declaration ','
+   51 local_function_declaration: encabezado_funcion '(' parametro . ')' '{' sentencias_funcion_local '}'
+   58 parametro: parametro . ';' tipo ID
+
+    ';'  desplazar e ir al estado 145
+    ')'  desplazar e ir al estado 222
+
+
+estado 222
+
+   51 local_function_declaration: encabezado_funcion '(' parametro ')' . '{' sentencias_funcion_local '}'
+
+    '{'  desplazar e ir al estado 223
+
+
+estado 223
+
+   51 local_function_declaration: encabezado_funcion '(' parametro ')' '{' . sentencias_funcion_local '}'
+
+    $default  reduce usando la regla 55 (sentencias_funcion_local)
+
+    sentencias_funcion_local  ir al estado 224
+
+
+estado 224
+
+   51 local_function_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local . '}'
+   52 sentencias_funcion_local: sentencias_funcion_local . declaracion_variables ','
+   53                         | sentencias_funcion_local . ejecutable ','
+   54                         | sentencias_funcion_local . local_function_declaration ','
 
     error   desplazar e ir al estado 1
     SHORT   desplazar e ir al estado 2
@@ -2936,69 +3003,69 @@ estado 221
     PRINT   desplazar e ir al estado 10
     FOR     desplazar e ir al estado 11
     RETURN  desplazar e ir al estado 12
-    ID      desplazar e ir al estado 203
+    ID      desplazar e ir al estado 209
     STRING  desplazar e ir al estado 14
-    '}'     desplazar e ir al estado 222
+    '}'     desplazar e ir al estado 225
 
-    ejecutable                  ir al estado 223
-    declaracion_variables       ir al estado 224
-    encabezado_funcion          ir al estado 207
-    local_function_declaration  ir al estado 225
-    retorno                     ir al estado 28
-    asignacion                  ir al estado 30
-    invocacion                  ir al estado 31
-    seleccion                   ir al estado 32
-    print                       ir al estado 33
-    bucle_for                   ir al estado 34
-    encabezado_for              ir al estado 35
-    acceso_atributo             ir al estado 36
-    tipo                        ir al estado 37
-
-
-estado 222
-
-   48 local_function_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' .
-
-    $default  reduce usando la regla 48 (local_function_declaration)
-
-
-estado 223
-
-   50 sentencias_funcion_local: sentencias_funcion_local ejecutable . ','
-
-    ','  desplazar e ir al estado 226
-
-
-estado 224
-
-   49 sentencias_funcion_local: sentencias_funcion_local declaracion_variables . ','
-
-    ','  desplazar e ir al estado 227
+    ejecutable                  ir al estado 226
+    declaracion_variables       ir al estado 227
+    encabezado_funcion          ir al estado 213
+    local_function_declaration  ir al estado 228
+    retorno                     ir al estado 31
+    asignacion                  ir al estado 33
+    invocacion                  ir al estado 34
+    seleccion                   ir al estado 35
+    print                       ir al estado 36
+    bucle_for                   ir al estado 37
+    encabezado_for              ir al estado 38
+    acceso_atributo             ir al estado 39
+    tipo                        ir al estado 40
 
 
 estado 225
 
-   51 sentencias_funcion_local: sentencias_funcion_local local_function_declaration . ','
+   51 local_function_declaration: encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' .
 
-    ','  desplazar e ir al estado 228
+    $default  reduce usando la regla 51 (local_function_declaration)
 
 
 estado 226
 
-   50 sentencias_funcion_local: sentencias_funcion_local ejecutable ',' .
+   53 sentencias_funcion_local: sentencias_funcion_local ejecutable . ','
 
-    $default  reduce usando la regla 50 (sentencias_funcion_local)
+    ','  desplazar e ir al estado 229
 
 
 estado 227
 
-   49 sentencias_funcion_local: sentencias_funcion_local declaracion_variables ',' .
+   52 sentencias_funcion_local: sentencias_funcion_local declaracion_variables . ','
 
-    $default  reduce usando la regla 49 (sentencias_funcion_local)
+    ','  desplazar e ir al estado 230
 
 
 estado 228
 
-   51 sentencias_funcion_local: sentencias_funcion_local local_function_declaration ',' .
+   54 sentencias_funcion_local: sentencias_funcion_local local_function_declaration . ','
 
-    $default  reduce usando la regla 51 (sentencias_funcion_local)
+    ','  desplazar e ir al estado 231
+
+
+estado 229
+
+   53 sentencias_funcion_local: sentencias_funcion_local ejecutable ',' .
+
+    $default  reduce usando la regla 53 (sentencias_funcion_local)
+
+
+estado 230
+
+   52 sentencias_funcion_local: sentencias_funcion_local declaracion_variables ',' .
+
+    $default  reduce usando la regla 52 (sentencias_funcion_local)
+
+
+estado 231
+
+   54 sentencias_funcion_local: sentencias_funcion_local local_function_declaration ',' .
+
+    $default  reduce usando la regla 54 (sentencias_funcion_local)

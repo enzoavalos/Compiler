@@ -17,7 +17,7 @@
 %token <string> ID STRING CTE_SHORT CTE_UINT CTE_DOUBLE
 %type <string> factor constante expresion asignador termino expresion_parentesis comparador condicion bloque_sentencias asignacion seleccion
 %type <string> bloque_else bloque_if argumento_bucle_for acceso_atributo encabezado_funcion sentencias_metodo sentencias_funcion_local
-%type <string> encabezado_for
+%type <string> encabezado_for encabezado_implement
 
 %left '=' PLUS_EQUAL  // Asociatividad izquierda para asignación y asignación con adición
 %left '.'  // Asociatividad izquierda para acceso a atributos y métodos
@@ -82,14 +82,25 @@ lista_variables : lista_variables ';' ID        { if(SyntacticActions::checkDecl
                 | ID error ','    { Logger::logError("declaracion de variables invalida") }
                 ;
 
-clase_declaration       : CLASS ID '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
-                                                                                        IntermediateCodeGenerator::setVarScope($2);
-                                                                                        SyntacticActions::setIdUse($2, "nombre-clase"); }
+encabezado_clase        : CLASS ID      { IntermediateCodeGenerator::setVarScope($2);
+                                        SyntacticActions::setIdUse($2, "nombre-clase");
+                                        IntermediateCodeGenerator::addScope($2);
+                                        }
                         ;
 
-interface_declaration   : INTERFACE ID '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz");
-                                                                IntermediateCodeGenerator::setVarScope($2);
-                                                                SyntacticActions::setIdUse($2, "nombre-interfaz"); }
+// TODO 4 Revisar redeclaracion de clases e interfaces
+clase_declaration       : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
+                                                                                                IntermediateCodeGenerator::onScopeFinished() }
+                        ;
+
+encabezado_interfaz     : INTERFACE ID          { IntermediateCodeGenerator::setVarScope($2);
+                                                SyntacticActions::setIdUse($2, "nombre-interfaz");
+                                                IntermediateCodeGenerator::addScope($2);
+                                                }
+                        ;
+
+interface_declaration   : encabezado_interfaz '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz");
+                                                                IntermediateCodeGenerator::onScopeFinished() }
                         ;
 
 interface_metodos       : interface_metodos interface_metodo_declaration
@@ -112,10 +123,19 @@ interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { Log
                                                                                 IntermediateCodeGenerator::onScopeFinished() }
                                 ;
 
-implement_declaration   : CLASS ID IMPLEMENT ID '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz");
-                                                                                        if(SyntacticActions::checkDeclaredClass($4)){
-                                                                                                IntermediateCodeGenerator::setVarScope($2);
-                                                                                                SyntacticActions::setIdUse($2, "nombre-clase");
+encabezado_implement    : CLASS ID IMPLEMENT ID         { $$ = $4;
+                                                        if(SyntacticActions::checkDeclaredClass($4)){
+                                                                IntermediateCodeGenerator::setVarScope($2);
+                                                                SyntacticActions::setIdUse($2, "nombre-clase");
+                                                                IntermediateCodeGenerator::addScope($2);
+                                                        }
+                                                        }
+                        ;
+
+// TODO 3 Buscar variables y metodos en ambito de clase y sino en ambito de interfaz que implementa
+implement_declaration   : encabezado_implement '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz");
+                                                                                        if(SyntacticActions::checkDeclaredClass($1, false)){
+                                                                                                IntermediateCodeGenerator::onScopeFinished();
                                                                                         }
                                                                                 }
                         ;
@@ -320,35 +340,57 @@ bucle_for       : encabezado_for '(' argumento_bucle_for ')' bloque_sentencias {
                                                                                 IntermediateCodeGenerator::onScopeFinished() }
                 ;
 
-// TODO 1 Revisar redeclaracion de variable
 encabezado_for  : FOR ID IN RANGE       { $$ = $2;
                                         char *aux = (char*) malloc(sizeof(char) * 4);
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         IntermediateCodeGenerator::addScope(aux);
-                                        IntermediateCodeGenerator::setVarScope($2);
-                                        SyntacticActions::setIdUse($2, "variable"); }
+                                        if(SyntacticActions::checkDeclaredVar($2, false)){
+                                                string id = $2;
+                                                Logger::logError("Redeclaracion de variable " + id);
+                                        }else{
+                                                IntermediateCodeGenerator::setVarScope($2);
+                                                SyntacticActions::setIdUse($2, "variable"); }
+                                        }
                 | ID IN RANGE           { $$ = $1;
                                         char *aux = (char*) malloc(sizeof(char) * 4);
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         Logger::logWarning("Falta sentencia FOR");
                                         IntermediateCodeGenerator::addScope(aux);
-                                        IntermediateCodeGenerator::setVarScope($1);
-                                        SyntacticActions::setIdUse($1, "variable"); }
+                                        if(SyntacticActions::checkDeclaredVar($1, false)){
+                                                string id = $1;
+                                                Logger::logError("Redeclaracion de variable " + id);
+                                        }else{
+                                                IntermediateCodeGenerator::setVarScope($1);
+                                                SyntacticActions::setIdUse($1, "variable");
+                                        }
+                                        }
                 | FOR IN RANGE          { Logger::logError("Se esperaba una variable") }
                 | FOR ID IN             { $$ = $2;
                                         char *aux = (char*) malloc(sizeof(char) * 4);
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         Logger::logWarning("Falta sentencia RANGE");
                                         IntermediateCodeGenerator::addScope(aux);
-                                        IntermediateCodeGenerator::setVarScope($2); 
-                                        SyntacticActions::setIdUse($2, "variable");}
+                                        if(SyntacticActions::checkDeclaredVar($2, false)){
+                                                string id = $2;
+                                                Logger::logError("Redeclaracion de variable " + id);
+                                        }else{
+                                                IntermediateCodeGenerator::setVarScope($2);
+                                                SyntacticActions::setIdUse($2, "variable");
+                                        }
+                                        }
                 | FOR ID RANGE          { $$ = $2;
                                         char *aux = (char*) malloc(sizeof(char) * 4);
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         Logger::logError("Falta sentencia IN");
                                         IntermediateCodeGenerator::addScope(aux);
-                                        IntermediateCodeGenerator::setVarScope($2);
-                                        SyntacticActions::setIdUse($2, "variable"); }
+                                        if(SyntacticActions::checkDeclaredVar($2, false)){
+                                                string id = $2;
+                                                Logger::logError("Redeclaracion de variable " + id);
+                                        }else{
+                                                IntermediateCodeGenerator::setVarScope($2);
+                                                SyntacticActions::setIdUse($2, "variable");
+                                        }
+                                        }
                 ;
 
 argumento_bucle_for     : constante ';' constante ';' constante { IntermediateCodeGenerator::forArguments($1, $3, $5) }
@@ -357,6 +399,7 @@ argumento_bucle_for     : constante ';' constante ';' constante { IntermediateCo
                         |       { Logger::logError("Sentencia FOR recibe 3 parametros, ninguno encontrado") }
                         ;
 
+// TODO 1 Revisar si variable o metodo de clase existe en ambito de clase
 acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo");
                                         if(SyntacticActions::checkDeclaredVar($1)){
                                                 char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);

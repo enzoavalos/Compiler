@@ -1,6 +1,20 @@
 {
     SHORT int1 ,
 
+    CLASS clase {
+        SHORT a ,
+        VOID m() {
+            DOUBLE int1 ,
+            VOID funcion1(){
+                DOUBLE zz ,
+                zz = s - zz ,
+                a = zz ,
+            } ,
+        } ,
+    } ,
+
+    clase objeto1 ,
+
     VOID q (DOUBLE x){
         RETURN ,
     } ,
@@ -9,8 +23,8 @@
         int1 += i ,
     ,
 
-    FOR i IN RANGE (2_s; 10_s; 1_s){
-        int1 = i,
+    FOR j IN RANGE (2_s; 10_s; 1_s){
+        int1 = j,
         q(34_s),
     } ,
 }
