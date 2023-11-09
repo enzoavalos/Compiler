@@ -16,6 +16,8 @@ class IntermediateCodeGenerator{
         const static string initialScope;
         const static int stackEmpty;
 
+        static int lastValidTerceto;
+
         static void addScope(char*);
         static void onScopeFinished(char*);
         static void setVarScope(char*);
@@ -59,6 +61,7 @@ string IntermediateCodeGenerator::scope = "main";
 const string IntermediateCodeGenerator::initialScope = "main";
 const int IntermediateCodeGenerator::stackEmpty = -1;
 int IntermediateCodeGenerator::lastTerceto = -1;
+int IntermediateCodeGenerator::lastValidTerceto = 0;
 map<int, Terceto> IntermediateCodeGenerator::tercetos = map<int, Terceto>();
 stack<int> IntermediateCodeGenerator::pila = stack<int>();
 stack<int> IntermediateCodeGenerator::returnStack = stack<int>();

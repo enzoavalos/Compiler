@@ -53,3 +53,22 @@ void SymbolTable::setScope(string lexeme, string scope){
         this->deleteSymbol(lexeme);
     }
 }
+
+string* SymbolTable::getSymbolsByScope(string scope){
+    string * symbols = new string[this->symbols.size()];
+    int i = 0;
+    for(auto& pair: this->symbols){
+        string lexeme = pair.first;
+        if (lexeme.find(scope) != string::npos) {
+            symbols[i++] = lexeme;
+        } else {
+            symbols[i++] = "";
+        }
+    }
+
+    return symbols;
+}
+
+int SymbolTable::getSymbolsSize(){
+    return this->symbols.size();
+}

@@ -82,10 +82,20 @@ lista_variables : lista_variables ';' ID        { if(SyntacticActions::checkDecl
                 | ID error ','    { Logger::logError("declaracion de variables invalida") }
                 ;
 
-encabezado_clase        : CLASS ID      { IntermediateCodeGenerator::setVarScope($2);
-                                        SyntacticActions::setIdUse($2, "nombre-clase");
-                                        IntermediateCodeGenerator::addScope($2);
+// Hay que evitar que el resto de la declaracion de la clase se ejecute, metodos y propiedades
+encabezado_clase        : CLASS ID      {
+                                        if (SyntacticActions::checkDeclaredClass($2, false)) {
+                                                string aux = $2;
+                                                Logger::logError("Redeclaracion de clase " + aux);
+                                                char* remove = (char*) malloc(sizeof(char) * 7);
+                                                remove[0] = 'b'; remove[1] = 'o'; remove[2] = 'r'; remove[3] = 'r'; remove[4] = 'a'; remove[5] = 'r'; remove[6] = '\0';
+                                                IntermediateCodeGenerator::addScope(remove);
+                                        } else {
+                                                IntermediateCodeGenerator::setVarScope($2);
+                                                SyntacticActions::setIdUse($2, "nombre-clase");
+                                                IntermediateCodeGenerator::addScope($2);
                                         }
+}
                         ;
 
 // TODO 4 Revisar redeclaracion de clases e interfaces
@@ -409,11 +419,12 @@ acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo");
                                 }
                 ;
 
-expresion       : expresion '+' termino { IntermediateCodeGenerator::addTerceto("+", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
-                | expresion '-' termino { IntermediateCodeGenerator::addTerceto("-", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
+// Que hacer si los tipos son diferentes?
+expresion       : expresion '+' termino { SyntacticActions::checkTypes($1, $3); IntermediateCodeGenerator::addTerceto("+", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                | expresion '-' termino { SyntacticActions::checkTypes($1, $3); IntermediateCodeGenerator::addTerceto("-", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
                 | tipo '(' expresion ')' { Logger::logError("Conversion explicita no permitida") }
-                | expresion '+' '(' expresion_parentesis ')' { IntermediateCodeGenerator::addTerceto("+", $1, $4); $$ = IntermediateCodeGenerator::getLastTerceto();}
-                | expresion '-' '(' expresion_parentesis ')' { IntermediateCodeGenerator::addTerceto("-", $1, $4); $$ = IntermediateCodeGenerator::getLastTerceto();}
+                | expresion '+' '(' expresion_parentesis ')' { SyntacticActions::checkTypes($1, $4); IntermediateCodeGenerator::addTerceto("+", $1, $4); $$ = IntermediateCodeGenerator::getLastTerceto();}
+                | expresion '-' '(' expresion_parentesis ')' { SyntacticActions::checkTypes($1, $4); IntermediateCodeGenerator::addTerceto("-", $1, $4); $$ = IntermediateCodeGenerator::getLastTerceto();}
                 | '(' expresion_parentesis ')' { $$ = $2; }
                 | termino { $$ = $1; }
                 ;
@@ -421,14 +432,14 @@ expresion       : expresion '+' termino { IntermediateCodeGenerator::addTerceto(
 
 
 expresion_parentesis    : '(' expresion_parentesis ')' { Logger::logError("Anidamiento de expresiones con parentesis no permitida") }
-                        | termino '+' termino
-                        | termino '-' termino
+                        | termino '+' termino { SyntacticActions::checkTypes($1, $3); IntermediateCodeGenerator::addTerceto("+", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                        | termino '-' termino { SyntacticActions::checkTypes($1, $3); IntermediateCodeGenerator::addTerceto("-", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
                         | termino
                         ;
 
 termino         : factor { $$ = $1; }
-                | termino '*' factor { IntermediateCodeGenerator::addTerceto("*", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
-                | termino '/' factor { SyntacticActions::check_division_by_zero($3); IntermediateCodeGenerator::addTerceto("/", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                | termino '*' factor { SyntacticActions::checkTypes($1, $3); IntermediateCodeGenerator::addTerceto("*", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                | termino '/' factor { SyntacticActions::checkTypes($1, $3); SyntacticActions::check_division_by_zero($3); IntermediateCodeGenerator::addTerceto("/", $1, $3); $$ = IntermediateCodeGenerator::getLastTerceto(); }
                 ;
 
 factor          : ID { if(SyntacticActions::checkDeclaredVar($1)) $$ = $1; }

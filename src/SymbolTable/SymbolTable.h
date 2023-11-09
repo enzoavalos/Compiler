@@ -15,6 +15,8 @@ class SymbolTable{
         void printTable() const;
         void deleteSymbol(string);
         void setScope(string, string);
+        string* getSymbolsByScope(string);
+        int getSymbolsSize();
 };
 
 #endif

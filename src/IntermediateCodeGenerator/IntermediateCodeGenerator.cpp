@@ -3,6 +3,7 @@
 
 void IntermediateCodeGenerator::addScope(char *newScope)
 {
+    IntermediateCodeGenerator::lastValidTerceto = IntermediateCodeGenerator::lastTerceto;
     string aux = newScope;
     scope += ":" + aux;
 }
@@ -10,10 +11,30 @@ void IntermediateCodeGenerator::addScope(char *newScope)
 void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
 {
     finishReturnStatement(end);
-    
+    string lastScopeString = scope;
     size_t lastScope = scope.rfind(":");
     if (lastScope != string::npos)
+        lastScopeString = scope.substr(lastScope + 1, scope.length());
         scope = scope.substr(0, lastScope);
+
+    // Solucion dudosa pero anda
+    // No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
+    if (lastScopeString == "borrar") {
+        // Borro todas las variables del scope
+        string *symbols = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
+
+        for (int i = 0; i < Lexer::symbolTable->getSymbolsSize(); i++) {
+            if (symbols[i] != "") {
+                Lexer::symbolTable->deleteSymbol(symbols[i]);
+            }
+        }
+
+        // Borro todos los tercetos invalidos
+        for (int i = lastValidTerceto + 1; i <= lastTerceto; i++) {
+            removeTerceto(i);
+        }
+
+    }
 }
 
 void IntermediateCodeGenerator::setVarScope(char *key)

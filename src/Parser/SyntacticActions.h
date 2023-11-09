@@ -22,6 +22,7 @@ class SyntacticActions {
         static bool checkDeclaredMethod(char*, bool);
         static bool checkDeclaredClass(char*, bool);
         static bool checkDeclaredClassMember(char*, char*);
+        static bool checkTypes(char* key1, char* key2);
     private:
         static Token * getSymbolToken(char* key);
         static Token * getSymbolToken(string key);

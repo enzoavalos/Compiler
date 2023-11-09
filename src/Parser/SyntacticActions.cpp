@@ -135,13 +135,21 @@ bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Variable " + lexeme + " no declarada";
 
-    if(!findId(lexeme)){
-        if(showMsg)
-            Logger::logError(errorMsg);
-        return false;
-    }
+    // if(!findId(lexeme)){
+    //     if(showMsg)
+    //         Logger::logError(errorMsg);
+    //     return true
+    // }
 
-    return true;
+    // Revisamos si existe una variable con el mismo nombre en el ambito actual, si existe, eliminamos la variable de la tabla de simbolos debido a que solo mantenemos el la referencia antigua
+    Token * token = getSymbolToken(lexeme + ":" + IntermediateCodeGenerator::scope);
+    if (token != NULL) {
+        Lexer::symbolTable->deleteSymbol(key);
+        return true;
+    }
+    if(showMsg)
+        Logger::logError(errorMsg);
+    return false;
 }
 
 bool SyntacticActions::findId(string id){
@@ -191,6 +199,8 @@ bool SyntacticActions::checkDeclaredClass(char* key, bool showMsg = true){
         return false;
     }
 
+    Lexer::symbolTable->deleteSymbol(key);
+
     return true;
 }
 
@@ -200,6 +210,24 @@ bool SyntacticActions::checkDeclaredClassMember(char* key, char* _class){
     string errorMsg = "Miembro " + lexeme + " de clase " + className +" no declarado";
 
     if(!findId(lexeme)){
+        Logger::logError(errorMsg);
+        return false;
+    }
+
+    return true;
+}
+
+bool SyntacticActions::checkTypes(char* key1, char* key2){
+    string lexeme1 = key1;
+    string lexeme2 = key2;
+    Token * token1 = getSymbolToken(lexeme1);
+    Token * token2 = getSymbolToken(lexeme2);
+
+    if(token1 == NULL || token2 == NULL)
+        return false;
+
+    if(token1->getType() != token2->getType()){
+        string errorMsg = "Tipos incompatibles: " + token1->getType() + " y " + token2->getType();
         Logger::logError(errorMsg);
         return false;
     }
