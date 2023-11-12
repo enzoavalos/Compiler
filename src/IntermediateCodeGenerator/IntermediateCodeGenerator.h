@@ -46,6 +46,8 @@ class IntermediateCodeGenerator{
         static void forBlock(char*, char*);
 
         static void returnStatement();
+
+        static string getTercetoType(string tercetoNumber);
     
     private:
         static map<int, Terceto> tercetos;

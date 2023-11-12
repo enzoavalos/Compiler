@@ -21,13 +21,11 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
     // Solucion dudosa pero anda
     // No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
     if (IntermediateCodeGenerator::isInvalidScope && lastScopeString == "remove") {
-        cout << "Invalid scope: " << lastScopeString << endl;
         // Borro todas las variables del scope
         string *symbols = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
 
         for (int i = 0; i <= Lexer::symbolTable->getSymbolsSize(); i++) {
             if (symbols[i] != "") {
-                cout << "Deleted symbol: " << symbols[i] << endl;
                 Lexer::symbolTable->deleteSymbol(symbols[i]);
             }
         }
@@ -215,8 +213,17 @@ void IntermediateCodeGenerator::finishReturnStatement(char *end){
                 int functionEnd = atoi(end);
                 tercetos[tercetoNumber].setOp1(to_string(functionEnd +1));
                 tercetos[tercetoNumber].setOp("RETURN");
-            }else
+            } else
                 done = true;
         }
     }
+}
+
+string IntermediateCodeGenerator::getTercetoType(string tercetoNumber) {
+    int terceto = atoi(tercetoNumber.c_str());
+    string op = tercetos[terceto].getOp();
+    if(op == "BF" || op == "BI" || op == "RETURN")
+        return "void";
+    else
+        return Lexer::symbolTable->getSymbol(tercetos[terceto].getOp1())->getType();
 }

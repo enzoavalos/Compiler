@@ -23,10 +23,14 @@ class SyntacticActions {
         static bool checkDeclaredClass(char*, bool);
         static bool checkDeclaredClassMember(char*, char*);
         static bool checkTypes(char* key1, char* key2);
+        static bool checkParameters(char*, char*);
+        static void addParamToMethod(char*, char*);
     private:
         static Token * getSymbolToken(char* key);
         static Token * getSymbolToken(string key);
-        static bool findId(string key);
+        static Token * findId(string key);
+        static bool isTerceto(string key);
+        static bool isId(string key);
 };
 
 string SyntacticActions::lastType = "no-type";
