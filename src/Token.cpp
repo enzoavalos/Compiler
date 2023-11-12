@@ -65,3 +65,11 @@ void Token::setUse(string use){
 string Token::getUse(){
     return this->use;
 }
+
+Token* Token::getParameter(){
+    return this->parameter;
+}
+
+void Token::setParameter(Token* parameter){
+    this->parameter = parameter;
+}
