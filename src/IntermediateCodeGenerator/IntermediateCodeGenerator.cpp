@@ -1,5 +1,6 @@
 #include "IntermediateCodeGenerator.h"
 #include "..\Logger.cpp"
+#include "..\Parser\SyntacticActions.h"
 
 void IntermediateCodeGenerator::addScope(char *newScope)
 {
@@ -222,8 +223,10 @@ void IntermediateCodeGenerator::finishReturnStatement(char *end){
 string IntermediateCodeGenerator::getTercetoType(string tercetoNumber) {
     int terceto = atoi(tercetoNumber.c_str());
     string op = tercetos[terceto].getOp();
+    
     if(op == "BF" || op == "BI" || op == "RETURN")
         return "void";
     else
-        return Lexer::symbolTable->getSymbol(tercetos[terceto].getOp1())->getType();
+        return SyntacticActions::findId(tercetos[terceto].getOp1())->getType();
+        //return Lexer::symbolTable->getSymbol(tercetos[terceto].getOp1())->getType();
 }

@@ -1,6 +1,7 @@
 #include "./SyntacticActions.h"
 #include "../Logger.cpp"
 #include "../Parser/gramatica.tab.hpp"
+#include <list>
 
 Token * SyntacticActions::getSymbolToken(char* key){
     string aux = key;
@@ -45,6 +46,7 @@ void SyntacticActions::addNegativeConstant(char* key){
 
         Token* token = new Token(aux, lex, line);
         token->setType(type);
+        token->setUse("constante");
         Lexer::symbolTable->addSymbol(token, lex);
     }
 }
@@ -130,26 +132,40 @@ void SyntacticActions::setIdUse(char* key, string use){
         token->setUse(use);
 }
 
-// TODO 2 Se debe permitir declaracion de variables de = nombre pero en distinto ambito
+bool SyntacticActions::checkRedeclaration(char*key, bool showMsg = true){
+    string lexeme = key;
+    string errorMsg = "Redeclaracion de identificador " + lexeme;
+    Token * token = getSymbolToken(lexeme + ":" + IntermediateCodeGenerator::scope);
+
+    if (token != NULL) {
+        if(showMsg)
+            Logger::logError(errorMsg);
+        Lexer::symbolTable->deleteSymbol(key);
+        return true;
+    }
+    return false;
+}
+
+// TODO 4 Manejar uso de constantes
 bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Variable " + lexeme + " no declarada";
 
-    // if(!findId(lexeme)){
-    //     if(showMsg)
-    //         Logger::logError(errorMsg);
-    //     return true
-    // }
-
-    // Revisamos si existe una variable con el mismo nombre en el ambito actual, si existe, eliminamos la variable de la tabla de simbolos debido a que solo mantenemos el la referencia antigua
-    Token * token = getSymbolToken(lexeme + ":" + IntermediateCodeGenerator::scope);
-    if (token != NULL) {
-        Lexer::symbolTable->deleteSymbol(key);
+    if(isConstant(lexeme))
         return true;
+
+    if(!findId(lexeme)){
+        if(showMsg)
+            Logger::logError(errorMsg);
+        return false;
     }
-    if(showMsg)
-        Logger::logError(errorMsg);
-    return false;
+
+    return true;
+}
+
+bool SyntacticActions::isConstant(string lexeme){
+    Token* token = getSymbolToken(lexeme);
+    return token != NULL || token->getType() == "constant";
 }
 
 Token* SyntacticActions::findId(string id){
@@ -228,8 +244,8 @@ bool SyntacticActions::checkTypes(char* key1, char* key2){
     Token * token1 = isId(lexeme1) ? findId(lexeme1) : getSymbolToken(lexeme1);
     Token * token2 = isId(lexeme2) ? findId(lexeme2) : getSymbolToken(lexeme2);
 
-    string type1;
-    string type2;
+    string type1="";
+    string type2="";
 
     if(token1 == NULL) {
         if (isTerceto(lexeme1)) {
@@ -267,46 +283,47 @@ bool SyntacticActions::isTerceto(string key){
 }
 
 bool SyntacticActions::isId(string key){
-    return key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_") == string::npos;
+    return key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789") == string::npos;
 }
 
 bool SyntacticActions::checkParameters(char* function, char* parameter) {
     string functionLex = function;
-    functionLex += ":" + IntermediateCodeGenerator::scope;
+    Token * token = findId(functionLex);
 
-    Token * token = getSymbolToken(functionLex);
+    if(parameter == NULL){
+        if(token->getParameter() == NULL)
+            return true;
+        else{
+            Logger::logError("La funcion " + functionLex + " esperaba un parametro");
+            return false;
+        }
+    }
 
-    string parameterLex = parameter;
-    parameterLex += ":" + IntermediateCodeGenerator::scope;
-    Token * parameterToken = isId(parameter) ? findId(parameterLex) : getSymbolToken(parameter);
-
-    if(token == NULL) {
-        Logger::logError("La funcion " + functionLex + " no esta declarada");
+    if(token->getParameter() == NULL){
+        Logger::logError("La funcion " + functionLex + " no recibe parametros");
         return false;
     }
 
+    string parameterLex = parameter;
+    Token * parameterToken = isId(parameter) ? findId(parameterLex) : getSymbolToken(parameter);
 
     if(parameterToken == NULL) {
         Logger::logError("El parametro " + parameterLex + " no esta declarado");
         return false;
     }
 
-
-    if(token->getParameter() == NULL){
-        Logger::logError("La funcion " + functionLex + " no tiene parametros");
-        return false;
-    }
-
     if(token->getParameter()->getType() != parameterToken->getType()){
-        Logger::logError("El parametro " + parameterLex + " no coincide con el parametro de la funcion " + functionLex);
+        Logger::logError("El parametro " + parameterLex + " no coincide con el argumento de la funcion " + functionLex);
         return false;
     }
-
 
     return true;
 }
 
 void SyntacticActions::addParamToMethod(char* function, char* paramater){
+    if(paramater == NULL)
+        return;
+    
     string auxScope;
     size_t lastScope = IntermediateCodeGenerator::scope.rfind(":");
     if (lastScope != string::npos)

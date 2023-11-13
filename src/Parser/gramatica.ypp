@@ -61,19 +61,13 @@ declaracion_variables   : tipo lista_variables          { Logger::infoMsg("Decla
                         | error lista_variables         { Logger::logError("Falta especificar el tipo de las variables") }
                         ;
 
-lista_variables : lista_variables ';' ID        { if(SyntacticActions::checkDeclaredVar($3, false)){
-                                                        string aux = $3;
-                                                        Logger::logError("Redeclaracion de variable " + aux);
-                                                }else{
+lista_variables : lista_variables ';' ID        { if(!SyntacticActions::checkRedeclaration($3)){
                                                         IntermediateCodeGenerator::setVarScope($3);
                                                         SyntacticActions::setIdType($3);
                                                         SyntacticActions::setIdUse($3, "variable");
                                                 }
                                         }
-                | ID                            { if(SyntacticActions::checkDeclaredVar($1, false)){
-                                                        string aux = $1;
-                                                        Logger::logError("Redeclaracion de variable " + aux);
-                                                }else{
+                | ID                            { if(!SyntacticActions::checkRedeclaration($1)){
                                                         IntermediateCodeGenerator::setVarScope($1);
                                                         SyntacticActions::setIdType($1);
                                                         SyntacticActions::setIdUse($1, "variable");
@@ -83,9 +77,7 @@ lista_variables : lista_variables ';' ID        { if(SyntacticActions::checkDecl
                 ;
 
 encabezado_clase        : CLASS ID      {
-                                        if (SyntacticActions::checkDeclaredClass($2, false)) {
-                                                string aux = $2;
-                                                Logger::logError("Redeclaracion de clase " + aux);
+                                        if (SyntacticActions::checkRedeclaration($2)) {
                                                 IntermediateCodeGenerator::isInvalidScope = true;
                                                 char* remove = (char*) malloc(sizeof(char) * 7);
                                                 remove[0] = 'r'; remove[1] = 'e'; remove[2] = 'm'; remove[3] = 'o'; remove[4] = 'v'; remove[5] = 'e'; remove[6] = '\0';
@@ -98,15 +90,12 @@ encabezado_clase        : CLASS ID      {
 }
                         ;
 
-// TODO 4 Revisar redeclaracion de clases e interfaces
 clase_declaration       : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
                                                                                                 IntermediateCodeGenerator::onScopeFinished() }
                         ;
 
 encabezado_interfaz     : INTERFACE ID          { 
-                                                if (SyntacticActions::checkDeclaredClass($2, false)) {
-                                                        string aux = $2;
-                                                        Logger::logError("Redeclaracion de interfaz " + aux);
+                                                if (SyntacticActions::checkRedeclaration($2)) {
                                                         IntermediateCodeGenerator::isInvalidScope = true;
                                                         char* remove = (char*) malloc(sizeof(char) * 7);
                                                         remove[0] = 'r'; remove[1] = 'e'; remove[2] = 'm'; remove[3] = 'o'; remove[4] = 'v'; remove[5] = 'e'; remove[6] = '\0';
@@ -127,10 +116,7 @@ interface_metodos       : interface_metodos interface_metodo_declaration
                         |
                         ;
 
-encabezado_funcion      : VOID ID       { if(SyntacticActions::checkDeclaredMethod($2, false)){
-                                                string aux = $2;
-                                                Logger::logError("Redeclaracion de funcion " + aux);
-                                        }else{
+encabezado_funcion      : VOID ID       { if(!SyntacticActions::checkRedeclaration($2)){
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 IntermediateCodeGenerator::addScope($2);
                                                 $$ = $2;
@@ -152,7 +138,7 @@ encabezado_implement    : CLASS ID IMPLEMENT ID         { $$ = $4;
                                                         }
                         ;
 
-// TODO 3 Buscar variables y metodos en ambito de clase y sino en ambito de interfaz que implementa
+// TODO 1.2 Buscar variables y metodos en ambito de clase y sino en ambito de interfaz que implementa
 implement_declaration   : encabezado_implement '{' metodos_clase herencia_composicion '}' { Logger::infoMsg("Implementacion de interfaz");
                                                                                         if(SyntacticActions::checkDeclaredClass($1, false)){
                                                                                                 IntermediateCodeGenerator::onScopeFinished();
@@ -228,10 +214,7 @@ lista_objetos           : lista_objetos ';' objeto
                         | objeto
                         ;
 
-objeto          : ID    { if(SyntacticActions::checkDeclaredVar($1, false)){
-                                string aux = $1;
-                                Logger::logError("Redeclaracion de objeto " + aux);
-                        }else{
+objeto          : ID    { if(SyntacticActions::checkRedeclaration($1)){
                                 IntermediateCodeGenerator::setVarScope($1);
                                 SyntacticActions::setIdType($1);
                                 SyntacticActions::setIdUse($1, "variable-objeto");
@@ -369,24 +352,22 @@ encabezado_for  : FOR ID IN RANGE       { $$ = $2;
                                         char *aux = (char*) malloc(sizeof(char) * 4);
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         IntermediateCodeGenerator::addScope(aux);
-                                        if(SyntacticActions::checkDeclaredVar($2, false)){
-                                                string id = $2;
-                                                Logger::logError("Redeclaracion de variable " + id);
-                                        }else{
+                                        if(!SyntacticActions::checkRedeclaration($2)){
                                                 IntermediateCodeGenerator::setVarScope($2);
-                                                SyntacticActions::setIdUse($2, "variable"); }
+                                                SyntacticActions::setIdUse($2, "variable");
+                                                SyntacticActions::lastType = "uint";
+                                                SyntacticActions::setIdType($2); }
                                         }
                 | ID IN RANGE           { $$ = $1;
                                         char *aux = (char*) malloc(sizeof(char) * 4);
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         Logger::logWarning("Falta sentencia FOR");
                                         IntermediateCodeGenerator::addScope(aux);
-                                        if(SyntacticActions::checkDeclaredVar($1, false)){
-                                                string id = $1;
-                                                Logger::logError("Redeclaracion de variable " + id);
-                                        }else{
+                                        if(!SyntacticActions::checkRedeclaration($1)){
                                                 IntermediateCodeGenerator::setVarScope($1);
                                                 SyntacticActions::setIdUse($1, "variable");
+                                                SyntacticActions::lastType = "uint";
+                                                SyntacticActions::setIdType($1);
                                         }
                                         }
                 | FOR IN RANGE          { Logger::logError("Se esperaba una variable") }
@@ -395,12 +376,11 @@ encabezado_for  : FOR ID IN RANGE       { $$ = $2;
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         Logger::logWarning("Falta sentencia RANGE");
                                         IntermediateCodeGenerator::addScope(aux);
-                                        if(SyntacticActions::checkDeclaredVar($2, false)){
-                                                string id = $2;
-                                                Logger::logError("Redeclaracion de variable " + id);
-                                        }else{
+                                        if(!SyntacticActions::checkRedeclaration($2)){
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 SyntacticActions::setIdUse($2, "variable");
+                                                SyntacticActions::lastType = "uint";
+                                                SyntacticActions::setIdType($2);
                                         }
                                         }
                 | FOR ID RANGE          { $$ = $2;
@@ -408,12 +388,11 @@ encabezado_for  : FOR ID IN RANGE       { $$ = $2;
                                         aux[0] = 'f'; aux[1] = 'o'; aux[2] = 'r'; aux[3] = '\0';
                                         Logger::logError("Falta sentencia IN");
                                         IntermediateCodeGenerator::addScope(aux);
-                                        if(SyntacticActions::checkDeclaredVar($2, false)){
-                                                string id = $2;
-                                                Logger::logError("Redeclaracion de variable " + id);
-                                        }else{
+                                        if(!SyntacticActions::checkRedeclaration($2)){
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 SyntacticActions::setIdUse($2, "variable");
+                                                SyntacticActions::lastType = "uint";
+                                                SyntacticActions::setIdType($2);
                                         }
                                         }
                 ;
