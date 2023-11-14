@@ -146,13 +146,9 @@ bool SyntacticActions::checkRedeclaration(char*key, bool showMsg = true){
     return false;
 }
 
-// TODO 4 Manejar uso de constantes
 bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Variable " + lexeme + " no declarada";
-
-    if(isConstant(lexeme))
-        return true;
 
     if(!findId(lexeme)){
         if(showMsg)
@@ -165,10 +161,16 @@ bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
 
 bool SyntacticActions::isConstant(string lexeme){
     Token* token = getSymbolToken(lexeme);
-    return token != NULL || token->getType() == "constant";
+    if(token == NULL)
+        return false;
+    int type = token->getTokenType();
+    return type == CTE_DOUBLE || type == CTE_SHORT || type == CTE_UINT;
 }
 
 Token* SyntacticActions::findId(string id){
+    if(isConstant(id))
+        return getSymbolToken(id);
+
     string lexeme = id;
     string scope = IntermediateCodeGenerator::scope;
     Token* token = NULL;
@@ -308,6 +310,10 @@ bool SyntacticActions::checkParameters(char* function, char* parameter) {
     Token * parameterToken = isId(parameter) ? findId(parameterLex) : getSymbolToken(parameter);
 
     if(parameterToken == NULL) {
+        if (isTerceto(parameterLex)) {
+            string type = IntermediateCodeGenerator::getTercetoType(parameterLex);
+            return type == token->getParameter()->getType();
+        }
         Logger::logError("El parametro " + parameterLex + " no esta declarado");
         return false;
     }

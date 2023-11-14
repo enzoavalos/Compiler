@@ -1,32 +1,19 @@
 {
-    SHORT var ,
-    SHORT int1 ,
-
-    CLASS clase {
-        SHORT a ,
-        VOID m() {
-            DOUBLE var ,
-            VOID funcion1(){
-                DOUBLE zz ,
-                zz = var - zz ,
-                a += a ,
-            } ,
-        } ,
-    } ,
-
-    clase objeto1 ,
-
-    VOID q (DOUBLE x){
-        RETURN ,
-    } ,
-
-    q(1.6d+20) ,
+    SHORT int1; int2 ,
     
-    FOR i IN RANGE (2_s; 10_s; 1_s)
-        int1 += 20_s ,
-    ,
+    IF ( int1 >= int2 ){
+        SHORT d1 ,
+        d1 += int1 ,
+    } ELSE
+        d1 = int2 ,
+    END_IF ,
 
-    FOR j IN RANGE (2_s; 10_s; 1_s){
-        q(j),
-    } ,
+    IF ( int1 !! int2 ){
+        SHORT aux ,
+        aux = int1 + int2 ,
+    } END_IF ,
+
+    IF ( int1 <= int2 )
+        PRINT #hola mundo# ,
+    END_IF ,
 }

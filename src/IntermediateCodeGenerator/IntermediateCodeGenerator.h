@@ -25,6 +25,7 @@ class IntermediateCodeGenerator{
 
         static void addTerceto(Terceto);
         static void addTerceto(string, string, string);
+        static void addLabelTerceto();
         static void completeTerceto(int, string);
         static void removeTerceto(int);
 

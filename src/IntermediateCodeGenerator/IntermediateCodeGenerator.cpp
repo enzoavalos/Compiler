@@ -126,11 +126,15 @@ void IntermediateCodeGenerator::ifElseExpression(char *cond, char *first, char *
     int firstInt = atoi(first);
     int secondInt = atoi(second);
 
+    addLabelTerceto();
+
+    // Bifurcacion incondicional
     int tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(to_string(secondInt + 1));
 
+    // Bifurcacion por falso
     tercetoNumber = removeStack();
-    tercetos[tercetoNumber].setOp2(to_string(firstInt + 1));
+    tercetos[tercetoNumber].setOp2(to_string(firstInt));
 }
 
 void IntermediateCodeGenerator::ifExpression(char *cond, char *first)
@@ -141,7 +145,7 @@ void IntermediateCodeGenerator::ifExpression(char *cond, char *first)
     removeTerceto(aux);
 
     int tercetoNumber = removeStack();
-    tercetos[tercetoNumber].setOp2(to_string(firstInt + 1));
+    tercetos[tercetoNumber].setOp2(to_string(firstInt));
 }
 
 void IntermediateCodeGenerator::endCondition()
@@ -228,5 +232,9 @@ string IntermediateCodeGenerator::getTercetoType(string tercetoNumber) {
         return "void";
     else
         return SyntacticActions::findId(tercetos[terceto].getOp1())->getType();
-        //return Lexer::symbolTable->getSymbol(tercetos[terceto].getOp1())->getType();
+}
+
+void IntermediateCodeGenerator::addLabelTerceto(){
+    string op = "Label" + to_string(lastTerceto+1);
+    addTerceto(op,"-","-");
 }
