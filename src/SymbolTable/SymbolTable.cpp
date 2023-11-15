@@ -54,19 +54,15 @@ void SymbolTable::setScope(string lexeme, string scope){
     }
 }
 
-string* SymbolTable::getSymbolsByScope(string scope){
-    string * symbols = new string[this->symbols.size()];
-    int i = 0;
+list<string>* SymbolTable::getSymbolsByScope(string scope){
+    list<string>* salida = new list<string>;
     for(auto& pair: this->symbols){
         string lexeme = pair.first;
-        if (lexeme.find(scope) != string::npos) {
-            symbols[i++] = lexeme;
-        } else {
-            symbols[i++] = "";
-        }
+        if (lexeme.find(scope) != string::npos)
+            salida->push_back(lexeme);
     }
 
-    return symbols;
+    return salida;
 }
 
 int SymbolTable::getSymbolsSize(){

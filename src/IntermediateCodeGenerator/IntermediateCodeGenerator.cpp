@@ -2,12 +2,10 @@
 #include "..\Logger.cpp"
 #include "..\Parser\SyntacticActions.h"
 
-void IntermediateCodeGenerator::addScope(char *newScope)
-{
+void IntermediateCodeGenerator::addScope(string newScope){
     if (!IntermediateCodeGenerator::isInvalidScope)
         IntermediateCodeGenerator::lastValidTerceto = IntermediateCodeGenerator::lastTerceto;
-    string aux = newScope;
-    scope += ":" + aux;
+    scope += ":" + newScope;
 }
 
 void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
@@ -23,13 +21,10 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
     // No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
     if (IntermediateCodeGenerator::isInvalidScope && lastScopeString == "remove") {
         // Borro todas las variables del scope
-        string *symbols = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
+        list<string>* lista = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
 
-        for (int i = 0; i <= Lexer::symbolTable->getSymbolsSize(); i++) {
-            if (symbols[i] != "") {
-                Lexer::symbolTable->deleteSymbol(symbols[i]);
-            }
-        }
+        for(const string& str : *lista)
+            Lexer::symbolTable->deleteSymbol(str);
 
         // Borro todos los tercetos invalidos
         for (int i = lastValidTerceto + 1; i <= lastTerceto; i++) {
@@ -37,7 +32,6 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
         }
 
         IntermediateCodeGenerator::isInvalidScope = false;
-
     }
 }
 
@@ -165,8 +159,16 @@ void IntermediateCodeGenerator::forArguments(char *inic, char *end, char *inc)
     addTerceto("=", "", inicString);
     addStack(lastTerceto);
 
+    // Se agrega label para salto incondicional
+    addLabelTerceto();
+    addStack(lastTerceto);
+
     // Primero se chequea la condicion y despues se actualiza la variable
-    addTerceto("<", "", endString);
+    // Dependiendo del signo de la variable de incremento es como se hace la comparacion
+    if(incString.find('-') == string::npos)
+        addTerceto("<", "", endString);
+    else
+        addTerceto(">", "", endString);
     addStack(lastTerceto);
 
     addTerceto("+", "", incString);
@@ -178,23 +180,30 @@ void IntermediateCodeGenerator::forArguments(char *inic, char *end, char *inc)
 
 void IntermediateCodeGenerator::forBlock(char *id, char *block)
 {
-    int tercetoNumber = pila.top();
+    //int tercetoNumber = pila.top();
     int blockInt = atoi(block);
-    pila.pop();
+    //pila.pop();
+    int tercetoNumber = removeStack();
 
     // Seteo el terceto de BF con el numero del terceto posterior al bloque
     tercetos[tercetoNumber].setOp2(to_string(blockInt + 2));
 
     string idString = id;
     // Asigno el identificador a los tercetos de asignacion, suma y comparacion
+    // Suma
+    tercetoNumber = removeStack();
+    tercetos[tercetoNumber].setOp1(idString);
+
     // Comparacion
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
 
-    // Suma, aca tambien creamos el branch incondicional que siempre va al incremento despues de cada bucle
+    // Bifuracion incondicional a label previo a la comparacion
     tercetoNumber = removeStack();
-    tercetos[tercetoNumber].setOp1(idString);
     addTerceto("BI", to_string(tercetoNumber), "-");
+
+    // Se agrega label para salto por falso
+    addLabelTerceto();
 
     // Asignacion inicial
     tercetoNumber = removeStack();

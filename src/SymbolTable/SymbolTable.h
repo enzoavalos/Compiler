@@ -3,6 +3,7 @@
 
 #include "../Token.h"
 #include <map>
+#include <list>
 
 class SymbolTable{
     private:
@@ -15,8 +16,8 @@ class SymbolTable{
         void printTable() const;
         void deleteSymbol(string);
         void setScope(string, string);
-        string* getSymbolsByScope(string);
         int getSymbolsSize();
+        list<string>* getSymbolsByScope(string);
 };
 
 #endif

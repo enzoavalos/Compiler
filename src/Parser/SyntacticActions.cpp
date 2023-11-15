@@ -1,7 +1,6 @@
 #include "./SyntacticActions.h"
 #include "../Logger.cpp"
 #include "../Parser/gramatica.tab.hpp"
-#include <list>
 
 Token * SyntacticActions::getSymbolToken(char* key){
     string aux = key;
@@ -348,4 +347,20 @@ void SyntacticActions::addParamToMethod(char* function, char* paramater){
         return;
 
     token->setParameter(paramaterToken);
+}
+
+bool SyntacticActions::checkForArguments(string arg1, string arg2, string arg3){
+    Token* token1 = getSymbolToken(arg1);
+    Token* token2 = getSymbolToken(arg2);
+    Token* token3 = getSymbolToken(arg3);
+
+    bool validArgs = (token1->getTokenType() == CTE_SHORT && token2->getTokenType() == CTE_SHORT && token3->getTokenType() == CTE_SHORT);
+    if(!validArgs){
+        Logger::logError("Argumentos invalidos, se esperan constantes de tipo SHORT");
+        return false;
+    }
+
+    bool validRanges = (checkLimits(arg1) && checkLimits(arg2) || checkLimits(arg3));
+
+    return validRanges;
 }

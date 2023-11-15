@@ -26,6 +26,7 @@ class SyntacticActions {
         static bool checkTypes(char* key1, char* key2);
         static bool checkParameters(char*, char*);
         static void addParamToMethod(char*, char*);
+        static bool checkForArguments(string, string, string);
         static Token * findId(string key);
     private:
         static Token * getSymbolToken(char* key);

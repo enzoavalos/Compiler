@@ -7,6 +7,7 @@
 #include "Terceto.h"
 #include "..\SymbolTable\SymbolTable.h"
 #include "..\Lexer.h"
+#include <list>
 using namespace std;
 
 class IntermediateCodeGenerator{
@@ -19,7 +20,9 @@ class IntermediateCodeGenerator{
         static int lastValidTerceto;
         static bool isInvalidScope;
 
-        static void addScope(char*);
+        //static void addScope(char*);
+        static void addScope(string);
+        static void addAncestorScope(char*, char*);
         static void onScopeFinished(char*);
         static void setVarScope(char*);
 

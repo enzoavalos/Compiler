@@ -1,19 +1,19 @@
 {
-    SHORT int1; int2 ,
-    
-    IF ( int1 >= int2 ){
-        SHORT d1 ,
-        d1 += int1 ,
-    } ELSE
-        d1 = int2 ,
-    END_IF ,
+    SHORT int1 ,
 
-    IF ( int1 !! int2 ){
-        SHORT aux ,
-        aux = int1 + int2 ,
-    } END_IF ,
+    VOID q(SHORT arg){
+        SHORT x,
+    } ,
 
-    IF ( int1 <= int2 )
-        PRINT #hola mundo# ,
-    END_IF ,
+    ** Este esta mal y sus tercetos se borran
+    FOR i IN RANGE (2_s; 10_ui; 1_s)
+        int1 += i ,
+    ,
+
+    FOR j IN RANGE (10_s; 2_s; -1_s){
+        int1 = j,
+        q(j),
+    } ,
+
+    int1 += -67_s ,
 }
