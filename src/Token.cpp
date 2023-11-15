@@ -73,3 +73,11 @@ Token* Token::getParameter(){
 void Token::setParameter(Token* parameter){
     this->parameter = parameter;
 }
+
+Token* Token::getFather(){
+    return this->father;
+}
+
+void Token::setFather(Token* father){
+    this->father = father;
+}

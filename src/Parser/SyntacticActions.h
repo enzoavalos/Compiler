@@ -28,14 +28,22 @@ class SyntacticActions {
         static void addParamToMethod(char*, char*);
         static bool checkForArguments(string, string, string);
         static Token * findId(string key);
+        static void addClassComposition(char*);
+        static void addObject(char*);
+        static string getObject();
+        static void addClassToObjects(char*);
+        static bool checkHasAttribute(char*, char*);
     private:
         static Token * getSymbolToken(char* key);
         static Token * getSymbolToken(string key);
         static bool isTerceto(string key);
         static bool isId(string key);
         static bool isConstant(string key);
+
+        static stack<string> objects;
 };
 
 string SyntacticActions::lastType = "no-type";
+stack<string> SyntacticActions::objects = stack<string>();
 
 #endif //SYNTACTIC_ACTIONS_H

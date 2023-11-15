@@ -1,0 +1,12 @@
+{
+    CLASS ca {
+        SHORT a,
+    },
+    CLASS cb {
+        SHORT b,
+        ca,
+    },
+    cb b1,
+    b1.b = 2_s,
+    b1.a,
+}

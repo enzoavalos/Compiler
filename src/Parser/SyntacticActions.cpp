@@ -103,7 +103,7 @@ void SyntacticActions::setIdType(char* id, char* type = nullptr){
 
     if(token == NULL)
         return;
-
+    cout << "lastType: " << lastType << endl;
     if(type == nullptr){
         if(lastType == "short") {
             token->setType("short");
@@ -241,6 +241,7 @@ bool SyntacticActions::checkTypes(char* key1, char* key2){
     string lexeme1 = key1;
     string lexeme2 = key2;
 
+
     // Revisar en la tabla de simbolos, si es un ID se debe usar el ambito
     Token * token1 = isId(lexeme1) ? findId(lexeme1) : getSymbolToken(lexeme1);
     Token * token2 = isId(lexeme2) ? findId(lexeme2) : getSymbolToken(lexeme2);
@@ -363,4 +364,109 @@ bool SyntacticActions::checkForArguments(string arg1, string arg2, string arg3){
     bool validRanges = (checkLimits(arg1) && checkLimits(arg2) || checkLimits(arg3));
 
     return validRanges;
+}
+
+void SyntacticActions::addClassComposition(char* key){
+    string lexeme = key;
+
+    Token* token = findId(lexeme);
+
+    if (IntermediateCodeGenerator::isInvalidScope) {
+        return;
+    }
+
+    if (token == NULL) {
+        Logger::logError("Clase " + lexeme + " no declarada");
+        return;
+    }
+
+    if (token->getUse() != "nombre-clase") {
+        Logger::logError("El identificador " + lexeme + " no es una clase");
+        return;
+    }
+
+
+    string className = IntermediateCodeGenerator::scope.find_last_of(":") != string::npos ? IntermediateCodeGenerator::scope.substr(IntermediateCodeGenerator::scope.find_last_of(":") + 1) : IntermediateCodeGenerator::scope;
+
+    Token * classToken = findId(className);
+
+    if (classToken == NULL) {
+        Logger::logError("Clase " + className + " no declarada");
+        return;
+    }
+
+    if (classToken->getUse() == "nombre-clase") {
+        cout << "Clase " << className << " puede heredar de " << lexeme << endl;
+        classToken->setFather(token);
+    }
+}
+
+void SyntacticActions::addObject(char* key){
+    string lexeme = key;
+
+    objects.push(lexeme);
+}
+
+string SyntacticActions::getObject(){
+    string object = objects.top();
+    objects.pop();
+    return object;
+}
+
+void SyntacticActions::addClassToObjects(char* key){
+    string lexeme = key;
+
+    Token* token = findId(lexeme);
+
+    if (token == NULL) {
+        Logger::logError("Clase " + lexeme + " no declarada");
+        return;
+    }
+
+    if (token->getUse() != "nombre-clase") {
+        Logger::logError("El identificador " + lexeme + " no es una clase");
+        return;
+    }
+
+    do {
+        string object = getObject();
+        Token* objectToken = findId(object);
+
+        if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
+            Logger::logError("Objeto " + object + " no declarado");
+            continue;
+        }
+
+        objectToken->setType(token->getLexeme());
+    } while (!objects.empty());
+}
+
+bool SyntacticActions::checkHasAttribute(char* object, char* attribute) {
+    string objectLex = object;
+    string attributeLex = attribute;
+
+    Token* objectToken = findId(objectLex);
+
+    if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
+        Logger::logError("Objeto " + objectLex + " no declarado");
+        return false;
+    }
+    Token* classToken = findId(objectToken->getType());
+    do {
+        // Revisar todas las variblas en el ambito de la clase
+        list<string>* lista = Lexer::symbolTable->getSymbolsByScope(classToken->getLexeme());
+        for(const string& str : *lista) {
+            string attribute = str.substr(0, str.find(":"));
+            string auxscope = str.substr(str.find(":") + 1);
+            if (attribute == attributeLex && auxscope.find(classToken->getLexeme()) != string::npos) {
+                cout << "Atributo " << attributeLex << " encontrado en la clase " << objectToken->getType() << endl;
+                return true;
+            }
+        }
+        classToken = classToken->getFather();
+    } while (classToken != NULL);
+
+    cout << "Atributo " << attributeLex << " no encontrado en la clase " << objectToken->getType() << endl;
+
+    return false;
 }

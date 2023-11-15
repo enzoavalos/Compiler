@@ -39,6 +39,8 @@ class Token
 
         Token * parameter = NULL;
 
+        Token * father = NULL;
+
     public:
         Token(int tokenType, string lexeme, int line);
         ~Token();
@@ -59,6 +61,9 @@ class Token
 
         void setParameter(Token*);
         Token* getParameter();
+
+        void setFather(Token*);
+        Token* getFather();
 };
 
 #endif // TOKEN_H

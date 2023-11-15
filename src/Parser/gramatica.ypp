@@ -162,8 +162,10 @@ funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_me
                         |
                         ;
 
-// TODO 2 Ver como manejar herencia x composicion
-herencia_composicion    : herencia_composicion ID ','   { Logger::infoMsg("Herencia por composicion"); }
+herencia_composicion    : herencia_composicion ID ','   { 
+        SyntacticActions::addClassComposition($2);
+        Logger::infoMsg("Herencia por composicion"); 
+        }
                         |
                         ;
 
@@ -203,7 +205,10 @@ distributed_method_implementation       : IMPL FOR ID ':' '{' metodos_clase '}' 
 retorno                 : RETURN
                         ;
 
-objeto_declaration      : ID lista_objetos      { if(SyntacticActions::checkDeclaredClass($1)) SyntacticActions::lastType = $1;
+objeto_declaration      : ID lista_objetos      { if(SyntacticActions::checkDeclaredClass($1)) {
+                                                        SyntacticActions::lastType = $1;
+                                                        SyntacticActions::addClassToObjects($1);
+                                                }
                                                 Logger::infoMsg("Declaracion de objeto") }
                         ;
 
@@ -211,18 +216,19 @@ lista_objetos           : lista_objetos ';' objeto
                         | objeto
                         ;
 
-objeto          : ID    { if(SyntacticActions::checkRedeclaration($1)){
+objeto          : ID    { if(!SyntacticActions::checkRedeclaration($1)){
                                 IntermediateCodeGenerator::setVarScope($1);
                                 SyntacticActions::setIdType($1);
                                 SyntacticActions::setIdUse($1, "variable-objeto");
+                                SyntacticActions::addObject($1);
                         }
                 }
                 ;
-
+// TODO Tenemos que revisar los tipos al asignar atributos, no puede ser igual a la funcion de chequear tipos en asignaciones comunes
 asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple");
                                                 if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkTypes($1, $3)) IntermediateCodeGenerator::addTerceto($2, $1, $3); }
                 | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo");
-                                if(SyntacticActions::checkDeclaredVar($1)){
+                                if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkHasAttribute($1, $3)) {
                                         char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
                                         sprintf(aux, "%s.%s", $1, $3);
                                         IntermediateCodeGenerator::addTerceto($4, aux, $5);
@@ -422,9 +428,8 @@ argumento_bucle_for     : constante ';' constante ';' constante { if(SyntacticAc
                         |       { Logger::logError("Sentencia FOR recibe 3 parametros, ninguno encontrado") }
                         ;
 
-// TODO 1 Revisar si variable o metodo de clase existe en ambito de clase
 acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo");
-                                        if(SyntacticActions::checkDeclaredVar($1)){
+                                        if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkHasAttribute($1, $3)) {
                                                 char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
                                                 sprintf(aux, "%s.%s", $1, $3);
                                                 $$ = aux;
