@@ -1,12 +1,31 @@
 {
     CLASS ca {
-        SHORT a,
+        SHORT x,
+
+        VOID p(DOUBLE arg){
+            RETURN ,
+        } ,
     },
+
     CLASS cb {
-        SHORT b,
+        SHORT y,
+    
+        VOID m(){
+            RETURN ,
+        } ,
+
         ca,
     },
-    cb b1,
-    b1.b = 2_s,
-    b1.a,
+
+    CLASS cc {
+        SHORT z ,
+
+        cb ,
+    } ,
+
+    cc c1 ,
+    c1.x = 2_s,
+    c1.y = 10_s ,
+    c1.z = 20_s ,
+    c1.p(1.5d+20) ,
 }

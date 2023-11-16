@@ -22,7 +22,6 @@ class IntermediateCodeGenerator{
 
         //static void addScope(char*);
         static void addScope(string);
-        static void addAncestorScope(char*, char*);
         static void onScopeFinished(char*);
         static void setVarScope(char*);
 

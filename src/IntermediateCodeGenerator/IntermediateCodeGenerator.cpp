@@ -11,6 +11,7 @@ void IntermediateCodeGenerator::addScope(string newScope){
 void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
 {
     finishReturnStatement(end);
+    
     string lastScopeString = scope;
     size_t lastScope = scope.rfind(":");
     if (lastScope != string::npos)

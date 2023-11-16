@@ -26,9 +26,24 @@ Token * SymbolTable::getSymbol(string lexeme) const{
 
 void SymbolTable::printTable() const{
     cout << "\nTabla de simbolos\n";
-    for(auto& pair: this->symbols)
-        cout << pair.first << " - referencias: " << pair.second->getReferences()
-        << " - tipo: " << pair.second->getType() << " - uso: " << pair.second->getUse() << endl;
+    for(auto& pair: this->symbols){
+        Token* token = pair.second;
+        string msg = pair.first + " - referencias: " + to_string(token->getReferences());
+
+        if(token->getType() != "no-type")
+            msg += " - tipo: " + token->getType();
+        
+        if(token->getUse() != "unused")
+            msg += " - uso: " + token->getUse();
+
+        if(token->getParameter() != NULL)
+            msg += " - parametro: " + token->getParameter()->getLexeme();
+
+        if(token->getFather() != NULL)
+            msg += " - padre: " + token->getFather()->getLexeme();
+        
+        cout << msg << endl;
+    }
 }
 
 void SymbolTable::deleteSymbol(string lexeme){

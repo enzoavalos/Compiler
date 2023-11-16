@@ -18,13 +18,13 @@ class SyntacticActions {
         static bool checkReturnScope();
         static void setIdType(char*, char*);
         static void setIdUse(char*, string);
-        static bool checkRedeclaration(char*, bool);
+        static bool checkRedeclaration(string, bool);
         static bool checkDeclaredVar(char*, bool);
         static bool checkDeclaredMethod(char*, bool);
         static bool checkDeclaredClass(char*, bool);
         static bool checkDeclaredClassMember(char*, char*);
         static bool checkTypes(char* key1, char* key2);
-        static bool checkParameters(char*, char*);
+        static bool checkParameters(string, string);
         static void addParamToMethod(char*, char*);
         static bool checkForArguments(string, string, string);
         static Token * findId(string key);
@@ -32,9 +32,11 @@ class SyntacticActions {
         static void addObject(char*);
         static string getObject();
         static void addClassToObjects(char*);
-        static bool checkHasAttribute(char*, char*);
+        static bool checkHasMember(string, string, char*);
+        static bool classImplementsInterfaceMethods(char*);
+
+        static Token * findMember(string, string);
     private:
-        static Token * getSymbolToken(char* key);
         static Token * getSymbolToken(string key);
         static bool isTerceto(string key);
         static bool isId(string key);

@@ -1,19 +1,14 @@
 {
-    SHORT int1 ,
-
-    VOID q(SHORT arg){
-        SHORT x,
+    INTERFACE interfaz {
+        VOID q (SHORT arg) ,
     } ,
+    
 
-    ** Este esta mal y sus tercetos se borran
-    FOR i IN RANGE (2_s; 10_ui; 1_s)
-        int1 += i ,
-    ,
+    CLASS cc IMPLEMENT interfaz{
+        SHORT z ,
 
-    FOR j IN RANGE (10_s; 2_s; -1_s){
-        int1 = j,
-        q(j),
+        VOID q(SHORT arg){
+            RETURN ,
+        } ,
     } ,
-
-    int1 += -67_s ,
 }
