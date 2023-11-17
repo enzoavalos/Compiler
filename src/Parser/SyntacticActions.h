@@ -1,10 +1,14 @@
 #ifndef SYNTACTIC_ACTIONS_H
 #define SYNTACTIC_ACTIONS_H
 
+
 #include "../SymbolTable/SymbolTable.h"
 #include "../Lexer.h"
 #include "../Token.h"
 #include <iostream>
+#include <string.h>
+#include <sstream>
+#include <vector>
 #include "../IntermediateCodeGenerator/IntermediateCodeGenerator.h"
 
 using namespace std;

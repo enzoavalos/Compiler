@@ -485,8 +485,27 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
             string memberAux = str.substr(0, str.find(":"));
             string auxscope = str.substr(str.find(":") + 1);
 
-            // TODO 4 Comparar lexema contra todo el ambito
-            if (memberAux == member && auxscope.find(classToken->getLexeme()) != string::npos) {
+            stringstream ss(auxscope);
+
+            vector<string> subscopes;
+            string subscope;
+            while (getline(ss, subscope, ':')) {
+                subscopes.push_back(subscope);
+            }
+
+            bool hasScope = memberAux == member;
+
+            if (hasScope) {
+                hasScope = false;
+                for (string scope : subscopes) {
+                    if (scope == classToken->getLexeme()) {
+                        hasScope = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasScope) {
                 cout << "Miembro " << member << " encontrado en la clase " << auxscope << endl;
 
                 // En caso de que corresponda a un metodo se deben chequear sus parametros

@@ -505,8 +505,8 @@ static const yytype_uint16 yyrline[] =
        0,    29,    29,    30,    31,    34,    35,    38,    39,    42,
       43,    44,    45,    46,    47,    48,    51,    52,    53,    54,
       55,    56,    57,    60,    61,    64,    70,    76,    79,    91,
-      95,   106,   110,   111,   114,   119,   134,   143,   144,   147,
-     150,   151,   154,   157,   166,   169,   172,   173,   176,   177,
+      95,   106,   110,   111,   114,   119,   133,   142,   143,   146,
+     149,   150,   153,   156,   165,   168,   172,   173,   176,   177,
      178,   179,   182,   187,   188,   189,   191,   194,   200,   201,
      202,   205,   209,   212,   219,   220,   223,   232,   234,   241,
      242,   243,   246,   252,   261,   263,   272,   273,   274,   279,
@@ -1772,7 +1772,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 134 "gramatica.ypp"
+#line 133 "gramatica.ypp"
     { Logger::infoMsg("Implementacion de interfaz");
                                                                                 if(!IntermediateCodeGenerator::isInvalidScope && !SyntacticActions::classImplementsInterfaceMethods((yyvsp[(1) - (5)].string))){
                                                                                         IntermediateCodeGenerator::isInvalidScope = true;
@@ -1785,21 +1785,21 @@ yyreduce:
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 147 "gramatica.ypp"
+#line 146 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de atributos de clase") ;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 154 "gramatica.ypp"
+#line 153 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de metodo") ;}
     break;
 
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 157 "gramatica.ypp"
+#line 156 "gramatica.ypp"
     { if(!SyntacticActions::checkRedeclaration((yyvsp[(2) - (2)].string))){
                                                 IntermediateCodeGenerator::setVarScope((yyvsp[(2) - (2)].string));
                                                 SyntacticActions::setIdUse((yyvsp[(2) - (2)].string), "nombre-funcion");
@@ -1812,7 +1812,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 166 "gramatica.ypp"
+#line 165 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de funcion");
                                                                                         SyntacticActions::addParamToMethod((yyvsp[(1) - (7)].string), (yyvsp[(3) - (7)].string));
                                                                                         IntermediateCodeGenerator::onScopeFinished((yyvsp[(6) - (7)].string)); ;}
