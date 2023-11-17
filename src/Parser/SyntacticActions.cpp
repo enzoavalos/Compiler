@@ -229,26 +229,16 @@ bool SyntacticActions::checkDeclaredClassMember(char* key, char* _class){
     return true;
 }
 
-bool SyntacticActions::checkTypes(char* key1, char* key2){
-    if (key1 == NULL || key2 == NULL) {
-        return false;
-    }
-    string lexeme1 = key1;
-    string lexeme2 = key2;
-
-
-    // Revisar en la tabla de simbolos, si es un ID se debe usar el ambito
-    Token * token1 = isId(lexeme1) ? findId(lexeme1) : getSymbolToken(lexeme1);
-    Token * token2 = isId(lexeme2) ? findId(lexeme2) : getSymbolToken(lexeme2);
-
+// Permite chequear tipos sin necesidad de que esten en mismo ambito, ya que recibe los tokens directamente
+bool SyntacticActions::checkTypes(Token* token1, Token* token2, string lex1, string lex2){
     string type1="";
     string type2="";
 
     if(token1 == NULL) {
-        if (isTerceto(lexeme1)) {
-            type1 = IntermediateCodeGenerator::getTercetoType(lexeme1);
+        if (isTerceto(lex1)) {
+            type1 = IntermediateCodeGenerator::getTercetoType(lex1);
         } else {
-            Logger::logError("Variable " + lexeme1 + " no declarada");
+            Logger::logError("Variable " + lex1 + " no declarada");
             return false;
         }
     } else {
@@ -256,10 +246,10 @@ bool SyntacticActions::checkTypes(char* key1, char* key2){
     }
 
     if(token2 == NULL) {
-        if (isTerceto(lexeme2)) {
-            type2 = IntermediateCodeGenerator::getTercetoType(lexeme2);
+        if (isTerceto(lex2)) {
+            type2 = IntermediateCodeGenerator::getTercetoType(lex2);
         } else {
-            Logger::logError("Variable " + lexeme2 + " no declarada");
+            Logger::logError("Variable " + lex2 + " no declarada");
             return false;
         }
     } else {
@@ -275,6 +265,21 @@ bool SyntacticActions::checkTypes(char* key1, char* key2){
     return true;
 }
 
+bool SyntacticActions::checkTypes(char* key1, char* key2){
+    if (key1 == NULL || key2 == NULL) {
+        return false;
+    }
+    string lexeme1 = key1;
+    string lexeme2 = key2;
+
+
+    // Revisar en la tabla de simbolos, si es un ID se debe usar el ambito
+    Token * token1 = isId(lexeme1) ? findId(lexeme1) : getSymbolToken(lexeme1);
+    Token * token2 = isId(lexeme2) ? findId(lexeme2) : getSymbolToken(lexeme2);
+
+    return checkTypes(token1, token2, lexeme1, lexeme2);
+}
+
 bool SyntacticActions::isTerceto(string key){
     return key.find_first_not_of("0123456789") == string::npos;
 }
@@ -283,10 +288,8 @@ bool SyntacticActions::isId(string key){
     return key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789") == string::npos;
 }
 
-bool SyntacticActions::checkParameters(string function, string parameter="") {
-    Token * token = findId(function);
-
-    if(parameter == "" || parameter == "-"){
+bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, string function, string parameter) {
+    if(parameterToken == NULL){
         if(token->getParameter() == NULL)
             return true;
         else{
@@ -299,8 +302,6 @@ bool SyntacticActions::checkParameters(string function, string parameter="") {
         Logger::logError("La funcion " + function + " no recibe parametros");
         return false;
     }
-
-    Token * parameterToken = isId(parameter) ? findId(parameter) : getSymbolToken(parameter);
 
     if(parameterToken == NULL) {
         if (isTerceto(parameter)) {
@@ -317,6 +318,13 @@ bool SyntacticActions::checkParameters(string function, string parameter="") {
     }
 
     return true;
+}
+
+bool SyntacticActions::checkParameters(string function, string parameter="") {
+    Token * token = findId(function);
+    Token * parameterToken = isId(parameter) ? findId(parameter) : getSymbolToken(parameter);
+
+    return checkParameters(token, parameterToken, function, parameter);
 }
 
 void SyntacticActions::addParamToMethod(char* function, char* paramater){
@@ -460,7 +468,7 @@ Token* SyntacticActions::findMember(string object, string member){
     return NULL;
 }*/
 
-bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL) {
+bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL) {
     Token* objectToken = findId(object);
 
     if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
@@ -490,6 +498,13 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
                     IntermediateCodeGenerator::scope = lastScope;
                     return valid;
                 }
+
+                // En caso de que expression no sea NULL se trata de una asignacion y se deben chequear los tipos
+                if(expression != NULL){
+                    Token* exp = isId(expression) ? findId(expression) : getSymbolToken(expression);
+                    return checkTypes(memberToken, exp, str, expression);
+                }
+
                 return true;
             }
         }

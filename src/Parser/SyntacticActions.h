@@ -32,15 +32,17 @@ class SyntacticActions {
         static void addObject(char*);
         static string getObject();
         static void addClassToObjects(char*);
-        static bool checkHasMember(string, string, char*);
+        static bool checkHasMember(string, string, char*, char*);
         static bool classImplementsInterfaceMethods(char*);
 
-        static Token * findMember(string, string);
+        //static Token * findMember(string, string);
     private:
         static Token * getSymbolToken(string key);
         static bool isTerceto(string key);
         static bool isId(string key);
         static bool isConstant(string key);
+        static bool checkTypes(Token*, Token*, string, string);
+        static bool checkParameters(Token*, Token*, string, string);
 
         static stack<string> objects;
 };

@@ -1969,7 +1969,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 234 "gramatica.ypp"
     { Logger::infoMsg("Asignacion de atributo");
-                                if(SyntacticActions::checkDeclaredVar((yyvsp[(1) - (5)].string)) && SyntacticActions::checkHasMember((yyvsp[(1) - (5)].string), (yyvsp[(3) - (5)].string))) {
+                                if(SyntacticActions::checkDeclaredVar((yyvsp[(1) - (5)].string)) && SyntacticActions::checkHasMember((yyvsp[(1) - (5)].string), (yyvsp[(3) - (5)].string), NULL, (yyvsp[(5) - (5)].string))) {
                                         char *aux = (char*) malloc(sizeof((yyvsp[(1) - (5)].string)) + sizeof((yyvsp[(3) - (5)].string)) + 2);
                                         sprintf(aux, "%s.%s", (yyvsp[(1) - (5)].string), (yyvsp[(3) - (5)].string));
                                         IntermediateCodeGenerator::addTerceto((yyvsp[(4) - (5)].string), aux, (yyvsp[(5) - (5)].string));
