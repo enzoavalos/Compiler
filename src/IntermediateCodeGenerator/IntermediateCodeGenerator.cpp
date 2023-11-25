@@ -97,7 +97,7 @@ void IntermediateCodeGenerator::modifyLastTercetoOperator(char *op)
 
 void IntermediateCodeGenerator::printTercetos()
 {
-    cout << endl;
+    cout << "\nTercetos" << endl;
     map<int, Terceto>::iterator it;
     for (it = tercetos.begin(); it != tercetos.end(); it++)
     {

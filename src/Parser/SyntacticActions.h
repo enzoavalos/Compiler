@@ -17,7 +17,7 @@ class SyntacticActions {
     public:
         static string lastType;
         static void check_division_by_zero(char* key);
-        static void addNegativeConstant(char* key);
+        static bool addNegativeConstant(char* key);
         static bool checkLimits(string key);
         static bool checkReturnScope();
         static void setIdType(char*, char*);
@@ -38,8 +38,6 @@ class SyntacticActions {
         static void addClassToObjects(char*);
         static bool checkHasMember(string, string, char*, char*);
         static bool classImplementsInterfaceMethods(char*);
-
-        //static Token * findMember(string, string);
     private:
         static Token * getSymbolToken(string key);
         static bool isTerceto(string key);

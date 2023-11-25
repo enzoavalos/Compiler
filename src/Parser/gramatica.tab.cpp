@@ -70,14 +70,13 @@
 /* Line 189 of yacc.c  */
 #line 1 "gramatica.ypp"
 
-// Declaraciones de código C si es necesario
 #include "SyntacticActions.h"
 #include "gramatica.tab.hpp"
 #include "../IntermediateCodeGenerator/IntermediateCodeGenerator.h"
 
 
 /* Line 189 of yacc.c  */
-#line 81 "gramatica.tab.cpp"
+#line 80 "gramatica.tab.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -140,7 +139,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 11 "gramatica.ypp"
+#line 10 "gramatica.ypp"
 
         int number = 0;
         char *string;
@@ -148,7 +147,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 152 "gramatica.tab.cpp"
+#line 151 "gramatica.tab.cpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -160,7 +159,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 164 "gramatica.tab.cpp"
+#line 163 "gramatica.tab.cpp"
 
 #ifdef short
 # undef short
@@ -502,20 +501,20 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    29,    29,    30,    31,    34,    35,    38,    39,    42,
-      43,    44,    45,    46,    47,    48,    51,    52,    53,    54,
-      55,    56,    57,    60,    61,    64,    70,    76,    79,    91,
-      95,   106,   110,   111,   114,   119,   133,   142,   143,   146,
-     149,   150,   153,   156,   165,   168,   172,   173,   176,   177,
-     178,   179,   182,   187,   188,   189,   191,   194,   200,   201,
-     202,   205,   209,   212,   219,   220,   223,   232,   234,   241,
-     242,   243,   246,   252,   261,   263,   272,   273,   274,   279,
-     281,   283,   284,   287,   292,   294,   298,   299,   300,   303,
-     309,   315,   322,   329,   336,   345,   346,   349,   351,   352,
-     355,   360,   366,   374,   382,   392,   393,   403,   415,   422,
-     432,   433,   434,   437,   447,   452,   457,   458,   462,   466,
-     467,   471,   472,   478,   484,   487,   488,   491,   498,   499,
-     503,   506,   507,   508,   511,   512,   513
+       0,    28,    28,    29,    30,    33,    34,    37,    38,    41,
+      42,    43,    44,    45,    46,    47,    50,    51,    52,    53,
+      54,    55,    56,    59,    60,    63,    69,    75,    78,    90,
+      94,   105,   109,   110,   113,   118,   132,   141,   142,   145,
+     148,   149,   152,   155,   164,   167,   171,   172,   175,   176,
+     177,   178,   181,   186,   187,   188,   190,   193,   199,   200,
+     201,   204,   208,   211,   218,   219,   222,   231,   233,   240,
+     241,   242,   245,   251,   260,   262,   271,   272,   273,   278,
+     280,   282,   283,   286,   291,   293,   297,   298,   299,   302,
+     308,   314,   321,   328,   335,   344,   345,   348,   350,   351,
+     354,   359,   365,   373,   381,   391,   392,   402,   414,   421,
+     431,   432,   433,   436,   446,   451,   456,   457,   461,   465,
+     466,   469,   470,   476,   482,   485,   486,   490,   497,   498,
+     506,   514,   515,   516,   519,   520,   521
 };
 #endif
 
@@ -1633,42 +1632,42 @@ yyreduce:
         case 3:
 
 /* Line 1455 of yacc.c  */
-#line 30 "gramatica.ypp"
+#line 29 "gramatica.ypp"
     { Logger::logError("Se esperaba llave como fin del programa") ;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 31 "gramatica.ypp"
+#line 30 "gramatica.ypp"
     { Logger::logError("Se esperaba llave como inicion del programa") ;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 57 "gramatica.ypp"
+#line 56 "gramatica.ypp"
     { if(SyntacticActions::checkReturnScope()) IntermediateCodeGenerator::returnStatement(); ;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 60 "gramatica.ypp"
+#line 59 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de variables") ;}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 61 "gramatica.ypp"
+#line 60 "gramatica.ypp"
     { Logger::logError("Falta especificar el tipo de las variables") ;}
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 64 "gramatica.ypp"
+#line 63 "gramatica.ypp"
     { if(!SyntacticActions::checkRedeclaration((yyvsp[(3) - (3)].string))){
                                                         IntermediateCodeGenerator::setVarScope((yyvsp[(3) - (3)].string));
                                                         SyntacticActions::setIdType((yyvsp[(3) - (3)].string));
@@ -1680,7 +1679,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 70 "gramatica.ypp"
+#line 69 "gramatica.ypp"
     { if(!SyntacticActions::checkRedeclaration((yyvsp[(1) - (1)].string))){
                                                         IntermediateCodeGenerator::setVarScope((yyvsp[(1) - (1)].string));
                                                         SyntacticActions::setIdType((yyvsp[(1) - (1)].string));
@@ -1692,14 +1691,14 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 76 "gramatica.ypp"
+#line 75 "gramatica.ypp"
     { Logger::logError("declaracion de variables invalida") ;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 79 "gramatica.ypp"
+#line 78 "gramatica.ypp"
     {
                                         if (SyntacticActions::checkRedeclaration((yyvsp[(2) - (2)].string))) {
                                                 IntermediateCodeGenerator::isInvalidScope = true;
@@ -1715,7 +1714,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 91 "gramatica.ypp"
+#line 90 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de clase");
                                                                                                 IntermediateCodeGenerator::onScopeFinished() ;}
     break;
@@ -1723,7 +1722,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 95 "gramatica.ypp"
+#line 94 "gramatica.ypp"
     { if (SyntacticActions::checkRedeclaration((yyvsp[(2) - (2)].string))) {
                                                         IntermediateCodeGenerator::isInvalidScope = true;
                                                         IntermediateCodeGenerator::addScope("remove");
@@ -1738,7 +1737,7 @@ yyreduce:
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 106 "gramatica.ypp"
+#line 105 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de interfaz");
                                                                 IntermediateCodeGenerator::onScopeFinished() ;}
     break;
@@ -1746,7 +1745,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 114 "gramatica.ypp"
+#line 113 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de metodo de interfaz");
                                                                                 SyntacticActions::addParamToMethod((yyvsp[(1) - (5)].string), (yyvsp[(3) - (5)].string));
                                                                                 IntermediateCodeGenerator::onScopeFinished() ;}
@@ -1755,7 +1754,7 @@ yyreduce:
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 119 "gramatica.ypp"
+#line 118 "gramatica.ypp"
     { if(SyntacticActions::checkDeclaredClass((yyvsp[(4) - (4)].string))){
                                                                 IntermediateCodeGenerator::setVarScope((yyvsp[(2) - (4)].string));
                                                                 SyntacticActions::setIdUse((yyvsp[(2) - (4)].string), "nombre-clase");
@@ -1772,7 +1771,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 133 "gramatica.ypp"
+#line 132 "gramatica.ypp"
     { Logger::infoMsg("Implementacion de interfaz");
                                                                                 if(!IntermediateCodeGenerator::isInvalidScope && !SyntacticActions::classImplementsInterfaceMethods((yyvsp[(1) - (5)].string))){
                                                                                         IntermediateCodeGenerator::isInvalidScope = true;
@@ -1785,21 +1784,21 @@ yyreduce:
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 146 "gramatica.ypp"
+#line 145 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de atributos de clase") ;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 153 "gramatica.ypp"
+#line 152 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de metodo") ;}
     break;
 
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 156 "gramatica.ypp"
+#line 155 "gramatica.ypp"
     { if(!SyntacticActions::checkRedeclaration((yyvsp[(2) - (2)].string))){
                                                 IntermediateCodeGenerator::setVarScope((yyvsp[(2) - (2)].string));
                                                 SyntacticActions::setIdUse((yyvsp[(2) - (2)].string), "nombre-funcion");
@@ -1812,7 +1811,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 165 "gramatica.ypp"
+#line 164 "gramatica.ypp"
     { Logger::infoMsg("Declaracion de funcion");
                                                                                         SyntacticActions::addParamToMethod((yyvsp[(1) - (7)].string), (yyvsp[(3) - (7)].string));
                                                                                         IntermediateCodeGenerator::onScopeFinished((yyvsp[(6) - (7)].string)); ;}
@@ -1821,42 +1820,42 @@ yyreduce:
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 172 "gramatica.ypp"
+#line 171 "gramatica.ypp"
     { SyntacticActions::addClassComposition((yyvsp[(1) - (2)].string)); ;}
     break;
 
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 176 "gramatica.ypp"
+#line 175 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
 
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 177 "gramatica.ypp"
+#line 176 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
 
   case 50:
 
 /* Line 1455 of yacc.c  */
-#line 178 "gramatica.ypp"
+#line 177 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
 
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 179 "gramatica.ypp"
+#line 178 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
 
   case 52:
 
 /* Line 1455 of yacc.c  */
-#line 182 "gramatica.ypp"
+#line 181 "gramatica.ypp"
     {      Logger::infoMsg("Declaracion de funcion local");
                                                                                                                 SyntacticActions::addParamToMethod((yyvsp[(1) - (7)].string), (yyvsp[(3) - (7)].string));
                                                                                                                 IntermediateCodeGenerator::onScopeFinished((yyvsp[(6) - (7)].string)) ;}
@@ -1865,21 +1864,21 @@ yyreduce:
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 187 "gramatica.ypp"
+#line 186 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
 
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 188 "gramatica.ypp"
+#line 187 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
 
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 189 "gramatica.ypp"
+#line 188 "gramatica.ypp"
     { Logger::logError("No se permite anidamiento multiple de funciones locales");
                                                                                                 (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
@@ -1887,14 +1886,14 @@ yyreduce:
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 191 "gramatica.ypp"
+#line 190 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto() ;}
     break;
 
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 194 "gramatica.ypp"
+#line 193 "gramatica.ypp"
     { 
                                         IntermediateCodeGenerator::setVarScope((yyvsp[(2) - (2)].string));
         SyntacticActions::setIdType((yyvsp[(2) - (2)].string));
@@ -1906,28 +1905,28 @@ yyreduce:
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 200 "gramatica.ypp"
+#line 199 "gramatica.ypp"
     { Logger::logError("Falta el tipo del argumento") ;}
     break;
 
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 201 "gramatica.ypp"
+#line 200 "gramatica.ypp"
     { Logger::logError("Solo se permite un parametro en declaracion de funcion") ;}
     break;
 
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 202 "gramatica.ypp"
+#line 201 "gramatica.ypp"
     { (yyval.string) = NULL; ;}
     break;
 
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 205 "gramatica.ypp"
+#line 204 "gramatica.ypp"
     { Logger::infoMsg("Declaracion distribuida de metodos");
                                                                                         SyntacticActions::checkDeclaredClass((yyvsp[(3) - (7)].string)) ;}
     break;
@@ -1935,7 +1934,7 @@ yyreduce:
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 212 "gramatica.ypp"
+#line 211 "gramatica.ypp"
     { if(SyntacticActions::checkDeclaredClass((yyvsp[(1) - (2)].string))) {
                                                         SyntacticActions::lastType = (yyvsp[(1) - (2)].string);
                                                         SyntacticActions::addClassToObjects((yyvsp[(1) - (2)].string));
@@ -1946,7 +1945,7 @@ yyreduce:
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 223 "gramatica.ypp"
+#line 222 "gramatica.ypp"
     { if(!SyntacticActions::checkRedeclaration((yyvsp[(1) - (1)].string))){
                                 IntermediateCodeGenerator::setVarScope((yyvsp[(1) - (1)].string));
                                 SyntacticActions::setIdType((yyvsp[(1) - (1)].string));
@@ -1959,7 +1958,7 @@ yyreduce:
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 232 "gramatica.ypp"
+#line 231 "gramatica.ypp"
     { Logger::infoMsg("Asignacion simple");
                                                 if(SyntacticActions::checkDeclaredVar((yyvsp[(1) - (3)].string)) && SyntacticActions::checkTypes((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) IntermediateCodeGenerator::addTerceto((yyvsp[(2) - (3)].string), (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string)); ;}
     break;
@@ -1967,7 +1966,7 @@ yyreduce:
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 234 "gramatica.ypp"
+#line 233 "gramatica.ypp"
     { Logger::infoMsg("Asignacion de atributo");
                                 if(SyntacticActions::checkDeclaredVar((yyvsp[(1) - (5)].string)) && SyntacticActions::checkHasMember((yyvsp[(1) - (5)].string), (yyvsp[(3) - (5)].string), NULL, (yyvsp[(5) - (5)].string))) {
                                         char *aux = (char*) malloc(sizeof((yyvsp[(1) - (5)].string)) + sizeof((yyvsp[(3) - (5)].string)) + 2);
@@ -1980,28 +1979,28 @@ yyreduce:
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 241 "gramatica.ypp"
+#line 240 "gramatica.ypp"
     { Logger::logError("Asignacion vacia") ;}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 242 "gramatica.ypp"
+#line 241 "gramatica.ypp"
     { Logger::logError("Asignacion vacia") ;}
     break;
 
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 243 "gramatica.ypp"
+#line 242 "gramatica.ypp"
     { Logger::logError("Asignacion vacia") ;}
     break;
 
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 246 "gramatica.ypp"
+#line 245 "gramatica.ypp"
     { 
                         char *aux = (char*) malloc(sizeof(char) * 2);
                         aux[0] = '=';
@@ -2013,7 +2012,7 @@ yyreduce:
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 252 "gramatica.ypp"
+#line 251 "gramatica.ypp"
     { 
                         char *aux = (char*) malloc(sizeof(char) * 3);
                         aux[0] = '+';
@@ -2026,7 +2025,7 @@ yyreduce:
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 261 "gramatica.ypp"
+#line 260 "gramatica.ypp"
     { Logger::infoMsg("Invocacion de funcion");
                                 if(SyntacticActions::checkDeclaredMethod((yyvsp[(1) - (4)].string)) && SyntacticActions::checkParameters((yyvsp[(1) - (4)].string), (yyvsp[(3) - (4)].string))) IntermediateCodeGenerator::addTerceto("INVOKE", (yyvsp[(1) - (4)].string), (yyvsp[(3) - (4)].string)); ;}
     break;
@@ -2034,7 +2033,7 @@ yyreduce:
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 263 "gramatica.ypp"
+#line 262 "gramatica.ypp"
     { Logger::infoMsg("Invocacion de metodo");
                         if(SyntacticActions::checkDeclaredVar((yyvsp[(1) - (6)].string)) && SyntacticActions::checkHasMember((yyvsp[(1) - (6)].string), (yyvsp[(3) - (6)].string), (yyvsp[(5) - (6)].string))){
                                 char *aux = (char*) malloc(sizeof((yyvsp[(1) - (6)].string)) + sizeof((yyvsp[(3) - (6)].string)) + 2);
@@ -2047,21 +2046,21 @@ yyreduce:
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 272 "gramatica.ypp"
+#line 271 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(1) - (1)].string); ;}
     break;
 
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 273 "gramatica.ypp"
+#line 272 "gramatica.ypp"
     { Logger::logError("Solo se permite un argumento en invocacion de funcion") ;}
     break;
 
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 274 "gramatica.ypp"
+#line 273 "gramatica.ypp"
     { char *aux = (char*) malloc(2);
                         aux[0] = '-';
                         (yyval.string) = aux; ;}
@@ -2070,7 +2069,7 @@ yyreduce:
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 279 "gramatica.ypp"
+#line 278 "gramatica.ypp"
     { Logger::infoMsg("Sentencia IF completa");
                                                                                 IntermediateCodeGenerator::ifElseExpression((yyvsp[(3) - (8)].string), (yyvsp[(5) - (8)].string), (yyvsp[(7) - (8)].string)); ;}
     break;
@@ -2078,7 +2077,7 @@ yyreduce:
   case 80:
 
 /* Line 1455 of yacc.c  */
-#line 281 "gramatica.ypp"
+#line 280 "gramatica.ypp"
     { Logger::infoMsg("Sentencia IF sin ELSE");
                                                                         IntermediateCodeGenerator::ifExpression((yyvsp[(3) - (6)].string), (yyvsp[(5) - (6)].string)); ;}
     break;
@@ -2086,21 +2085,21 @@ yyreduce:
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 283 "gramatica.ypp"
+#line 282 "gramatica.ypp"
     { Logger::logError("Falta sentencia END_IF") ;}
     break;
 
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 284 "gramatica.ypp"
+#line 283 "gramatica.ypp"
     { Logger::logError("Falta sentencia END_IF") ;}
     break;
 
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 287 "gramatica.ypp"
+#line 286 "gramatica.ypp"
     { IntermediateCodeGenerator::addTerceto("BI", "", "-");
                                         IntermediateCodeGenerator::addStack(IntermediateCodeGenerator::lastTerceto);
                                         IntermediateCodeGenerator::addLabelTerceto();
@@ -2110,7 +2109,7 @@ yyreduce:
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 294 "gramatica.ypp"
+#line 293 "gramatica.ypp"
     { Logger::infoMsg("Condicion de control");
                                                                 IntermediateCodeGenerator::addTerceto((yyvsp[(2) - (3)].string), (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string));
                                                                 IntermediateCodeGenerator::endCondition();
@@ -2120,28 +2119,28 @@ yyreduce:
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 298 "gramatica.ypp"
+#line 297 "gramatica.ypp"
     { Logger::logError("Se esperaba expresion en lado derecho de comparacion") ;}
     break;
 
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 299 "gramatica.ypp"
+#line 298 "gramatica.ypp"
     { Logger::logError("Se esperaba expresion en lado izquierdo de comparacion") ;}
     break;
 
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 300 "gramatica.ypp"
+#line 299 "gramatica.ypp"
     { Logger::logError("Se esperaba un operador de comparacion") ;}
     break;
 
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 303 "gramatica.ypp"
+#line 302 "gramatica.ypp"
     { 
                         char *aux = (char*) malloc(sizeof(char) * 2);
                         aux[0] = '<';
@@ -2153,7 +2152,7 @@ yyreduce:
   case 90:
 
 /* Line 1455 of yacc.c  */
-#line 309 "gramatica.ypp"
+#line 308 "gramatica.ypp"
     {
                         char *aux = (char*) malloc(sizeof(char) * 2);
                         aux[0] = '>';
@@ -2165,7 +2164,7 @@ yyreduce:
   case 91:
 
 /* Line 1455 of yacc.c  */
-#line 315 "gramatica.ypp"
+#line 314 "gramatica.ypp"
     {
                         char *aux = (char*) malloc(sizeof(char) * 3);
                         aux[0] = '<';
@@ -2178,7 +2177,7 @@ yyreduce:
   case 92:
 
 /* Line 1455 of yacc.c  */
-#line 322 "gramatica.ypp"
+#line 321 "gramatica.ypp"
     {
                         char *aux = (char*) malloc(sizeof(char) * 3);
                         aux[0] = '>';
@@ -2191,7 +2190,7 @@ yyreduce:
   case 93:
 
 /* Line 1455 of yacc.c  */
-#line 329 "gramatica.ypp"
+#line 328 "gramatica.ypp"
     {
                         char *aux = (char*) malloc(sizeof(char) * 3);
                         aux[0] = '=';
@@ -2204,7 +2203,7 @@ yyreduce:
   case 94:
 
 /* Line 1455 of yacc.c  */
-#line 336 "gramatica.ypp"
+#line 335 "gramatica.ypp"
     {
                         char *aux = (char*) malloc(sizeof(char) * 3);
                         aux[0] = '!';
@@ -2217,21 +2216,21 @@ yyreduce:
   case 95:
 
 /* Line 1455 of yacc.c  */
-#line 345 "gramatica.ypp"
+#line 344 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto(); ;}
     break;
 
   case 96:
 
 /* Line 1455 of yacc.c  */
-#line 346 "gramatica.ypp"
+#line 345 "gramatica.ypp"
     { (yyval.string) = IntermediateCodeGenerator::getLastTerceto(); ;}
     break;
 
   case 97:
 
 /* Line 1455 of yacc.c  */
-#line 349 "gramatica.ypp"
+#line 348 "gramatica.ypp"
     { Logger::infoMsg("Sentencia PRINT");
                         IntermediateCodeGenerator::addTerceto("PRINT", (yyvsp[(2) - (2)].string), "-"); ;}
     break;
@@ -2239,21 +2238,21 @@ yyreduce:
   case 98:
 
 /* Line 1455 of yacc.c  */
-#line 351 "gramatica.ypp"
+#line 350 "gramatica.ypp"
     { Logger::logError("Se esperaba cadena para imprimir") ;}
     break;
 
   case 99:
 
 /* Line 1455 of yacc.c  */
-#line 352 "gramatica.ypp"
+#line 351 "gramatica.ypp"
     { Logger::logError("Falta sentencia PRINT") ;}
     break;
 
   case 100:
 
 /* Line 1455 of yacc.c  */
-#line 355 "gramatica.ypp"
+#line 354 "gramatica.ypp"
     { if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                         IntermediateCodeGenerator::forBlock((yyvsp[(1) - (5)].string), (yyvsp[(5) - (5)].string));
                                                                                 }
@@ -2264,7 +2263,7 @@ yyreduce:
   case 101:
 
 /* Line 1455 of yacc.c  */
-#line 360 "gramatica.ypp"
+#line 359 "gramatica.ypp"
     { Logger::logWarning("Falta parentesis en los argumentos del bloque for");
                                                                                 if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                         IntermediateCodeGenerator::forBlock((yyvsp[(1) - (4)].string), (yyvsp[(4) - (4)].string));
@@ -2276,7 +2275,7 @@ yyreduce:
   case 102:
 
 /* Line 1455 of yacc.c  */
-#line 366 "gramatica.ypp"
+#line 365 "gramatica.ypp"
     { Logger::logWarning("Falta parentesis en los argumentos del bloque for");
                                                                                 if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                         IntermediateCodeGenerator::forBlock((yyvsp[(1) - (4)].string), (yyvsp[(4) - (4)].string));
@@ -2288,7 +2287,7 @@ yyreduce:
   case 103:
 
 /* Line 1455 of yacc.c  */
-#line 374 "gramatica.ypp"
+#line 373 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(2) - (4)].string);
                                         IntermediateCodeGenerator::addScope("for");
                                         if(!SyntacticActions::checkRedeclaration((yyvsp[(2) - (4)].string))){
@@ -2302,7 +2301,7 @@ yyreduce:
   case 104:
 
 /* Line 1455 of yacc.c  */
-#line 382 "gramatica.ypp"
+#line 381 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(1) - (3)].string);
                                         Logger::logWarning("Falta sentencia FOR");
                                         IntermediateCodeGenerator::addScope("for");
@@ -2318,14 +2317,14 @@ yyreduce:
   case 105:
 
 /* Line 1455 of yacc.c  */
-#line 392 "gramatica.ypp"
+#line 391 "gramatica.ypp"
     { Logger::logError("Se esperaba una variable") ;}
     break;
 
   case 106:
 
 /* Line 1455 of yacc.c  */
-#line 393 "gramatica.ypp"
+#line 392 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(2) - (3)].string);
                                         Logger::logWarning("Falta sentencia RANGE");
                                         IntermediateCodeGenerator::addScope("for");
@@ -2341,7 +2340,7 @@ yyreduce:
   case 107:
 
 /* Line 1455 of yacc.c  */
-#line 403 "gramatica.ypp"
+#line 402 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(2) - (3)].string);
                                         Logger::logError("Falta sentencia IN");
                                         IntermediateCodeGenerator::addScope("for");
@@ -2357,7 +2356,7 @@ yyreduce:
   case 108:
 
 /* Line 1455 of yacc.c  */
-#line 415 "gramatica.ypp"
+#line 414 "gramatica.ypp"
     { if(SyntacticActions::checkForArguments((yyvsp[(1) - (5)].string), (yyvsp[(3) - (5)].string), (yyvsp[(5) - (5)].string))){
                                                                         IntermediateCodeGenerator::forArguments((yyvsp[(1) - (5)].string), (yyvsp[(3) - (5)].string), (yyvsp[(5) - (5)].string));
                                                                 } else {
@@ -2370,7 +2369,7 @@ yyreduce:
   case 109:
 
 /* Line 1455 of yacc.c  */
-#line 422 "gramatica.ypp"
+#line 421 "gramatica.ypp"
     { SyntacticActions::addNegativeConstant((yyvsp[(6) - (6)].string));
                                                                         char *aux = (char*) malloc(sizeof((yyvsp[(6) - (6)].string)) + 2);
                                                                         sprintf(aux, "-%s", (yyvsp[(6) - (6)].string));
@@ -2386,28 +2385,28 @@ yyreduce:
   case 110:
 
 /* Line 1455 of yacc.c  */
-#line 432 "gramatica.ypp"
+#line 431 "gramatica.ypp"
     { Logger::logError("Sentencia FOR recibe 3 parametros, 2 encontrados") ;}
     break;
 
   case 111:
 
 /* Line 1455 of yacc.c  */
-#line 433 "gramatica.ypp"
+#line 432 "gramatica.ypp"
     { Logger::logError("Sentencia FOR recibe 3 parametros, 1 encontrados") ;}
     break;
 
   case 112:
 
 /* Line 1455 of yacc.c  */
-#line 434 "gramatica.ypp"
+#line 433 "gramatica.ypp"
     { Logger::logError("Sentencia FOR recibe 3 parametros, ninguno encontrado") ;}
     break;
 
   case 113:
 
 /* Line 1455 of yacc.c  */
-#line 437 "gramatica.ypp"
+#line 436 "gramatica.ypp"
     { Logger::infoMsg("Acceso a atributo");
                                         if(SyntacticActions::checkDeclaredVar((yyvsp[(1) - (3)].string)) && SyntacticActions::checkHasMember((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) {
                                                 char *aux = (char*) malloc(sizeof((yyvsp[(1) - (3)].string)) + sizeof((yyvsp[(3) - (3)].string)) + 2);
@@ -2420,7 +2419,7 @@ yyreduce:
   case 114:
 
 /* Line 1455 of yacc.c  */
-#line 447 "gramatica.ypp"
+#line 446 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) {
                                                 IntermediateCodeGenerator::addTerceto("+", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string));
                                                 (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
@@ -2431,7 +2430,7 @@ yyreduce:
   case 115:
 
 /* Line 1455 of yacc.c  */
-#line 452 "gramatica.ypp"
+#line 451 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) {
                                                 IntermediateCodeGenerator::addTerceto("-", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string));
                                                 (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
@@ -2442,14 +2441,14 @@ yyreduce:
   case 116:
 
 /* Line 1455 of yacc.c  */
-#line 457 "gramatica.ypp"
+#line 456 "gramatica.ypp"
     { Logger::logError("Conversion explicita no permitida") ;}
     break;
 
   case 117:
 
 /* Line 1455 of yacc.c  */
-#line 458 "gramatica.ypp"
+#line 457 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (5)].string), (yyvsp[(4) - (5)].string))) {
                                                                 IntermediateCodeGenerator::addTerceto("+", (yyvsp[(1) - (5)].string), (yyvsp[(4) - (5)].string)); 
                                                                 (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
@@ -2459,7 +2458,7 @@ yyreduce:
   case 118:
 
 /* Line 1455 of yacc.c  */
-#line 462 "gramatica.ypp"
+#line 461 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (5)].string), (yyvsp[(4) - (5)].string))) {
                                                                 IntermediateCodeGenerator::addTerceto("-", (yyvsp[(1) - (5)].string), (yyvsp[(4) - (5)].string));
                                                                 (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
@@ -2469,28 +2468,28 @@ yyreduce:
   case 119:
 
 /* Line 1455 of yacc.c  */
-#line 466 "gramatica.ypp"
+#line 465 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(2) - (3)].string); ;}
     break;
 
   case 120:
 
 /* Line 1455 of yacc.c  */
-#line 467 "gramatica.ypp"
+#line 466 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(1) - (1)].string); ;}
     break;
 
   case 121:
 
 /* Line 1455 of yacc.c  */
-#line 471 "gramatica.ypp"
+#line 469 "gramatica.ypp"
     { Logger::logError("Anidamiento de expresiones con parentesis no permitida") ;}
     break;
 
   case 122:
 
 /* Line 1455 of yacc.c  */
-#line 472 "gramatica.ypp"
+#line 470 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) {
                                                         IntermediateCodeGenerator::addTerceto("+", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string)); 
                                                         (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
@@ -2502,7 +2501,7 @@ yyreduce:
   case 123:
 
 /* Line 1455 of yacc.c  */
-#line 478 "gramatica.ypp"
+#line 476 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) {
                                                         IntermediateCodeGenerator::addTerceto("-", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string)); 
                                                         (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
@@ -2514,23 +2513,24 @@ yyreduce:
   case 125:
 
 /* Line 1455 of yacc.c  */
-#line 487 "gramatica.ypp"
+#line 485 "gramatica.ypp"
     { (yyval.string) = (yyvsp[(1) - (1)].string); ;}
     break;
 
   case 126:
 
 /* Line 1455 of yacc.c  */
-#line 488 "gramatica.ypp"
+#line 486 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) {
-IntermediateCodeGenerator::addTerceto("*", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string)); (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
+                                        IntermediateCodeGenerator::addTerceto("*", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string));
+                                        (yyval.string) = IntermediateCodeGenerator::getLastTerceto();
                 }  ;}
     break;
 
   case 127:
 
 /* Line 1455 of yacc.c  */
-#line 491 "gramatica.ypp"
+#line 490 "gramatica.ypp"
     { if (SyntacticActions::checkTypes((yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string))) {
                                         SyntacticActions::check_division_by_zero((yyvsp[(3) - (3)].string));
                                         IntermediateCodeGenerator::addTerceto("/", (yyvsp[(1) - (3)].string), (yyvsp[(3) - (3)].string)); 
@@ -2541,73 +2541,82 @@ IntermediateCodeGenerator::addTerceto("*", (yyvsp[(1) - (3)].string), (yyvsp[(3)
   case 128:
 
 /* Line 1455 of yacc.c  */
-#line 498 "gramatica.ypp"
+#line 497 "gramatica.ypp"
     { if(SyntacticActions::checkDeclaredVar((yyvsp[(1) - (1)].string))) (yyval.string) = (yyvsp[(1) - (1)].string); ;}
     break;
 
   case 129:
 
 /* Line 1455 of yacc.c  */
-#line 499 "gramatica.ypp"
-    { SyntacticActions::addNegativeConstant((yyvsp[(2) - (2)].string));
-                                char *aux = (char*) malloc(sizeof((yyvsp[(2) - (2)].string)) + 2);
-                                sprintf(aux, "-%s", (yyvsp[(2) - (2)].string));
-                                (yyval.string) = aux; ;}
+#line 498 "gramatica.ypp"
+    { if(SyntacticActions::addNegativeConstant((yyvsp[(2) - (2)].string))){
+                                        char *aux = (char*) malloc(sizeof((yyvsp[(2) - (2)].string)) + 2);
+                                        sprintf(aux, "-%s", (yyvsp[(2) - (2)].string));
+                                        (yyval.string) = aux;        
+                                        }else{
+                                                (yyval.string) = NULL;
+                                        }
+                                ;}
     break;
 
   case 130:
 
 /* Line 1455 of yacc.c  */
-#line 503 "gramatica.ypp"
-    { SyntacticActions::checkLimits((yyvsp[(1) - (1)].string)); (yyval.string) = (yyvsp[(1) - (1)].string); ;}
+#line 506 "gramatica.ypp"
+    { if(SyntacticActions::checkLimits((yyvsp[(1) - (1)].string))){
+                                        (yyval.string) = (yyvsp[(1) - (1)].string);        
+                                }else{
+                                        (yyval.string) = NULL;
+                                }
+                                ;}
     break;
 
   case 131:
 
 /* Line 1455 of yacc.c  */
-#line 506 "gramatica.ypp"
+#line 514 "gramatica.ypp"
     { SyntacticActions::lastType = "short"; ;}
     break;
 
   case 132:
 
 /* Line 1455 of yacc.c  */
-#line 507 "gramatica.ypp"
+#line 515 "gramatica.ypp"
     { SyntacticActions::lastType = "double"; ;}
     break;
 
   case 133:
 
 /* Line 1455 of yacc.c  */
-#line 508 "gramatica.ypp"
+#line 516 "gramatica.ypp"
     { SyntacticActions::lastType = "uint"; ;}
     break;
 
   case 134:
 
 /* Line 1455 of yacc.c  */
-#line 511 "gramatica.ypp"
+#line 519 "gramatica.ypp"
     { SyntacticActions::lastType = "short"; ;}
     break;
 
   case 135:
 
 /* Line 1455 of yacc.c  */
-#line 512 "gramatica.ypp"
+#line 520 "gramatica.ypp"
     { SyntacticActions::lastType = "uint"; ;}
     break;
 
   case 136:
 
 /* Line 1455 of yacc.c  */
-#line 513 "gramatica.ypp"
+#line 521 "gramatica.ypp"
     { SyntacticActions::lastType = "double"; ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 2611 "gramatica.tab.cpp"
+#line 2620 "gramatica.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

@@ -46,13 +46,21 @@ void SymbolTable::printTable() const{
     }
 }
 
-void SymbolTable::deleteSymbol(string lexeme){
+void SymbolTable::decreaseSymbolReferences(string lexeme){
     Token * token = this->getSymbol(lexeme);
     if(token != NULL){
         token->decreaseReferences();
         
         if(token->getReferences() <= 0)
-            this->symbols.erase(lexeme);
+            this->deleteSymbol(lexeme);
+    }
+}
+
+void SymbolTable::deleteSymbol(string lexeme){
+    Token * token = this->getSymbol(lexeme);
+    if(token != NULL){
+        this->symbols.erase(lexeme);
+        delete token;
     }
 }
 

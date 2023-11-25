@@ -21,11 +21,11 @@ void SyntacticActions::check_division_by_zero(char* key){
         }
 }
 
-void SyntacticActions::addNegativeConstant(char* key){
+bool SyntacticActions::addNegativeConstant(char* key){
     int line = Lexer::symbolTable->getSymbol(key)->getLine();
     string lex = "-";
     lex.append(Lexer::symbolTable->getSymbol(key)->getLexeme());
-    Lexer::symbolTable->deleteSymbol(key);
+    Lexer::symbolTable->decreaseSymbolReferences(key);
     if(checkLimits(lex)){
         int aux = CTE_SHORT;
         string type = "short";
@@ -42,7 +42,11 @@ void SyntacticActions::addNegativeConstant(char* key){
         token->setType(type);
         token->setUse("constante");
         Lexer::symbolTable->addSymbol(token, lex);
+
+        return true;
     }
+
+    return false;
 }
 
 bool SyntacticActions::checkLimits(string key){
@@ -143,6 +147,7 @@ bool SyntacticActions::checkRedeclaration(string lexeme, bool showMsg = true){
 bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Variable " + lexeme + " no declarada";
+    Lexer::symbolTable->decreaseSymbolReferences(key);
 
     if(!findId(lexeme)){
         if(showMsg)
@@ -188,6 +193,7 @@ Token* SyntacticActions::findId(string id){
 bool SyntacticActions::checkDeclaredMethod(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Funcion " + lexeme + " no declarada";
+    Lexer::symbolTable->decreaseSymbolReferences(key);
 
     if(findId(lexeme) == NULL){
         if(showMsg)
@@ -198,9 +204,11 @@ bool SyntacticActions::checkDeclaredMethod(char* key, bool showMsg = true){
     return true;
 }
 
+// TODO 1 Permitir declaracion anidad de clases
 bool SyntacticActions::checkDeclaredClass(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Tipo " + lexeme + " no declarado";
+    Lexer::symbolTable->decreaseSymbolReferences(key);
     // Clases e interfaces solo pueden ser declaradas en un ambito global
     lexeme += ":" + IntermediateCodeGenerator::initialScope;
     Token * token = getSymbolToken(lexeme);
@@ -219,6 +227,7 @@ bool SyntacticActions::checkDeclaredClass(char* key, bool showMsg = true){
 bool SyntacticActions::checkDeclaredClassMember(char* key, char* _class){
     string lexeme = key;
     string className = _class;
+    Lexer::symbolTable->decreaseSymbolReferences(key);
     string errorMsg = "Miembro " + lexeme + " de clase " + className +" no declarado";
 
     if(!findId(lexeme)){
@@ -265,13 +274,12 @@ bool SyntacticActions::checkTypes(Token* token1, Token* token2, string lex1, str
     return true;
 }
 
-bool SyntacticActions::checkTypes(char* key1, char* key2){
+bool SyntacticActions::checkTypes(char* key1=NULL, char* key2=NULL){
     if (key1 == NULL || key2 == NULL) {
         return false;
     }
     string lexeme1 = key1;
     string lexeme2 = key2;
-
 
     // Revisar en la tabla de simbolos, si es un ID se debe usar el ambito
     Token * token1 = isId(lexeme1) ? findId(lexeme1) : getSymbolToken(lexeme1);
@@ -289,7 +297,7 @@ bool SyntacticActions::isId(string key){
 }
 
 bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, string function, string parameter) {
-    if(parameterToken == NULL){
+    if(parameterToken == NULL && !isTerceto(parameter)){
         if(token->getParameter() == NULL)
             return true;
         else{
@@ -369,6 +377,7 @@ bool SyntacticActions::checkForArguments(string arg1, string arg2, string arg3){
 
 void SyntacticActions::addClassComposition(char* key){
     string lexeme = key;
+    Lexer::symbolTable->decreaseSymbolReferences(key);
 
     Token* token = findId(lexeme);
 
@@ -398,7 +407,6 @@ void SyntacticActions::addClassComposition(char* key){
     }
 
     if (classToken->getUse() == "nombre-clase") {
-        Logger::infoMsg("Clase " + className + " hereda de " + lexeme);
         classToken->setFather(token);
     }
 }
@@ -443,33 +451,9 @@ void SyntacticActions::addClassToObjects(char* key){
     } while (!objects.empty());
 }
 
-/*
-Token* SyntacticActions::findMember(string object, string member){
-    Token* token = findId(object);
-    Token* classToken = findId(token->getType());
-
-    do {
-        // Revisar todas las variblas en el ambito de la clase
-        list<string>* lista = Lexer::symbolTable->getSymbolsByScope(classToken->getLexeme());
-
-        for(const string& str : *lista) {
-            string memberAux = str.substr(0, str.find(":"));
-            string auxscope = str.substr(str.find(":") + 1);
-
-            if (memberAux == member && auxscope.find(classToken->getLexeme()) != string::npos) {
-                cout << "Miembro " << member << " encontrado en la clase " << auxscope << endl;
-
-                return getSymbolToken(str);
-            }
-        }
-        classToken = classToken->getFather();
-    } while (classToken != NULL);
-
-    return NULL;
-}*/
-
 bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL) {
     Token* objectToken = findId(object);
+    Lexer::symbolTable->decreaseSymbolReferences(member);
 
     if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
         Logger::logError("Objeto " + object + " no declarado");
@@ -506,7 +490,7 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
             }
 
             if (hasScope) {
-                cout << "Miembro " << member << " encontrado en la clase " << auxscope << endl;
+                //cout << "Miembro " << member << " encontrado en la clase " << auxscope << endl;
 
                 // En caso de que corresponda a un metodo se deben chequear sus parametros
                 Token* memberToken = getSymbolToken(str);
@@ -530,7 +514,8 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
         classToken = classToken->getFather();
     } while (classToken != NULL);
 
-    cout << "Atributo " << member << " no encontrado en la clase " << objectToken->getType() << endl;
+    string msg = "Atributo " + member + " no encontrado en la clase " + objectToken->getType();
+    Logger::logError(msg);
 
     return false;
 }

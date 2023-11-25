@@ -14,6 +14,7 @@ class SymbolTable{
         void addSymbol(Token *, string);
         Token * getSymbol(string) const;
         void printTable() const;
+        void decreaseSymbolReferences(string);
         void deleteSymbol(string);
         void setScope(string, string);
         int getSymbolsSize();

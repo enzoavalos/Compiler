@@ -31,7 +31,7 @@
     **Este es un comentario
 
     INTERFACE z {
-        VOID q (UINT arg) ,
+        VOID q () ,
     } ,
 
     CLASS ca {
@@ -42,10 +42,10 @@
         } ,
     },
 
-    CLASS clase2 IMPLEMENT z{
-        VOID q(UINT arg){
-            RETURN ,
-        } ,
+    CLASS cb {
+        SHORT _s1 ,
+
+        ca ,
     } ,
 
     CLASS clase {
@@ -59,12 +59,6 @@
         } ,
     } ,
 
-    ** IMPL FOR clase : {
-        ** VOID p (){
-            ** DOUBLE s ,
-        ** } ,
-    ** } ,
-
     FOR i IN RANGE (2_s; 10_s; 1_s)
         int1 += i ,
     ,
@@ -75,8 +69,9 @@
     } ,
 
     DOUBLE d3 ,
-    q(d3 + 1.5),
+    funcion(d3 + 1.5d+20),
 
-    clase.atributo = 10_ui ,
-    clase.k() ,
+    clase objeto ,
+    objeto.atributo = 10_ui ,
+    objeto.k() ,
 }
