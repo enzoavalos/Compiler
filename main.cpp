@@ -10,6 +10,9 @@
 #include "src/Token.cpp"
 #include "src/IntermediateCodeGenerator/Terceto.cpp"
 #include "src/IntermediateCodeGenerator/IntermediateCodeGenerator.cpp"
+#include "src/Assembler/Assembler.cpp"
+
+string pathOutAssembler = "src/Assembler/out.asm";
 
 using namespace std;
 int yylex();
@@ -25,6 +28,7 @@ Lexer *lexer;
 
 SymbolTable table = SymbolTable();
 SymbolTable * Lexer::symbolTable = &table;
+Assembler * assembler;
 
 int main(int argc, char* argv[])
 {
@@ -57,6 +61,13 @@ int main(int argc, char* argv[])
 
     table.printTable();
     IntermediateCodeGenerator::printTercetos();
+
+    assembler = new Assembler(pathOutAssembler);
+
+    assembler->generate();
+
+    delete assembler;
+    return 0;
 }
 
 void yyerror(const char * text)
