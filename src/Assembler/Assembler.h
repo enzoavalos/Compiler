@@ -15,6 +15,7 @@ private:
     ofstream fileStream;
     stringstream declarations;
     stringstream dataStream;
+    stack<string> lastOperation = stack<string>();
 
     list<string> functions;
 
@@ -33,10 +34,7 @@ private:
 
     void generateAssign(Terceto *terceto);
     void generateOp(string operation, Terceto *terceto);
-    void generateAdd(Terceto *terceto);
-    void generateSub(Terceto *terceto);
-    void generateMul(Terceto *terceto);
-    void generateDiv(Terceto *terceto);
+    void generateComp(Terceto *terceto);
 
 public:
     Assembler(string filePath);

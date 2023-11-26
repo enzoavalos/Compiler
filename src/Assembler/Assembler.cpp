@@ -71,6 +71,7 @@ void Assembler::declareVariables()
 
 void Assembler::generate()
 {
+    // Cambiar la primer linea, esto es el tamaño del archivo
     fileStream << ".386" << endl;
     fileStream << ".model flat, stdcall" << endl;
     fileStream << "option casemap :none" << endl;
@@ -94,6 +95,7 @@ void Assembler::generate()
     start();
 }
 
+// TODO: no esta implementado
 void Assembler::declareFunctions()
 {
     list<string>::iterator it = functions.begin();
@@ -108,90 +110,43 @@ void Assembler::declareFunctions()
     }
 }
 
-// TODO: revisar estas generaciones, probablemente se puede optimizar y achicar un monton
+// TODO: revisar estas generaciones, probablemente se puede optimizar y sacar codigo repetido
 void Assembler::generateAssign(Terceto *terceto)
 {
     string op1 = terceto->getOp1();
     string op2 = terceto->getOp2();
-    if ((SyntacticActions::isTerceto(op1) && !SyntacticActions::isTerceto(op2)))
+
+    // Caso 1, variable/constante y registro
+    if (SyntacticActions::isId(op1) && SyntacticActions::isTerceto(op2))
     {
-        int terceto = atoi(op1.c_str());
-        Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto);
-        fileStream << "mov " << tercetoOp1->getRegisterName() << ", " << op2 << endl;
+        int terceto2 = atoi(op2.c_str());
+        Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
+        fileStream << "mov " << op1 << ", " << tercetoOp2->getRegisterName() << endl;
+        this->freeRegister(tercetoOp2->getRegisterName());
         return;
     }
-    else if (SyntacticActions::isTerceto(op2) && !SyntacticActions::isTerceto(op1))
-    {
-        int terceto = atoi(op2.c_str());
-        fileStream << "mov " << op1 << ", " << IntermediateCodeGenerator::getTerceto(terceto)->getRegisterName() << endl;
-        return;
-    }
-    if (SyntacticActions::isId(op1) && SyntacticActions::isId(op2))
+
+    // Caso 2, variable/constante y variable/constante
+    if ((SyntacticActions::isId(op1) || SyntacticActions::isConstant(op1)) && (SyntacticActions::isId(op2) || SyntacticActions::isConstant(op2)))
     {
         string registerName = getFreeRegister();
         fileStream << "mov " << registerName << ", " << op2 << endl;
         fileStream << "mov " << op1 << ", " << registerName << endl;
-        return;
-    }
-    if (SyntacticActions::isId(op1) && SyntacticActions::isConstant(op2))
-    {
-        string registerName = getFreeRegister();
-        fileStream << "mov " << registerName << ", " << op2 << endl;
-        return;
-    }
-
-    if (SyntacticActions::isTerceto(op1) && SyntacticActions::isTerceto(op2))
-    {
-        int terceto1 = atoi(op1.c_str());
-        int terceto2 = atoi(op2.c_str());
-        Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
-        Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
-        fileStream << "mov " << tercetoOp1->getRegisterName() << ", " << tercetoOp2->getRegisterName() << endl;
-        this->freeRegister(tercetoOp2->getRegisterName());
+        this->freeRegister(registerName);
         return;
     }
 }
 
+// TODO: Tenemos que hacer algo con los numeros. Eliminar el sufijos de SHORT y UINT. Y usar los registros correspondientes segun el tamaño de la variable?
 void Assembler::generateOp(string operation, Terceto *terceto)
 {
     string op1 = terceto->getOp1();
     string op2 = terceto->getOp2();
 
-    if (SyntacticActions::isId(op1) && (SyntacticActions::isId(op2) || SyntacticActions::isConstant(op2)))
-    {
-        string registerName = getFreeRegister();
-        fileStream << "mov " << registerName << ", " << op1 << endl;
-        fileStream << operation << " " << registerName << ", " << op2 << endl;
-        terceto->setRegisterName(registerName);
-        return;
-    }
-    if (SyntacticActions::isId(op2) && (SyntacticActions::isId(op1) || SyntacticActions::isConstant(op1)))
-    {
-        string registerName = getFreeRegister();
-        fileStream << operation << " " << registerName << ", " << op1 << endl;
-        terceto->setRegisterName(registerName);
-        return;
-    }
-    if (SyntacticActions::isTerceto(op1) && !SyntacticActions::isTerceto(op2))
-    {
-        int terceto1 = atoi(op1.c_str());
-        Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
-        fileStream << operation << " " << tercetoOp1->getRegisterName() << ", " << op2 << endl;
-        terceto->setRegisterName(tercetoOp1->getRegisterName());
-        return;
-    }
-
-    if (SyntacticActions::isTerceto(op2) && !SyntacticActions::isTerceto(op1))
-    {
-        int terceto2 = atoi(op2.c_str());
-        Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
-        fileStream << operation << " " << tercetoOp2->getRegisterName() << ", " << op1 << endl;
-        terceto->setRegisterName(tercetoOp2->getRegisterName());
-        return;
-    }
-
+    // Caso 3, 2 tercetos
     if (SyntacticActions::isTerceto(op1) && SyntacticActions::isTerceto(op2))
     {
+        cout << "Caso 3" << endl;
         int terceto1 = atoi(op1.c_str());
         int terceto2 = atoi(op2.c_str());
         Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
@@ -200,6 +155,101 @@ void Assembler::generateOp(string operation, Terceto *terceto)
         this->freeRegister(tercetoOp2->getRegisterName());
         terceto->setRegisterName(tercetoOp1->getRegisterName());
         return;
+    }
+
+    // Caso 4, 1 terceto y 1 variable/constante
+    if (!SyntacticActions::isTerceto(op1) && SyntacticActions::isTerceto(op2))
+    {
+        cout << "Caso 4" << endl;
+        // Caso conmutativo (*, +)
+        if (operation == "add" || operation == "mul")
+        {
+
+            int terceto2 = atoi(op2.c_str());
+            Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
+            fileStream << operation << " " << tercetoOp2->getRegisterName() << ", " << op1 << endl;
+            terceto->setRegisterName(tercetoOp2->getRegisterName());
+            return;
+        }
+        else
+        {
+            int terceto2 = atoi(op2.c_str());
+            Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
+            string registerName = getFreeRegister();
+            fileStream << "mov " << registerName << ", " << op1 << endl;
+            fileStream << operation << " " << registerName << ", " << tercetoOp2->getRegisterName() << endl;
+            terceto->setRegisterName(registerName);
+            return;
+        }
+    }
+
+    // Caso 1, 2 variables/constantes
+    if ((SyntacticActions::isId(op1) || SyntacticActions::isConstant(op1)) && (SyntacticActions::isId(op2) || SyntacticActions::isConstant(op2)))
+    {
+        cout << "Caso 1" << endl;
+        string registerName = getFreeRegister();
+        fileStream << "mov " << registerName << ", " << op1 << endl;
+        fileStream << operation << " " << registerName << ", " << op2 << endl;
+        terceto->setRegisterName(registerName);
+        return;
+    }
+
+    // Caso 2, 1 variable/constante y 1 terceto
+    if (SyntacticActions::isTerceto(op1) && !SyntacticActions::isTerceto(op2))
+    {
+        cout << "Caso 2" << endl;
+        int terceto1 = atoi(op1.c_str());
+        Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
+        fileStream << operation << " " << tercetoOp1->getRegisterName() << ", " << op2 << endl;
+        terceto->setRegisterName(tercetoOp1->getRegisterName());
+        return;
+    }
+}
+
+void Assembler::generateComp(Terceto *terceto)
+{
+    string op1 = terceto->getOp1();
+    string op2 = terceto->getOp2();
+
+    if (SyntacticActions::isTerceto(op1) && SyntacticActions::isTerceto(op2))
+    {
+        int terceto1 = atoi(op1.c_str());
+        int terceto2 = atoi(op2.c_str());
+        Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
+        Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
+        fileStream << "cmp " << tercetoOp1->getRegisterName() << ", " << tercetoOp2->getRegisterName() << endl;
+        freeRegister(tercetoOp1->getRegisterName());
+        freeRegister(tercetoOp2->getRegisterName());
+        return;
+    }
+
+    if (SyntacticActions::isTerceto(op1) && !SyntacticActions::isTerceto(op2))
+    {
+        int terceto1 = atoi(op1.c_str());
+        Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
+        fileStream << "cmp " << tercetoOp1->getRegisterName() << ", " << op2 << endl;
+        freeRegister(tercetoOp1->getRegisterName());
+        return;
+    }
+
+    if (!SyntacticActions::isTerceto(op1) && SyntacticActions::isTerceto(op2))
+    {
+        int terceto2 = atoi(op2.c_str());
+        Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
+        fileStream << "cmp " << op1 << ", " << tercetoOp2->getRegisterName() << endl;
+        freeRegister(tercetoOp2->getRegisterName());
+        return;
+    }
+
+    if (!SyntacticActions::isTerceto(op1) && !SyntacticActions::isTerceto(op2))
+    {
+        string registerName = getFreeRegister();
+        string registerName2 = getFreeRegister();
+        fileStream << "mov " << registerName << ", " << op1 << endl;
+        fileStream << "mov " << registerName2 << ", " << op2 << endl;
+        fileStream << "cmp " << registerName << ", " << registerName2 << endl;
+        freeRegister(registerName);
+        freeRegister(registerName2);
     }
 }
 
@@ -224,6 +274,14 @@ void Assembler::start()
         {
             generateOp("add", terceto);
         }
+        else if (op == "+=")
+        {
+            string registerName = getFreeRegister();
+            fileStream << "mov " << registerName << ", " << op1 << endl;
+            fileStream << "add " << registerName << ", " << op2 << endl;
+            fileStream << "mov " << op1 << ", " << registerName << endl;
+            freeRegister(registerName);
+        }
         else if (op == "-")
         {
             generateOp("sub", terceto);
@@ -235,6 +293,46 @@ void Assembler::start()
         else if (op == "/")
         {
             generateOp("div", terceto);
+        }
+        else if (op == ">=")
+        {
+            generateComp(terceto);
+            lastOperation.push("jl");
+        }
+        else if (op == "<=")
+        {
+            generateComp(terceto);
+            lastOperation.push("jg");
+        }
+        else if (op == ">")
+        {
+            generateComp(terceto);
+            lastOperation.push("jle");
+        }
+        else if (op == "<")
+        {
+            generateComp(terceto);
+            lastOperation.push("jge");
+        }
+        else if (op == "==")
+        {
+            generateComp(terceto);
+            lastOperation.push("jne");
+        }
+        else if (op == "BF")
+        {
+            string label = SyntacticActions::isTerceto(op2) ? "Label" + op2 : "Label" + op1;
+            fileStream << lastOperation.top() << " " << label << endl;
+            lastOperation.pop();
+        }
+        else if (op == "BI")
+        {
+            string label = SyntacticActions::isTerceto(op2) ? "Label" + op2 : "Label" + op1;
+            fileStream << "jmp " << label << endl;
+        }
+        else if (op.find("Label") != string::npos)
+        {
+            fileStream << op << ":" << endl;
         }
 
         it++;
