@@ -19,6 +19,7 @@ class SymbolTable{
         void setScope(string, string);
         int getSymbolsSize();
         list<string>* getSymbolsByScope(string);
+        map<string,Token*> getSymbols();
 };
 
 #endif

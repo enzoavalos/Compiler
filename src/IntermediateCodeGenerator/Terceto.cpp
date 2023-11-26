@@ -42,3 +42,11 @@ void Terceto::setLine(int line){
 int Terceto::getLine(){
     return this->line;
 }
+
+void Terceto::setRegisterName(string registerName) {
+    this->registerName = registerName;
+}
+
+string Terceto::getRegisterName() {
+    return this->registerName;
+}

@@ -248,3 +248,15 @@ void IntermediateCodeGenerator::addLabelTerceto(){
     string op = "Label" + to_string(lastTerceto+1);
     addTerceto(op,"-","-");
 }
+
+void IntermediateCodeGenerator::addLabelTerceto(string label){
+    addTerceto(label,"-","-");
+}
+
+map<int, Terceto> * IntermediateCodeGenerator::getTercetos(){
+    return &tercetos;
+}
+
+Terceto * IntermediateCodeGenerator::getTerceto(int tercetoNumber){
+    return tercetos.find(tercetoNumber) != tercetos.end() ? &tercetos[tercetoNumber] : nullptr;
+}

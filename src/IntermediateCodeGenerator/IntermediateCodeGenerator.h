@@ -28,6 +28,7 @@ class IntermediateCodeGenerator{
         static void addTerceto(Terceto);
         static void addTerceto(string, string, string);
         static void addLabelTerceto();
+        static void addLabelTerceto(string);
         static void completeTerceto(int, string);
         static void removeTerceto(int);
 
@@ -51,6 +52,9 @@ class IntermediateCodeGenerator{
         static void returnStatement();
 
         static string getTercetoType(string tercetoNumber);
+
+        static map<int, Terceto> * getTercetos();
+        static Terceto * getTerceto(int tercetoNumber);
     
     private:
         static map<int, Terceto> tercetos;

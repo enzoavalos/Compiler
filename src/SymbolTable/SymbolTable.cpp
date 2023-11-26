@@ -91,3 +91,7 @@ list<string>* SymbolTable::getSymbolsByScope(string scope){
 int SymbolTable::getSymbolsSize(){
     return this->symbols.size();
 }
+
+map<string,Token*> SymbolTable::getSymbols(){
+    return this->symbols;
+}

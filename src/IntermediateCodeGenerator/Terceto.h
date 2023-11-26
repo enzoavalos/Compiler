@@ -17,6 +17,9 @@ class Terceto{
         void setOp1(string op1);
         void setOp2(string op2);
 
+        void setRegisterName(string registerName);
+        string getRegisterName();
+
         static void completarTerceto(int numeroTerceto); // Completar terceto incompleto, backpatching
 
         void setLine(int);
@@ -26,6 +29,8 @@ class Terceto{
         string op;
         string op1; // Operador 1, puede ser otro terceto
         string op2;
+
+        string registerName = "";
 };
 
 #endif

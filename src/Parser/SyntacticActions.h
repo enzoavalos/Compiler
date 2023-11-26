@@ -38,11 +38,11 @@ class SyntacticActions {
         static void addClassToObjects(char*);
         static bool checkHasMember(string, string, char*, char*);
         static bool classImplementsInterfaceMethods(char*);
-    private:
-        static Token * getSymbolToken(string key);
         static bool isTerceto(string key);
         static bool isId(string key);
         static bool isConstant(string key);
+    private:
+        static Token * getSymbolToken(string key);
         static bool checkTypes(Token*, Token*, string, string);
         static bool checkParameters(Token*, Token*, string, string);
 
