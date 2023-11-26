@@ -37,9 +37,15 @@ class Token
         string use;
         string type;
 
+        Token * parameter = NULL;
+
+        Token * father = NULL;
+
     public:
         Token(int tokenType, string lexeme, int line);
         ~Token();
+        Token* copy();
+
         int getTokenType();
         string getLexeme();
         int getLine();
@@ -52,6 +58,12 @@ class Token
         void setUse(string);
         string getUse();
         string getType();
+
+        void setParameter(Token*);
+        Token* getParameter();
+
+        void setFather(Token*);
+        Token* getFather();
 };
 
 #endif // TOKEN_H

@@ -31,7 +31,7 @@ void Lexer::addSymbol(Token *token)
 {
     // Solo se agrega a la tabla de simbolos aquellos tokens que tengan lexema
     if (!token->getLexeme().empty())
-        symbolTable->addSymbol(token);
+        symbolTable->addSymbol(token, token->getLexeme());
 }
 
 Token *Lexer::scanToken()

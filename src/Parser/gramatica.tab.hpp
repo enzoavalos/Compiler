@@ -75,7 +75,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 16 "gramatica.ypp"
+#line 10 "gramatica.ypp"
 
         int number = 0;
         char *string;

@@ -34,3 +34,11 @@ void Terceto::setOp2(string op2){
 void Terceto::completarTerceto(int numeroTerceto) {
     
 }
+
+void Terceto::setLine(int line){
+    this->line = line;
+}
+
+int Terceto::getLine(){
+    return this->line;
+}

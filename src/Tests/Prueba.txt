@@ -1,0 +1,14 @@
+{
+    INTERFACE interfaz {
+        VOID q (SHORT arg) ,
+    } ,
+    
+
+    CLASS cc IMPLEMENT interfaz{
+        SHORT z ,
+
+        VOID q(SHORT arg){
+            RETURN ,
+        } ,
+    } ,
+}
