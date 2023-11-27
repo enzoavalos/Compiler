@@ -249,8 +249,8 @@ void IntermediateCodeGenerator::addLabelTerceto(){
     addTerceto(op,"-","-");
 }
 
-void IntermediateCodeGenerator::addLabelTerceto(string label){
-    addTerceto(label,"-","-");
+void IntermediateCodeGenerator::addLabelTerceto(string label, string op){
+    addTerceto(label, op,"-");
 }
 
 map<int, Terceto> * IntermediateCodeGenerator::getTercetos(){

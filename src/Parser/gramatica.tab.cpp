@@ -1803,8 +1803,8 @@ yyreduce:
                                                 IntermediateCodeGenerator::setVarScope((yyvsp[(2) - (2)].string));
                                                 SyntacticActions::setIdUse((yyvsp[(2) - (2)].string), "nombre-funcion");
                                                 string aux = (yyvsp[(2) - (2)].string);
-                                                string label = "inic_" + aux;
-                                                IntermediateCodeGenerator::addLabelTerceto(label);
+                                                string label = "inic_func";
+                                                IntermediateCodeGenerator::addLabelTerceto(label, (yyvsp[(2) - (2)].string));
                                                 IntermediateCodeGenerator::addScope((yyvsp[(2) - (2)].string));
                                                 (yyval.string) = (yyvsp[(2) - (2)].string);
                                         }

@@ -15,6 +15,9 @@ private:
     ofstream fileStream;
     stringstream declarations;
     stringstream dataStream;
+
+    stringstream * reference;
+
     stack<string> lastOperation = stack<string>();
 
     list<string> functions;
@@ -30,7 +33,6 @@ private:
     void freeRegister(string registerName);
 
     void declareVariables();
-    void declareFunctions();
 
     void generateAssign(Terceto *terceto);
     void generateOp(string operation, Terceto *terceto);

@@ -156,8 +156,8 @@ encabezado_funcion      : VOID ID       { if(!SyntacticActions::checkRedeclarati
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 SyntacticActions::setIdUse($2, "nombre-funcion");
                                                 string aux = $2;
-                                                string label = "inic_" + aux;
-                                                IntermediateCodeGenerator::addLabelTerceto(label);
+                                                string label = "inic_func";
+                                                IntermediateCodeGenerator::addLabelTerceto(label, $2);
                                                 IntermediateCodeGenerator::addScope($2);
                                                 $$ = $2;
                                         }
