@@ -31,11 +31,15 @@
     **Este es un comentario
 
     INTERFACE z {
-        VOID q () ,
+        VOID q (DOUBLE par) ,
     } ,
 
-    CLASS ca {
+    CLASS ca IMPLEMENT z{
         UINT x,
+
+        VOID q (DOUBLE par){
+            RETURN ,
+        } ,
 
         VOID p(DOUBLE arg){
             RETURN ,
@@ -43,6 +47,14 @@
     },
 
     CLASS cb {
+        CLASS anidada {
+            UINT myuint ,
+
+            VOID k(){
+                RETURN ,
+            } ,
+        } ,
+
         SHORT _s1 ,
 
         ca ,

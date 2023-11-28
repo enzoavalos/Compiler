@@ -16,7 +16,7 @@
 %token <string> ID STRING CTE_SHORT CTE_UINT CTE_DOUBLE
 %type <string> factor constante expresion asignador termino expresion_parentesis comparador condicion bloque_sentencias asignacion seleccion argumentos
 %type <string> bloque_else bloque_if argumento_bucle_for acceso_atributo encabezado_funcion sentencias_metodo sentencias_funcion_local parametro
-%type <string> encabezado_for encabezado_implement
+%type <string> encabezado_for encabezado_implement herencia_composicion
 
 %left '=' PLUS_EQUAL  // Asociatividad izquierda para asignación y asignación con adición
 %left '.'  // Asociatividad izquierda para acceso a atributos y métodos
@@ -78,7 +78,6 @@ lista_variables : lista_variables ';' ID        { if(!SyntacticActions::checkRed
 encabezado_clase        : CLASS ID      {
                                         if (SyntacticActions::checkRedeclaration($2)) {
                                                 IntermediateCodeGenerator::isInvalidScope = true;
-                                                IntermediateCodeGenerator::addScope("remove");
                                         } else {
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 SyntacticActions::setIdUse($2, "nombre-clase");
@@ -87,13 +86,17 @@ encabezado_clase        : CLASS ID      {
 }
                         ;
 
-clase_declaration       : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
+clase_declaration       : encabezado_clase '{' nested_class_declaration atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
                                                                                                 IntermediateCodeGenerator::onScopeFinished() }
                         ;
 
+nested_class_declaration        : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' ','         { Logger::infoMsg("Declaracion de clase local");
+                                                                                                IntermediateCodeGenerator::onScopeFinished() }
+                                |
+                                ;
+
 encabezado_interfaz     : INTERFACE ID          { if (SyntacticActions::checkRedeclaration($2)) {
                                                         IntermediateCodeGenerator::isInvalidScope = true;
-                                                        IntermediateCodeGenerator::addScope("remove");
                                                 } else {
                                                         IntermediateCodeGenerator::setVarScope($2);
                                                         SyntacticActions::setIdUse($2, "nombre-interfaz");
@@ -123,26 +126,27 @@ encabezado_implement    : CLASS ID IMPLEMENT ID         { if(SyntacticActions::c
                                                                 $$ = $4;
                                                         }else{
                                                                 IntermediateCodeGenerator::isInvalidScope = true;
-                                                                IntermediateCodeGenerator::addScope("remove");
                                                         }
                                                         }
                         ;
 
-// Ver como eliminar simbolos y tercetos creados si no implementa todos los metodos de la interfaz
-implement_declaration   : encabezado_implement '{' atributos metodos_clase '}'    { Logger::infoMsg("Implementacion de interfaz");
-                                                                                if(!IntermediateCodeGenerator::isInvalidScope && !SyntacticActions::classImplementsInterfaceMethods($1)){
-                                                                                        IntermediateCodeGenerator::isInvalidScope = true;
-                                                                                        IntermediateCodeGenerator::addScope("remove");
-                                                                                }
-                                                                                IntermediateCodeGenerator::onScopeFinished();
-                                                                        }
+implement_declaration   : encabezado_implement '{' atributos metodos_clase herencia_composicion '}'
+                        { Logger::infoMsg("Implementacion de interfaz");
+                                SyntacticActions::removeClassComposition($5);
+                                if(!IntermediateCodeGenerator::isInvalidScope && !SyntacticActions::classImplementsInterfaceMethods($1)){
+                                        IntermediateCodeGenerator::isInvalidScope = true;
+                                }
+                                IntermediateCodeGenerator::onScopeFinished();
+                        }
                         ;
 
+// TODO 2 Permitir declaracion de atributos con tipo de clases declaradas
 atributos               : atributos atributo_declaration
                         |
                         ;
 
-atributo_declaration    : declaracion_variables ',' { Logger::infoMsg("Declaracion de atributos de clase") }
+atributo_declaration    : declaracion_variables ','     { Logger::infoMsg("Declaracion de atributos de clase") }
+                        //| objeto_declaration ','
                         ;
 
 metodos_clase   : metodos_clase metodo_declaration
@@ -152,6 +156,7 @@ metodos_clase   : metodos_clase metodo_declaration
 metodo_declaration      : funcion_declaration ',' { Logger::infoMsg("Declaracion de metodo") }
                         ;
 
+// TODO 5 Revisar etiqueta de inicio y fin de funcion
 encabezado_funcion      : VOID ID       { if(!SyntacticActions::checkRedeclaration($2)){
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 SyntacticActions::setIdUse($2, "nombre-funcion");
@@ -170,9 +175,8 @@ funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_me
                         |
                         ;
 
-// TODO 2 Informar error cuando se quiera heredar en una implementacion de interfaz
-herencia_composicion    : ID ','   { SyntacticActions::addClassComposition($1); }
-                        |
+herencia_composicion    : ID ','   { SyntacticActions::addClassComposition($1); $$ = $1; }
+                        |          { $$ = NULL; }
                         ;
 
 sentencias_metodo       : sentencias_metodo declaracion_variables ','   { $$ = IntermediateCodeGenerator::getLastTerceto() }
@@ -418,7 +422,6 @@ argumento_bucle_for     : constante ';' constante ';' constante { if(SyntacticAc
                                                                         IntermediateCodeGenerator::forArguments($1, $3, $5);
                                                                 } else {
                                                                         IntermediateCodeGenerator::isInvalidScope = true;
-                                                                        IntermediateCodeGenerator::addScope("remove");
                                                                 }
                                                                 }
                         | constante ';' constante ';' '-' constante     { SyntacticActions::addNegativeConstant($6);
@@ -428,7 +431,6 @@ argumento_bucle_for     : constante ';' constante ';' constante { if(SyntacticAc
                                                                         IntermediateCodeGenerator::forArguments($1, $3, aux);
                                                                         } else {
                                                                                 IntermediateCodeGenerator::isInvalidScope = true;
-                                                                                IntermediateCodeGenerator::addScope("remove");
                                                                         }
                                                                         }
                         | constante ';' constante { Logger::logError("Sentencia FOR recibe 3 parametros, 2 encontrados") }
@@ -514,9 +516,9 @@ factor          : ID { if(SyntacticActions::checkDeclaredVar($1)) $$ = $1; }
                                 }
                 ;
 
-constante       : CTE_SHORT     { SyntacticActions::lastType = "short"; }
-                | CTE_DOUBLE    { SyntacticActions::lastType = "double"; }
-                | CTE_UINT      { SyntacticActions::lastType = "uint"; }
+constante       : CTE_SHORT     { SyntacticActions::lastType = "short"; IntermediateCodeGenerator::setVarScope($1); }
+                | CTE_DOUBLE    { SyntacticActions::lastType = "double"; IntermediateCodeGenerator::setVarScope($1); }
+                | CTE_UINT      { SyntacticActions::lastType = "uint"; IntermediateCodeGenerator::setVarScope($1); }
                 ;
 
 tipo    : SHORT         { SyntacticActions::lastType = "short"; }

@@ -204,14 +204,14 @@ bool SyntacticActions::checkDeclaredMethod(char* key, bool showMsg = true){
     return true;
 }
 
-// TODO 1 Permitir declaracion anidad de clases
 bool SyntacticActions::checkDeclaredClass(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Tipo " + lexeme + " no declarado";
     Lexer::symbolTable->decreaseSymbolReferences(key);
     // Clases e interfaces solo pueden ser declaradas en un ambito global
-    lexeme += ":" + IntermediateCodeGenerator::initialScope;
-    Token * token = getSymbolToken(lexeme);
+    //lexeme += ":" + IntermediateCodeGenerator::initialScope;
+    //Token * token = getSymbolToken(lexeme);
+    Token * token = findId(lexeme);
 
     if(token == NULL || (token->getUse() != "nombre-clase" && token->getUse() != "nombre-interfaz")){
         if(showMsg)
@@ -289,14 +289,14 @@ bool SyntacticActions::checkTypes(char* key1=NULL, char* key2=NULL){
 }
 
 bool SyntacticActions::isTerceto(string key){
-    return key.find_first_not_of("0123456789") == string::npos;
+    return (key.find_first_not_of("0123456789") == string::npos) && (key != "");
 }
 
 bool SyntacticActions::isId(string key){
-    return key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789") == string::npos;
+    return (key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789") == string::npos) && (key != "");
 }
 
-bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, string function, string parameter) {
+bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, string function, string parameter="") {
     if(parameterToken == NULL && !isTerceto(parameter)){
         if(token->getParameter() == NULL)
             return true;
@@ -373,6 +373,24 @@ bool SyntacticActions::checkForArguments(string arg1, string arg2, string arg3){
     bool validRanges = (checkLimits(arg1) && checkLimits(arg2) || checkLimits(arg3));
 
     return validRanges;
+}
+
+void SyntacticActions::removeClassComposition(char* key = NULL){
+    if(key == NULL)
+        return;
+    
+    string className = IntermediateCodeGenerator::scope.find_last_of(":") != string::npos ?
+        IntermediateCodeGenerator::scope.substr(IntermediateCodeGenerator::scope.find_last_of(":") + 1) : IntermediateCodeGenerator::scope;
+
+    Token * classToken = findId(className);
+
+    if (classToken == NULL)
+        return;
+
+    if (classToken->getUse() == "nombre-clase")
+        classToken->setFather(NULL);
+
+    Logger::logError("No se permite herencia en clase que implementa una interfaz");
 }
 
 void SyntacticActions::addClassComposition(char* key){
@@ -490,8 +508,6 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
             }
 
             if (hasScope) {
-                //cout << "Miembro " << member << " encontrado en la clase " << auxscope << endl;
-
                 // En caso de que corresponda a un metodo se deben chequear sus parametros
                 Token* memberToken = getSymbolToken(str);
                 if(memberToken->getUse() == "nombre-funcion"){
@@ -533,9 +549,7 @@ bool SyntacticActions::classImplementsInterfaceMethods(char* interface){
             }else{
                 Token* functionToken = findId(memberToken->getLexeme())->getParameter();
                 string parameter = functionToken ? functionToken->getLexeme() : "";
-                if(!checkParameters(memberToken->getLexeme(), parameter)){
-                    return false;
-                }
+                return checkParameters(memberToken, functionToken, memberToken->getLexeme(), parameter);
             }
         }
     }

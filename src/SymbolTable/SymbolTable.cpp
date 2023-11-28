@@ -28,7 +28,7 @@ void SymbolTable::printTable() const{
     cout << "\nTabla de simbolos\n";
     for(auto& pair: this->symbols){
         Token* token = pair.second;
-        string msg = pair.first + " - referencias: " + to_string(token->getReferences());
+        string msg = pair.first + " - lexema: " + token->getLexeme() + " - referencias: " + to_string(token->getReferences());
 
         if(token->getType() != "no-type")
             msg += " - tipo: " + token->getType();

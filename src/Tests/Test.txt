@@ -1,31 +1,28 @@
 {
-    CLASS ca {
-        UINT x,
-
-        VOID p(DOUBLE arg){
-            RETURN ,
-        } ,
-    },
-
-    CLASS cb {
-        DOUBLE y,
-    
-        VOID m(){
-            RETURN ,
-        } ,
-
-        ca,
-    },
-
-    CLASS cc {
-        SHORT z ,
-
-        cb ,
+    INTERFACE z {
+        VOID q (DOUBLE par) ,
     } ,
 
-    cc c1 ,
-    c1.x = 2_ui ,
-    c1.y = .6d+20 ,
-    c1.z = 4_s + 20_s ,
-    c1.p(1.5d+20) ,
+    CLASS ca IMPLEMENT z{
+        UINT u1,
+        DOUBLE d1,
+        SHORT s1,
+
+        VOID q(DOUBLE par){
+            RETURN ,
+        },
+
+        VOID myfuncion(){
+            SHORT s2,
+            UINT u2,
+
+            IF (u1 !! 0_ui){
+                PRINT #hola mundo# ,
+                u1 = 12_ui + 20_ui ,
+            }
+            ELSE
+                RETURN ,
+            END_IF ,
+        } ,
+    },
 }

@@ -33,6 +33,7 @@ class SyntacticActions {
         static bool checkForArguments(string, string, string);
         static Token * findId(string key);
         static void addClassComposition(char*);
+        static void removeClassComposition(char*);
         static void addObject(char*);
         static string getObject();
         static void addClassToObjects(char*);

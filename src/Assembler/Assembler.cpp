@@ -99,9 +99,10 @@ void Assembler::generate()
 
     fileStream << "start:" << endl;
     fileStream << dataStream.str();
+    fileStream << "end start" << endl;
 }
 
-// TODO: revisar estas generaciones, probablemente se puede optimizar y sacar codigo repetido
+// TODO 3: revisar estas generaciones, probablemente se puede optimizar y sacar codigo repetido
 void Assembler::generateAssign(Terceto *terceto)
 {
     string op1 = terceto->getOp1();
@@ -128,7 +129,7 @@ void Assembler::generateAssign(Terceto *terceto)
     }
 }
 
-// TODO: Tenemos que hacer algo con los numeros. Eliminar el sufijos de SHORT y UINT. Y usar los registros correspondientes segun el tamaño de la variable?
+// TODO 4: Tenemos que hacer algo con los numeros. Eliminar el sufijos de SHORT y UINT. Y usar los registros correspondientes segun el tamaño de la variable?
 void Assembler::generateOp(string operation, Terceto *terceto)
 {
     string op1 = terceto->getOp1();

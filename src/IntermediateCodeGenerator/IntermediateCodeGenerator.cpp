@@ -18,9 +18,8 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
         lastScopeString = scope.substr(lastScope + 1, scope.length());
         scope = scope.substr(0, lastScope);
 
-    // Solucion dudosa pero anda
-    // No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
-    if (IntermediateCodeGenerator::isInvalidScope && lastScopeString == "remove") {
+    //TODO 1 No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
+    if (IntermediateCodeGenerator::isInvalidScope) {
         // Borro todas las variables del scope
         list<string>* lista = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
 
