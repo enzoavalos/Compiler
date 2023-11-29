@@ -312,6 +312,9 @@ void Assembler::start()
         {
             generateComp(terceto);
             lastOperation.push("jne");
+        }else if(op == "!!"){
+            generateComp(terceto);
+            lastOperation.push("je");
         }
         else if (op == "BF")
         {

@@ -18,7 +18,7 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
         lastScopeString = scope.substr(lastScope + 1, scope.length());
         scope = scope.substr(0, lastScope);
 
-    //TODO 1 No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
+    //TODO 2 No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
     if (IntermediateCodeGenerator::isInvalidScope) {
         // Borro todas las variables del scope
         list<string>* lista = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
@@ -48,17 +48,25 @@ void IntermediateCodeGenerator::addTerceto(Terceto terceto)
     tercetos[lastTerceto] = terceto;
 }
 
-void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string operand1, string operand2)
-{
-    Terceto terceto = Terceto(operatorTercerto, operand1, operand2);
+void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string operand1, string operand2){
+    string type = "no-type";
+    if(SyntacticActions::isTerceto(operand1))
+        type = getTercetoType(operand1);
+    else{
+        Token * token = SyntacticActions::findId(operand1);
+        if(token != NULL)
+            type = token->getType();
+    }
+    
+    if(!SyntacticActions::isTerceto(operand1) && operand1 != "")
+        operand1 += ":" + scope;
+    if(!SyntacticActions::isTerceto(operand2) && operand2 != "")
+        operand2 += ":" + scope;
+    
+    Terceto terceto = Terceto(operatorTercerto, operand1, operand2, type);
     lastTerceto++;
     terceto.setLine(TransitionMatrix::getLine());
     tercetos[lastTerceto] = terceto;
-}
-
-void IntermediateCodeGenerator::completeTerceto(int tercetoNumber, string op)
-{
-    tercetos[tercetoNumber].setOp(op);
 }
 
 void IntermediateCodeGenerator::removeTerceto(int tercetoNumber)
@@ -78,20 +86,6 @@ int IntermediateCodeGenerator::removeStack()
     int value = pila.top();
     pila.pop();
     return value;
-}
-
-void IntermediateCodeGenerator::assignTerceto(char *operatorTerceto, char *operand1, char *operand2)
-{
-    string operatorString = operatorTerceto;
-    string operand1String = operand1;
-    string operand2String = operand2;
-    addTerceto(operatorString, operand1String, operand2String);
-}
-
-void IntermediateCodeGenerator::modifyLastTercetoOperator(char *op)
-{
-    string lexeme = op;
-    tercetos[lastTerceto - 1].setOp2(lexeme);
 }
 
 void IntermediateCodeGenerator::printTercetos()
@@ -174,15 +168,13 @@ void IntermediateCodeGenerator::forArguments(char *inic, char *end, char *inc)
     addTerceto("+", "", incString);
     addStack(lastTerceto);
 
-    addTerceto("BF", to_string(lastTerceto -1), "-");
+    addTerceto("BF", to_string(lastTerceto -1), "");
     addStack(lastTerceto);
 }
 
 void IntermediateCodeGenerator::forBlock(char *id, char *block)
 {
-    //int tercetoNumber = pila.top();
     int blockInt = atoi(block);
-    //pila.pop();
     int tercetoNumber = removeStack();
 
     // Seteo el terceto de BF con el numero del terceto posterior al bloque
@@ -200,7 +192,7 @@ void IntermediateCodeGenerator::forBlock(char *id, char *block)
 
     // Bifuracion incondicional a label previo a la comparacion
     tercetoNumber = removeStack();
-    addTerceto("BI", to_string(tercetoNumber), "-");
+    addTerceto("BI", to_string(tercetoNumber), "");
 
     // Se agrega label para salto por falso
     addLabelTerceto();
@@ -212,7 +204,7 @@ void IntermediateCodeGenerator::forBlock(char *id, char *block)
 
 void IntermediateCodeGenerator::returnStatement(){
     string ret = "RETURN:" + scope;
-    addTerceto(ret, "", "-");
+    addTerceto(ret, "", "");
     returnStack.push(lastTerceto);
 }
 
@@ -240,16 +232,16 @@ string IntermediateCodeGenerator::getTercetoType(string tercetoNumber) {
     if(op == "BF" || op == "BI" || op == "RETURN")
         return "void";
     else
-        return SyntacticActions::findId(tercetos[terceto].getOp1())->getType();
+        return tercetos[terceto].getType();
 }
 
 void IntermediateCodeGenerator::addLabelTerceto(){
     string op = "Label" + to_string(lastTerceto+1);
-    addTerceto(op,"-","-");
+    addTerceto(op,"","");
 }
 
 void IntermediateCodeGenerator::addLabelTerceto(string label, string op){
-    addTerceto(label, op,"-");
+    addTerceto(label, op,"");
 }
 
 map<int, Terceto> * IntermediateCodeGenerator::getTercetos(){

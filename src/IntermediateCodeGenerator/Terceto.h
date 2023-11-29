@@ -7,7 +7,7 @@ using namespace std;
 class Terceto{
     public:
         Terceto();
-        Terceto(string, string, string);
+        Terceto(string, string, string, string);
 
         string getOp() ;
         string getOp1() ;
@@ -20,6 +20,8 @@ class Terceto{
         void setRegisterName(string registerName);
         string getRegisterName();
 
+        string getType() const;
+
         static void completarTerceto(int numeroTerceto); // Completar terceto incompleto, backpatching
 
         void setLine(int);
@@ -27,8 +29,9 @@ class Terceto{
     private:
         int line = 1;
         string op;
-        string op1; // Operador 1, puede ser otro terceto
+        string op1;
         string op2;
+        string type;
 
         string registerName = "";
 };

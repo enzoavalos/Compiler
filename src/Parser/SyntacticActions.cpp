@@ -22,9 +22,10 @@ void SyntacticActions::check_division_by_zero(char* key){
 }
 
 bool SyntacticActions::addNegativeConstant(char* key){
-    int line = Lexer::symbolTable->getSymbol(key)->getLine();
+    Token* token = getSymbolToken(key);
+    int line = token->getLine();
     string lex = "-";
-    lex.append(Lexer::symbolTable->getSymbol(key)->getLexeme());
+    lex.append(token->getLexeme());
     Lexer::symbolTable->decreaseSymbolReferences(key);
     if(checkLimits(lex)){
         int aux = CTE_SHORT;
@@ -208,9 +209,6 @@ bool SyntacticActions::checkDeclaredClass(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Tipo " + lexeme + " no declarado";
     Lexer::symbolTable->decreaseSymbolReferences(key);
-    // Clases e interfaces solo pueden ser declaradas en un ambito global
-    //lexeme += ":" + IntermediateCodeGenerator::initialScope;
-    //Token * token = getSymbolToken(lexeme);
     Token * token = findId(lexeme);
 
     if(token == NULL || (token->getUse() != "nombre-clase" && token->getUse() != "nombre-interfaz")){
@@ -266,7 +264,7 @@ bool SyntacticActions::checkTypes(Token* token1, Token* token2, string lex1, str
     }
 
     if(type1 != type2){
-        string errorMsg = "Tipos incompatibles: " + token1->getType() + " y " + token2->getType();
+        string errorMsg = "Tipos incompatibles: " + type1 + " y " + type2;
         Logger::logError(errorMsg);
         return false;
     }
@@ -441,6 +439,14 @@ string SyntacticActions::getObject(){
     return object;
 }
 
+void SyntacticActions::emptyObjects(bool deleteObjects=false){
+    while(!objects.empty()){
+        string object = getObject();
+        if(deleteObjects)
+            Lexer::symbolTable->deleteSymbol(object);
+    }
+}
+
 void SyntacticActions::addClassToObjects(char* key){
     string lexeme = key;
 
@@ -456,17 +462,18 @@ void SyntacticActions::addClassToObjects(char* key){
         return;
     }
 
-    do {
+    while (!objects.empty()) {
         string object = getObject();
         Token* objectToken = findId(object);
 
-        if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
+        if (objectToken == NULL || objectToken->getUse() != "variable") {
             Logger::logError("Objeto " + object + " no declarado");
             continue;
         }
-
+        
+        objectToken->setUse("variable-objeto");
         objectToken->setType(token->getLexeme());
-    } while (!objects.empty());
+    }
 }
 
 bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL) {

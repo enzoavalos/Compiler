@@ -6,7 +6,6 @@
 using namespace std;
 
 enum Type {
-    // EOF
     TOKEN_EOF = 0,
     // Return ASCII value
     TOKEN_PLUS = 43,

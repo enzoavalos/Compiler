@@ -20,7 +20,6 @@ class IntermediateCodeGenerator{
         static int lastValidTerceto;
         static bool isInvalidScope;
 
-        //static void addScope(char*);
         static void addScope(string);
         static void onScopeFinished(char*);
         static void setVarScope(char*);
@@ -29,14 +28,10 @@ class IntermediateCodeGenerator{
         static void addTerceto(string, string, string);
         static void addLabelTerceto();
         static void addLabelTerceto(string, string);
-        static void completeTerceto(int, string);
         static void removeTerceto(int);
 
         static void addStack(int);
         static int removeStack();
-
-        static void assignTerceto(char*, char*, char*);
-        static void modifyLastTercetoOperator(char*);
 
         static void printTercetos();
         static char* getLastTerceto();

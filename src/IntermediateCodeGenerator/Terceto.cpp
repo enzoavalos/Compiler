@@ -3,10 +3,11 @@
 Terceto::Terceto(){
 }
 
-Terceto::Terceto(string op, string op1, string op2){
+Terceto::Terceto(string op, string op1, string op2, string type="no-type"){
     setOp(op);
     setOp1(op1);
     setOp2(op2);
+    this->type = type;
 }
 
 string Terceto::getOp() {
@@ -49,4 +50,8 @@ void Terceto::setRegisterName(string registerName) {
 
 string Terceto::getRegisterName() {
     return this->registerName;
+}
+
+string Terceto::getType() const{
+    return this->type;
 }
