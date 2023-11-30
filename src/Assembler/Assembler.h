@@ -5,7 +5,7 @@
 #include "..\IntermediateCodeGenerator\IntermediateCodeGenerator.h"
 #include "..\Lexer.h"
 #include "..\Parser\SyntacticActions.h"
-
+#include <algorithm>
 using namespace std;
 
 class Assembler
@@ -13,12 +13,14 @@ class Assembler
 
 private:
     ofstream fileStream;
-    stringstream declarations;
+    
+    map<string, stringstream> functionDeclarations;
     stringstream dataStream;
 
     stringstream * reference;
 
     stack<string> lastOperation = stack<string>();
+    stack<string> functionStack = stack<string>();
 
     list<string> functions;
 
@@ -37,6 +39,8 @@ private:
     void generateAssign(Terceto *terceto);
     void generateOp(string operation, Terceto *terceto);
     void generateComp(Terceto *terceto);
+
+    string replaceScopeChar(string scope);
 
 public:
     Assembler(string filePath);

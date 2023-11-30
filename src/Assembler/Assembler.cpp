@@ -45,7 +45,7 @@ void Assembler::declareVariables()
     while (it != symbols.end())
     {
         Token *token = it->second;
-        string varName = it->first;
+        string varName = this->replaceScopeChar(it->first);
         string type = token->getType();
         string use = token->getUse();
 
@@ -95,7 +95,9 @@ void Assembler::generate()
     fileStream << ".code" << endl;
 
     // Declarar funciones
-    fileStream << declarations.str();
+    for(auto it = functionDeclarations.begin(); it != functionDeclarations.end(); it++){
+        fileStream << it->second.str();
+    }
 
     fileStream << "start:" << endl;
     fileStream << dataStream.str();
@@ -105,8 +107,8 @@ void Assembler::generate()
 // TODO 3: revisar estas generaciones, probablemente se puede optimizar y sacar codigo repetido
 void Assembler::generateAssign(Terceto *terceto)
 {
-    string op1 = terceto->getOp1();
-    string op2 = terceto->getOp2();
+    string op1 = this->replaceScopeChar(terceto->getOp1());
+    string op2 = this->replaceScopeChar(terceto->getOp2());
 
     // Caso 1, variable/constante y registro
     if (SyntacticActions::isId(op1) && SyntacticActions::isTerceto(op2))
@@ -132,9 +134,8 @@ void Assembler::generateAssign(Terceto *terceto)
 // TODO 4: Tenemos que hacer algo con los numeros. Eliminar el sufijos de SHORT y UINT. Y usar los registros correspondientes segun el tamaño de la variable?
 void Assembler::generateOp(string operation, Terceto *terceto)
 {
-    string op1 = terceto->getOp1();
-    string op2 = terceto->getOp2();
-
+        string op1 = this->replaceScopeChar(terceto->getOp1());
+        string op2 = this->replaceScopeChar(terceto->getOp2());
     // Caso 3, 2 tercetos
     if (SyntacticActions::isTerceto(op1) && SyntacticActions::isTerceto(op2))
     {
@@ -178,7 +179,6 @@ void Assembler::generateOp(string operation, Terceto *terceto)
     // Caso 1, 2 variables/constantes
     if ((SyntacticActions::isId(op1) || SyntacticActions::isConstant(op1)) && (SyntacticActions::isId(op2) || SyntacticActions::isConstant(op2)))
     {
-        cout << "Caso 1" << endl;
         string registerName = getFreeRegister();
         (*reference) << "mov " << registerName << ", " << op1 << endl;
         (*reference) << operation << " " << registerName << ", " << op2 << endl;
@@ -189,7 +189,6 @@ void Assembler::generateOp(string operation, Terceto *terceto)
     // Caso 2, 1 variable/constante y 1 terceto
     if (SyntacticActions::isTerceto(op1) && !SyntacticActions::isTerceto(op2))
     {
-        cout << "Caso 2" << endl;
         int terceto1 = atoi(op1.c_str());
         Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
         (*reference) << operation << " " << tercetoOp1->getRegisterName() << ", " << op2 << endl;
@@ -200,8 +199,8 @@ void Assembler::generateOp(string operation, Terceto *terceto)
 
 void Assembler::generateComp(Terceto *terceto)
 {
-    string op1 = terceto->getOp1();
-    string op2 = terceto->getOp2();
+    string op1 = this->replaceScopeChar(terceto->getOp1());
+    string op2 = this->replaceScopeChar(terceto->getOp2());
 
     if (SyntacticActions::isTerceto(op1) && SyntacticActions::isTerceto(op2))
     {
@@ -257,8 +256,8 @@ void Assembler::start()
     {
         Terceto *terceto = &it->second;
         string op = terceto->getOp();
-        string op1 = terceto->getOp1();
-        string op2 = terceto->getOp2();
+        string op1 = this->replaceScopeChar(terceto->getOp1());
+        string op2 = this->replaceScopeChar(terceto->getOp2());
 
         if (op == "=")
         {
@@ -335,21 +334,48 @@ void Assembler::start()
         //  Posibles soluciones? Contar anidamientos y aumentar/descontar segun inicio o return
         else if (op == "inic_func")
         {
-            reference = &declarations;
+            functionDeclarations[op1] = stringstream();
+            reference = &functionDeclarations[op1];
             (*reference) << op1 << ":" << endl;
+            functionStack.push(op1);
         }
+        else if (op == "end_func")
+        {
+            reference = &functionDeclarations[op1];
+            // Revisar, si hay un RETURN y end_func juntos, que no se repitan los ret
+
+            (*reference) << "end_" << op1 << ":" << endl;
+            (*reference) << "ret" << endl;
+
+            functionStack.pop();
+            if (functionStack.empty())
+            {
+                reference = &dataStream;
+            }
+        }
+        // Solucion posible. Agregar una etiqueta que marca el fin de la funcion y que el RETURN se convierta en un JMP a esa etiqueta
         else if (op == "RETURN")
         {
-            (*reference) << "ret" << endl;
-            (*reference) << "" << endl;
-            reference = &dataStream;
+            // Obtengamos el terceto al que hace referencia el return
+            int tercetoNumber = atoi(op1.c_str());
+            Terceto *terceto = IntermediateCodeGenerator::getTerceto(tercetoNumber);
+            string funcName = terceto->getOp1();
+            reference = &functionDeclarations[funcName];            
+            (*reference) << "jmp end_" << funcName << endl;
         }
         else if (op == "INVOKE")
         {
             // Como se envian argumentos a la funcion?
-            (*reference) << "call " << op1 << " " << op2 << endl;
+            (*reference) << "invoke " << op1 << ", " << op2 << endl;
         }
 
         it++;
     }
+}
+
+string Assembler::replaceScopeChar(string scope)
+{
+    string newScope = scope;
+    replace(newScope.begin(), newScope.end(), ':', '@');
+    return newScope;
 }
