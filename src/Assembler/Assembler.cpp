@@ -359,7 +359,7 @@ void Assembler::start()
             // Obtengamos el terceto al que hace referencia el return
             int tercetoNumber = atoi(op1.c_str());
             Terceto *terceto = IntermediateCodeGenerator::getTerceto(tercetoNumber);
-            string funcName = terceto->getOp1();
+            string funcName = this->replaceScopeChar(terceto->getOp1());
             reference = &functionDeclarations[funcName];            
             (*reference) << "jmp end_" << funcName << endl;
         }
