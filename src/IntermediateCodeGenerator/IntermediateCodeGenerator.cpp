@@ -58,9 +58,9 @@ void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string opera
             type = token->getType();
     }
     
-    if(!SyntacticActions::isTerceto(operand1) && operand1 != "")
+    if(!SyntacticActions::isTerceto(operand1) && !SyntacticActions::isConstant(operand1) && !SyntacticActions::isString(operand1) && operand1 != "")
         operand1 += ":" + scope;
-    if(!SyntacticActions::isTerceto(operand2) && operand2 != "")
+    if(!SyntacticActions::isTerceto(operand2) && !SyntacticActions::isConstant(operand2) && !SyntacticActions::isString(operand2) && operand2 != "")
         operand2 += ":" + scope;
     
     Terceto terceto = Terceto(operatorTercerto, operand1, operand2, type);

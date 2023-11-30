@@ -1886,7 +1886,7 @@ yyreduce:
     {      Logger::infoMsg("Declaracion de funcion local");
                                                                                                                 SyntacticActions::addParamToMethod((yyvsp[(1) - (7)].string), (yyvsp[(3) - (7)].string));
                                                                                                                 IntermediateCodeGenerator::onScopeFinished((yyvsp[(6) - (7)].string));
-                                                                                                                IntermediateCodeGenerator::addLabelTerceto("inic_func", (yyvsp[(1) - (7)].string)); ;}
+                                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", (yyvsp[(1) - (7)].string)); ;}
     break;
 
   case 55:

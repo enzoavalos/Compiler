@@ -197,7 +197,7 @@ sentencias_metodo       : sentencias_metodo declaracion_variables ','   { $$ = I
 local_function_declaration      :  encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' {      Logger::infoMsg("Declaracion de funcion local");
                                                                                                                 SyntacticActions::addParamToMethod($1, $3);
                                                                                                                 IntermediateCodeGenerator::onScopeFinished($6);
-                                                                                                                IntermediateCodeGenerator::addLabelTerceto("inic_func", $1); }
+                                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", $1); }
                                 ;
 
 sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','    { $$ = IntermediateCodeGenerator::getLastTerceto() }

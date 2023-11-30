@@ -42,6 +42,7 @@ class SyntacticActions {
         static bool isTerceto(string key);
         static bool isId(string key);
         static bool isConstant(string key);
+        static bool isString(string key);
         static void emptyObjects(bool);
     private:
         static Token * getSymbolToken(string key);
