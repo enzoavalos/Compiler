@@ -291,7 +291,7 @@ bool SyntacticActions::isTerceto(string key){
 }
 
 bool SyntacticActions::isId(string key){
-    return (key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789:") == string::npos) && (key != "");
+    return (key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789:@") == string::npos) && (key != "");
 }
 
 bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, string function, string parameter="") {
