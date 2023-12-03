@@ -16,8 +16,17 @@ private:
     
     map<string, stringstream> functionDeclarations;
     stringstream dataStream;
+    stringstream auxStream;
+
+    vector<string> auxVars = vector<string>();
 
     stringstream * reference;
+
+    map<string, bool> errorMap = {
+        {"doubleOverflow", false},
+        {"uintOverflow", false},
+        {"uintNegative", false}
+    };
 
     stack<string> lastOperation = stack<string>();
     stack<string> functionStack = stack<string>();
@@ -37,10 +46,20 @@ private:
     void declareVariables();
 
     void generateAssign(Terceto *terceto);
+    void generateAssignDouble(Terceto *terceto);
+
     void generateOp(string operation, Terceto *terceto);
+    void generateDoubleOp(string operation, Terceto *terceto);
+
     void generateComp(Terceto *terceto);
+    void generateDoubleComp(Terceto *terceto);
 
     string replaceScopeChar(string scope);
+    string removeNumberSuffix(string name);
+
+    bool isDouble(string key);
+    bool isAuxVar(string key);
+    bool isRegister(string key);
 
 public:
     Assembler(string filePath);
