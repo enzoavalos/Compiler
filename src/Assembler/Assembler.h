@@ -5,6 +5,7 @@
 #include "..\IntermediateCodeGenerator\IntermediateCodeGenerator.h"
 #include "..\Lexer.h"
 #include "..\Parser\SyntacticActions.h"
+
 #include <algorithm>
 using namespace std;
 
@@ -12,6 +13,9 @@ class Assembler
 {
 
 private:
+    vector<Register*> registersVector = vector<Register*>();
+
+
     ofstream fileStream;
     
     map<string, stringstream> functionDeclarations;
@@ -40,7 +44,7 @@ private:
         {"edx", false},
     };
 
-    string getFreeRegister();
+    string getFreeRegister(int size);
     void freeRegister(string registerName);
 
     void declareVariables();
@@ -54,12 +58,17 @@ private:
     void generateComp(Terceto *terceto);
     void generateDoubleComp(Terceto *terceto);
 
+    void checkDoubleOverflow(string auxVar);
+    void checkNegativeUint(Terceto *terceto);
+
     string replaceScopeChar(string scope);
     string removeNumberSuffix(string name);
 
     bool isDouble(string key);
     bool isAuxVar(string key);
     bool isRegister(string key);
+
+    int getOperationSize(string type);
 
 public:
     Assembler(string filePath);
