@@ -135,7 +135,8 @@ bool SyntacticActions::checkRedeclaration(string lexeme, bool showMsg = true){
     string errorMsg = "Redeclaracion de identificador " + lexeme;
     Token * token = getSymbolToken(lexeme + ":" + IntermediateCodeGenerator::scope);
 
-    if (token != NULL) {
+    // Its allowed to redefine a metthod prototype inside the class scope
+    if (token != NULL && token->getUse() != "prototipo-metodo") {
         if(showMsg)
             Logger::logError(errorMsg);
         Lexer::symbolTable->deleteSymbol(lexeme);
@@ -476,7 +477,7 @@ void SyntacticActions::addClassToObjects(char* key){
     }
 }
 
-bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL) {
+bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL, char* assignOperator=NULL) {
     Token* objectToken = findId(object);
     Lexer::symbolTable->decreaseSymbolReferences(member);
 
@@ -515,23 +516,33 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
             }
 
             if (hasScope) {
-                // En caso de que corresponda a un metodo se deben chequear sus parametros
+                // Check parameters if its a method
                 Token* memberToken = getSymbolToken(str);
                 if(memberToken->getUse() == "nombre-funcion"){
                     string lastScope = IntermediateCodeGenerator::scope;
                     IntermediateCodeGenerator::scope = auxscope;
                     bool valid = checkParameters(member, parameter);
                     IntermediateCodeGenerator::scope = lastScope;
+                    if(valid)
+                        IntermediateCodeGenerator::addTerceto("INVOKE", str, parameter);
+                    /* lastMember = new char(str.size() +1);
+                    strcpy(lastMember, str.c_str()); */
                     return valid;
                 }
 
                 // En caso de que expression no sea NULL se trata de una asignacion y se deben chequear los tipos
                 if(expression != NULL){
                     Token* exp = isId(expression) ? findId(expression) : getSymbolToken(expression);
-                    return checkTypes(memberToken, exp, str, expression);
+                    bool valid = checkTypes(memberToken, exp, str, expression);
+                    if(valid)
+                        IntermediateCodeGenerator::addTerceto(assignOperator, str, expression);
+                    return valid;
                 }
 
-                return true;
+                if(memberToken->getUse() == "prototipo-metodo"){
+                    Logger::logError("El metodo " + member + " no fue implementado");
+                    return false;
+                }
             }
         }
         classToken = classToken->getFather();
@@ -554,14 +565,66 @@ bool SyntacticActions::classImplementsInterfaceMethods(char* interface){
                 Logger::logError("La clase no implementa todos los metodos de la interfaz " + interfaceLex);
                 return false;
             }else{
-                Token* functionToken = findId(memberToken->getLexeme())->getParameter();
-                string parameter = functionToken ? functionToken->getLexeme() : "";
-                return checkParameters(memberToken, functionToken, memberToken->getLexeme(), parameter);
+                Token* parameterToken = findId(memberToken->getLexeme())->getParameter();
+                string parameter = parameterToken ? parameterToken->getLexeme() : "";
+                return checkParameters(memberToken, parameterToken, memberToken->getLexeme(), parameter);
             }
         }
     }
 
     return true;
+}
+
+bool SyntacticActions::checkDistributedMethodImplementation(string lexeme){
+    if(IntermediateCodeGenerator::isInvalidScope)
+        return false;
+
+    // Get class prototype methods
+    list<string>* prototypes = Lexer::symbolTable->getSymbolsByScope(lexeme + ":" + "prototype");
+    if(prototypes->size() == 0){
+        Logger::logError("La clase " + lexeme + " no posee prototipos de metodo");
+        return false;
+    }
+    // Get class members
+    list<string>* lista = Lexer::symbolTable->getSymbolsByScope(IntermediateCodeGenerator::scope + ":" + "dist-implementation");
+
+    bool valid = true;
+    // Iterate over all implemented methods in IMPL FOR block
+    for(const string& str : *lista) {
+        Token* methodToken = getSymbolToken(str);
+        bool found = false, showMsg = true;
+
+        // Iterate over all class prototypes
+        for(const string& memb : *prototypes) {
+            if(found)
+                break;
+            Token* prototypeToken = getSymbolToken(memb);
+
+            if(prototypeToken != NULL && prototypeToken->getLexeme() == methodToken->getLexeme()){
+                if(prototypeToken->getUse() == "prototipo-metodo"){
+                    found = true;
+                    Token* parameterToken = methodToken->getParameter();
+                    string parameter = parameterToken ? parameterToken->getLexeme() : "";
+                    if(!checkParameters(prototypeToken, parameterToken, prototypeToken->getLexeme(), parameter)){
+                        found = showMsg = false;
+                        break;
+                    }
+                    // Set implemented method scope to the class scope
+                    IntermediateCodeGenerator::setCustomScope(str, IntermediateCodeGenerator::scope);
+                }
+            }
+        }
+
+        if(!found){
+            if(showMsg)
+                Logger::logError("El metodo " + methodToken->getLexeme() + " no corresponde a un prototipo de metodo de la clase " + lexeme);
+            IntermediateCodeGenerator::deleteFunctionTercetos(str);
+            Lexer::symbolTable->deleteSymbol(str);
+            valid = false;
+        }
+    }
+
+    return valid;
 }
 
 bool SyntacticActions::isString(string key){

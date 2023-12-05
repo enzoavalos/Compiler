@@ -18,7 +18,7 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
         lastScopeString = scope.substr(lastScope + 1, scope.length());
         scope = scope.substr(0, lastScope);
 
-    //TODO 2 No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
+    //TODO 5 No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
     if (IntermediateCodeGenerator::isInvalidScope) {
         // Borro todas las variables del scope
         list<string>* lista = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
@@ -27,11 +27,27 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
             Lexer::symbolTable->deleteSymbol(str);
 
         // Borro todos los tercetos invalidos
-        for (int i = lastValidTerceto + 1; i <= lastTerceto; i++) {
-            removeTerceto(i);
-        }
+        deleteInvalidTercetos();
 
         IntermediateCodeGenerator::isInvalidScope = false;
+    }
+}
+
+void IntermediateCodeGenerator::deleteInvalidTercetos(){
+    for (int i = lastValidTerceto + 1; i <= lastTerceto; i++)
+        removeTerceto(i);
+}
+
+void IntermediateCodeGenerator::removeTerceto(int tercetoNumber)
+{
+    tercetos.erase(tercetoNumber);
+}
+
+void IntermediateCodeGenerator::deleteFunctionTercetos(string lexeme){
+    Token* token = Lexer::symbolTable->getSymbol(lexeme);
+    if(token != NULL && token->getBegin() != -1){
+        for(int i=token->getBegin(); i <= token->getEnd(); i++)
+            removeTerceto(i);
     }
 }
 
@@ -39,6 +55,16 @@ void IntermediateCodeGenerator::setVarScope(char *key)
 {
     string lexeme = key;
     Lexer::symbolTable->setScope(lexeme, scope);
+}
+
+void IntermediateCodeGenerator::setCustomScope(string lexeme, string newScope){
+    // Determines whether lexeme is only and ID or an ID after name mangling
+    if (lexeme.rfind(":") == string::npos)
+        lexeme += ":" + scope;
+        
+    if (newScope.rfind(":") == string::npos)
+        newScope = scope + ":" + newScope;
+    Lexer::symbolTable->setScope(lexeme, newScope);
 }
 
 void IntermediateCodeGenerator::addTerceto(Terceto terceto)
@@ -58,7 +84,8 @@ void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string opera
             type = token->getType();
     }
     
-    if(!SyntacticActions::isTerceto(operand1) && !SyntacticActions::isConstant(operand1) && !SyntacticActions::isString(operand1) && operand1 != "")
+    if(!SyntacticActions::isTerceto(operand1) && !SyntacticActions::isConstant(operand1) && !SyntacticActions::isString(operand1)
+        && operand1.rfind(":") == string::npos && operand1 != "")
         operand1 += ":" + scope;
     if(!SyntacticActions::isTerceto(operand2) && !SyntacticActions::isConstant(operand2) && !SyntacticActions::isString(operand2) && operand2 != "")
         operand2 += ":" + scope;
@@ -67,11 +94,6 @@ void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string opera
     lastTerceto++;
     terceto.setLine(TransitionMatrix::getLine());
     tercetos[lastTerceto] = terceto;
-}
-
-void IntermediateCodeGenerator::removeTerceto(int tercetoNumber)
-{
-    tercetos.erase(tercetoNumber);
 }
 
 void IntermediateCodeGenerator::addStack(int tercetoNumber)
@@ -242,6 +264,16 @@ void IntermediateCodeGenerator::addLabelTerceto(){
 
 void IntermediateCodeGenerator::addLabelTerceto(string label, string op){
     addTerceto(label, op,"");
+
+    if(label == "inic_func"){
+        Token* token = Lexer::symbolTable->getSymbol(op + ":" + scope);
+        if(token != NULL)
+            token->setBegin(lastTerceto);
+    } else if(label == "end_func"){
+        Token* token = Lexer::symbolTable->getSymbol(op + ":" + scope);
+        if(token != NULL)
+            token->setEnd(lastTerceto);
+    }
 }
 
 map<int, Terceto> * IntermediateCodeGenerator::getTercetos(){

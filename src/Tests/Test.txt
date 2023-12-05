@@ -1,28 +1,28 @@
 {
-    INTERFACE z {
-        VOID q (DOUBLE par) ,
-    } ,
+    SHORT int1 ,
+    
+    CLASS clase {
+        UINT atributo ,
 
-    CLASS ca IMPLEMENT z{
-        UINT u1,
-        DOUBLE d1,
-        SHORT s1,
+        VOID q(UINT aux) ,
 
-        VOID q(DOUBLE par){
-            RETURN ,
-        },
-
-        VOID myfuncion(){
-            SHORT s2,
-            UINT u2,
-
-            IF (u1 !! 0_ui){
-                PRINT #hola mundo# ,
-                u1 = 12_ui + 20_ui ,
-            }
-            ELSE
+        VOID k (){
+            int1 = 45_s ,
+            IF (int1 == 0_s)
                 RETURN ,
             END_IF ,
         } ,
-    },
+
+        VOID p (DOUBLE arg) ,
+    } ,
+
+    IMPL FOR clase : {
+        VOID p(DOUBLE arg){
+            arg = .6d-1 ,
+        } ,
+    } ,
+
+    clase objeto ,
+    objeto.atributo = 10_ui ,
+    **objeto.p(1.5d+20) ,
 }

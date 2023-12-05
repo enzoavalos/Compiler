@@ -23,12 +23,14 @@ class IntermediateCodeGenerator{
         static void addScope(string);
         static void onScopeFinished(char*);
         static void setVarScope(char*);
+        static void setCustomScope(string, string);
 
         static void addTerceto(Terceto);
         static void addTerceto(string, string, string);
         static void addLabelTerceto();
         static void addLabelTerceto(string, string);
         static void removeTerceto(int);
+        static void deleteFunctionTercetos(string);
 
         static void addStack(int);
         static int removeStack();
@@ -57,9 +59,9 @@ class IntermediateCodeGenerator{
         static stack<int> pila;
         // Pila usada para backpatching de tercetos de sentencias de retorno
         static stack<int> returnStack;
-        static int tercetoCount;
 
         static void finishReturnStatement(char*);
+        static void deleteInvalidTercetos();
 };
 
 string IntermediateCodeGenerator::scope = "main";

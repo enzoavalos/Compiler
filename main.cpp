@@ -10,6 +10,7 @@
 #include "src/Token.cpp"
 #include "src/IntermediateCodeGenerator/Terceto.cpp"
 #include "src/IntermediateCodeGenerator/IntermediateCodeGenerator.cpp"
+#include "src/Assembler/Register.cpp"
 #include "src/Assembler/Assembler.cpp"
 
 string pathOutAssembler = "src/Assembler/out.asm";
@@ -62,11 +63,12 @@ int main(int argc, char* argv[])
     table.printTable();
     IntermediateCodeGenerator::printTercetos();
 
-    assembler = new Assembler(pathOutAssembler);
+    //assembler = new Assembler(pathOutAssembler);
 
     //assembler->generate();
 
-    delete assembler;
+    delete lexer;
+    //delete assembler;
     return 0;
 }
 
@@ -78,10 +80,6 @@ void yyerror(const char * text)
 int yylex() {
     Token *token = lexer->scanToken();
     string lex = token->getLexeme();
-
-    /*printf("Linea %d: token: %d\n",token->getLine(), token->getTokenType());
-    if(lex != "")
-        printf("Lexema: %s\n", lex.c_str());*/
 
     char *cstr = new char[lex.length() + 1];
     strcpy(cstr, lex.c_str());

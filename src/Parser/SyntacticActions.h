@@ -16,6 +16,7 @@ using namespace std;
 class SyntacticActions {
     public:
         static string lastType;
+        //static char* lastMember;
         static void check_division_by_zero(char* key);
         static bool addNegativeConstant(char* key);
         static bool checkLimits(string key);
@@ -37,13 +38,14 @@ class SyntacticActions {
         static void addObject(char*);
         static string getObject();
         static void addClassToObjects(char*);
-        static bool checkHasMember(string, string, char*, char*);
+        static bool checkHasMember(string, string, char*, char*, char*);
         static bool classImplementsInterfaceMethods(char*);
         static bool isTerceto(string key);
         static bool isId(string key);
         static bool isConstant(string key);
         static bool isString(string key);
         static void emptyObjects(bool);
+        static bool checkDistributedMethodImplementation(string);
     private:
         static Token * getSymbolToken(string key);
         static bool checkTypes(Token*, Token*, string, string);
@@ -52,6 +54,7 @@ class SyntacticActions {
         static stack<string> objects;
 };
 
+//char* SyntacticActions::lastMember = NULL;
 string SyntacticActions::lastType = "no-type";
 stack<string> SyntacticActions::objects = stack<string>();
 

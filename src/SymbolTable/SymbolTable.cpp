@@ -41,6 +41,9 @@ void SymbolTable::printTable() const{
 
         if(token->getFather() != NULL)
             msg += " - padre: " + token->getFather()->getLexeme();
+
+        if(token->getUse() == "nombre-funcion")
+            msg += " - inicio: " + to_string(token->getBegin()) + " - fin: " + to_string(token->getEnd());
         
         cout << msg << endl;
     }
@@ -68,8 +71,7 @@ void SymbolTable::setScope(string lexeme, string scope){
     Token * token = this->getSymbol(lexeme);
 
     if(token != NULL){
-        string lexeme = token->getLexeme();
-        string varName = lexeme + ":" + scope;
+        string varName = token->getLexeme() + ":" + scope;
         Token * _token = token->copy();
         this->addSymbol(_token, varName);
 

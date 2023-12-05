@@ -12,8 +12,10 @@
 
     VOID funcion ( DOUBLE arg ){
         DOUBLE x ,
-        x = arg ,
-        RETURN ,
+        
+        VOID funcion_anidada(){
+            RETURN ,
+        } ,
     } ,
 
     IF ( int1 >= int2 ){
@@ -58,7 +60,7 @@
         ca ,
     } ,
 
-    CLASS clase {
+    CLASS cc {
         UINT atributo ,
 
         VOID k (){
@@ -67,6 +69,8 @@
                 RETURN ,
             END_IF ,
         } ,
+
+        VOID p (SHORT my_var) ,
     } ,
 
     FOR i IN RANGE (2_s; 10_s; 1_s)
@@ -78,10 +82,16 @@
         funcion(-4.d-10),
     } ,
 
+    IMPL FOR cc : {
+        VOID p(SHORT my_var){
+            my_var = int1 + 56_s ,
+        } ,
+    } ,
+
     DOUBLE d3 ,
     funcion(d3 + 1.5d+20),
 
-    clase objeto ,
+    cc objeto ,
     objeto.atributo = 10_ui ,
     objeto.k() ,
 }

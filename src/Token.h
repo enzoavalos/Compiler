@@ -32,6 +32,7 @@ class Token
         string lexeme;
         int line;
         int references;
+        int begin, end;
         
         string use;
         string type;
@@ -48,6 +49,7 @@ class Token
         int getTokenType();
         string getLexeme();
         int getLine();
+        void setReferences(int);
         void increaseReferences();
         void decreaseReferences();
         int getReferences() const;
@@ -57,6 +59,11 @@ class Token
         void setUse(string);
         string getUse();
         string getType();
+
+        void setBegin(int);
+        void setEnd(int);
+        int getBegin();
+        int getEnd();
 
         void setParameter(Token*);
         Token* getParameter();
