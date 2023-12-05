@@ -7,6 +7,7 @@
 
     SHORT int1 ; int2 ,
     DOUBLE d1; d2 ,
+    UINT u1 ,
 
     int1 = 43_s / 1_s ,
 
@@ -62,6 +63,8 @@
 
     CLASS cc {
         UINT atributo ,
+        DOUBLE atr_d ,
+        SHORT at_s ,
 
         VOID k (){
             int1 = 45_s ,
@@ -94,4 +97,10 @@
     cc objeto ,
     objeto.atributo = 10_ui ,
     objeto.k() ,
+    funcion(objeto.atr_d) ,
+    u1 = 10_ui + (objeto.atributo * 34_ui) ,
+
+    IF ( int1 !! objeto.at_s )
+        PRINT #hola mundo# ,
+    END_IF ,
 }

@@ -151,7 +151,8 @@ bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
     string errorMsg = "Variable " + lexeme + " no declarada";
     Lexer::symbolTable->decreaseSymbolReferences(key);
 
-    if(!findId(lexeme)){
+    Token* varToken = findId(lexeme);
+    if(varToken == NULL){
         if(showMsg)
             Logger::logError(errorMsg);
         return false;
@@ -169,7 +170,7 @@ bool SyntacticActions::isConstant(string lexeme){
 }
 
 Token* SyntacticActions::findId(string id){
-    if(isConstant(id))
+    if(isConstant(id) || id.rfind(":") != string::npos)
         return getSymbolToken(id);
 
     string lexeme = id;
@@ -327,7 +328,9 @@ bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, stri
     return true;
 }
 
-bool SyntacticActions::checkParameters(string function, string parameter="") {
+bool SyntacticActions::checkParameters(string function, char* parameter=NULL) {
+    if(parameter == NULL)
+        return false;
     Token * token = findId(function);
     Token * parameterToken = isId(parameter) ? findId(parameter) : getSymbolToken(parameter);
 
@@ -477,13 +480,13 @@ void SyntacticActions::addClassToObjects(char* key){
     }
 }
 
-bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL, char* assignOperator=NULL) {
+char* SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL, char* assignOperator=NULL) {
     Token* objectToken = findId(object);
     Lexer::symbolTable->decreaseSymbolReferences(member);
 
     if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
         Logger::logError("Objeto " + object + " no declarado");
-        return false;
+        return NULL;
     }
     Token* classToken = findId(objectToken->getType());
 
@@ -491,7 +494,7 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
         // Revisar todas las variblas en el ambito de la clase
         list<string>* lista = Lexer::symbolTable->getSymbolsByScope(classToken->getLexeme());
 
-        for(const string& str : *lista) {
+        for(string& str : *lista) {
             string memberAux = str.substr(0, str.find(":"));
             string auxscope = str.substr(str.find(":") + 1);
 
@@ -503,19 +506,24 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
                 subscopes.push_back(subscope);
             }
 
-            bool hasScope = memberAux == member;
+            //bool hasScope = memberAux == member;
 
-            if (hasScope) {
-                hasScope = false;
+            if (memberAux == member) {
+                //hasScope = false;
                 for (string scope : subscopes) {
                     if (scope == classToken->getLexeme()) {
-                        hasScope = true;
-                        break;
+                        lastClassMember = str;
+                        str += '\0';
+                        char* lastMember = (char*) malloc(sizeof(str) + 1);
+                        lastMember = strcpy(lastMember, str.c_str());
+                        return lastMember;
+                        /* hasScope = true;
+                        break; */
                     }
                 }
             }
 
-            if (hasScope) {
+            /* if (hasScope) {
                 // Check parameters if its a method
                 Token* memberToken = getSymbolToken(str);
                 if(memberToken->getUse() == "nombre-funcion"){
@@ -525,8 +533,6 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
                     IntermediateCodeGenerator::scope = lastScope;
                     if(valid)
                         IntermediateCodeGenerator::addTerceto("INVOKE", str, parameter);
-                    /* lastMember = new char(str.size() +1);
-                    strcpy(lastMember, str.c_str()); */
                     return valid;
                 }
 
@@ -543,15 +549,51 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
                     Logger::logError("El metodo " + member + " no fue implementado");
                     return false;
                 }
-            }
+            } */
         }
         classToken = classToken->getFather();
     } while (classToken != NULL);
 
     string msg = "Atributo " + member + " no encontrado en la clase " + objectToken->getType();
     Logger::logError(msg);
+    lastClassMember = "";
 
-    return false;
+    return NULL;
+}
+
+bool SyntacticActions::checkAttributeAssignment(string assignOperator, char* expression=NULL){
+    Token* memberToken = getSymbolToken(lastClassMember);
+    if(IntermediateCodeGenerator::isInvalidScope || lastClassMember == "" || memberToken == NULL || expression == NULL)
+        return false;
+
+    Token* exp = isId(expression) ? findId(expression) : getSymbolToken(expression);
+    bool valid = checkTypes(memberToken, exp, lastClassMember, expression);
+    if(valid)
+        IntermediateCodeGenerator::addTerceto(assignOperator, lastClassMember, expression);
+    
+    lastClassMember = "";
+    return valid;
+}
+
+bool SyntacticActions::checkMethodParameters(char* parameter = NULL){
+    Token* memberToken = getSymbolToken(lastClassMember);
+    if(IntermediateCodeGenerator::isInvalidScope || lastClassMember == "" || memberToken == NULL || parameter == NULL)
+        return false;
+
+    bool valid = false;
+    if(memberToken->getUse() == "nombre-funcion"){
+        string auxscope = lastClassMember.substr(lastClassMember.find(":") + 1);
+        string lastScope = IntermediateCodeGenerator::scope;
+        IntermediateCodeGenerator::scope = auxscope;
+        valid = checkParameters(memberToken->getLexeme(), parameter);
+        IntermediateCodeGenerator::scope = lastScope;
+        if(valid)
+            IntermediateCodeGenerator::addTerceto("INVOKE", lastClassMember, parameter);
+    }else if(memberToken->getUse() == "prototipo-metodo")
+        Logger::logError("El metodo " + lastClassMember + " no fue implementado");
+
+    lastClassMember = "";
+    return valid;
 }
 
 bool SyntacticActions::classImplementsInterfaceMethods(char* interface){

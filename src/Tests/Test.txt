@@ -1,8 +1,15 @@
 {
     SHORT int1 ,
+
+    VOID funcion ( DOUBLE arg ){
+        DOUBLE x ,
+        arg += x + 12.5d+20 ,
+    } ,
     
     CLASS clase {
-        UINT atributo ,
+        UINT at_ui ,
+        SHORT at_s ,
+        DOUBLE at_d ,
 
         VOID q(UINT aux) ,
 
@@ -23,6 +30,14 @@
     } ,
 
     clase objeto ,
-    objeto.atributo = 10_ui ,
-    **objeto.p(1.5d+20) ,
+    objeto.at_ui = 10_ui ,
+    objeto.p(1.5d+20) ,
+
+    int1 = 10_s - ( objeto.at_s + 34_s ) ,
+
+    IF ( int1 !! objeto.at_s )
+        PRINT #hola mundo# ,
+    END_IF ,
+
+    funcion(objeto.at_d) ,
 }

@@ -87,7 +87,8 @@ void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string opera
     if(!SyntacticActions::isTerceto(operand1) && !SyntacticActions::isConstant(operand1) && !SyntacticActions::isString(operand1)
         && operand1.rfind(":") == string::npos && operand1 != "")
         operand1 += ":" + scope;
-    if(!SyntacticActions::isTerceto(operand2) && !SyntacticActions::isConstant(operand2) && !SyntacticActions::isString(operand2) && operand2 != "")
+    if(!SyntacticActions::isTerceto(operand2) && !SyntacticActions::isConstant(operand2) && !SyntacticActions::isString(operand2)
+    && operand2.rfind(":") == string::npos && operand2 != "")
         operand2 += ":" + scope;
     
     Terceto terceto = Terceto(operatorTercerto, operand1, operand2, type);
@@ -132,6 +133,8 @@ char *IntermediateCodeGenerator::getLastTerceto()
 
 void IntermediateCodeGenerator::ifElseExpression(char *cond, char *first, char *second)
 {
+    if(cond == NULL || first == NULL || second == NULL)
+        return;
     int condInt = atoi(cond);
     int firstInt = atoi(first);
     int secondInt = atoi(second);
@@ -149,6 +152,8 @@ void IntermediateCodeGenerator::ifElseExpression(char *cond, char *first, char *
 
 void IntermediateCodeGenerator::ifExpression(char *cond, char *first)
 {
+    if(cond == NULL || first == NULL)
+        return;
     int firstInt = atoi(first);
     // Unconditional bifurcation not needed, thus its removed
     int aux = removeStack();
