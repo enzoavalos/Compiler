@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     table.printTable();
     IntermediateCodeGenerator::printTercetos();
 
-    //assembler = new Assembler(pathOutAssembler);
+    assembler = new Assembler(pathOutAssembler);
 
     //assembler->generate();
 

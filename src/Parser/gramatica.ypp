@@ -55,8 +55,7 @@ ejecutable      : asignacion
                 | retorno       { if(SyntacticActions::checkReturnScope()) IntermediateCodeGenerator::returnStatement(); }
                 ;
 
-declaracion_variables   : tipo lista_variables          { Logger::infoMsg("Declaracion de variables");
-                                                        SyntacticActions::emptyObjects(true); }
+declaracion_variables   : tipo lista_variables
                         | error lista_variables         { Logger::logError("Falta especificar el tipo de las variables") }
                         ;
 
@@ -80,7 +79,6 @@ lista_variables : lista_variables ';' ID        { if(!SyntacticActions::checkRed
 objeto_declaration      : ID lista_variables    { if(SyntacticActions::checkDeclaredClass($1)) {
                                                         SyntacticActions::lastType = $1;
                                                         SyntacticActions::addClassToObjects($1);
-                                                        Logger::infoMsg("Declaracion de objeto");
                                                 } else {
                                                         SyntacticActions::emptyObjects(true);
                                                 }
@@ -99,12 +97,11 @@ encabezado_clase        : CLASS ID      {
                         ;
 
 clase_declaration       : encabezado_clase '{' nested_class_declaration atributos metodos_clase
-                                herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
-                                                                IntermediateCodeGenerator::onScopeFinished() }
+                                herencia_composicion '}' { //Logger::infoMsg("Declaracion de clase");
+                                                                IntermediateCodeGenerator::onScopeFinished(); }
                         ;
 
-nested_class_declaration        : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' ','         { Logger::infoMsg("Declaracion de clase local");
-                                                                                                IntermediateCodeGenerator::onScopeFinished() }
+nested_class_declaration        : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' ','         { IntermediateCodeGenerator::onScopeFinished(); }
                                 |
                                 ;
 
@@ -118,16 +115,15 @@ encabezado_interfaz     : INTERFACE ID          { if (SyntacticActions::checkRed
                                                 }
                         ;
 
-interface_declaration   : encabezado_interfaz '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz");
-                                                                IntermediateCodeGenerator::onScopeFinished() }
+interface_declaration   : encabezado_interfaz '{' interface_metodos '}' { //Logger::infoMsg("Declaracion de interfaz");
+                                                                IntermediateCodeGenerator::onScopeFinished(); }
                         ;
 
 interface_metodos       : interface_metodos interface_metodo_declaration
                         |
                         ;
 
-interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { Logger::infoMsg("Declaracion de metodo de interfaz");
-                                                                                SyntacticActions::addParamToMethod($1, $3);
+interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { SyntacticActions::addParamToMethod($1, $3);
                                                                                 IntermediateCodeGenerator::onScopeFinished() }
                                 ;
 
@@ -144,7 +140,7 @@ encabezado_implement    : CLASS ID IMPLEMENT ID         { if(SyntacticActions::c
                         ;
 
 implement_declaration   : encabezado_implement '{' atributos metodos_clase herencia_composicion '}'
-                        { Logger::infoMsg("Implementacion de interfaz");
+                        { //Logger::infoMsg("Implementacion de interfaz");
                                 SyntacticActions::removeClassComposition($5);
                                 if(!IntermediateCodeGenerator::isInvalidScope && !SyntacticActions::classImplementsInterfaceMethods($1)){
                                         IntermediateCodeGenerator::isInvalidScope = true;
@@ -153,7 +149,7 @@ implement_declaration   : encabezado_implement '{' atributos metodos_clase heren
                         }
                         ;
 
-atributos               : atributos declaracion_variables ','    { Logger::infoMsg("Declaracion de atributos de clase") }
+atributos               : atributos declaracion_variables ','
                         |
                         ;
 
@@ -161,8 +157,8 @@ metodos_clase   : metodos_clase metodo_declaration
                 |
                 ;
 
-metodo_declaration      : funcion_declaration ',' { Logger::infoMsg("Declaracion de metodo") }
-                        | encabezado_funcion '(' parametro ')' ','      { Logger::infoMsg("Prototipo de metodo");
+metodo_declaration      : funcion_declaration ','
+                        | encabezado_funcion '(' parametro ')' ','      { //Logger::infoMsg("Prototipo de metodo");
                                                                                 if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                         SyntacticActions::addParamToMethod($1, $3);
                                                                                         IntermediateCodeGenerator::onScopeFinished();
@@ -186,10 +182,12 @@ encabezado_funcion      : VOID ID       { if(!SyntacticActions::checkRedeclarati
                                 }
                         ;
 
-funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' { Logger::infoMsg("Declaracion de funcion");
-                                                                                        SyntacticActions::addParamToMethod($1, $3);
-                                                                                        IntermediateCodeGenerator::onScopeFinished($6);
-                                                                                        IntermediateCodeGenerator::addLabelTerceto("end_func", $1);
+funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' { //Logger::infoMsg("Declaracion de funcion");
+                                                                                        if(!IntermediateCodeGenerator::isInvalidScope){
+                                                                                                SyntacticActions::addParamToMethod($1, $3);
+                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", $1);
+                                                                                                IntermediateCodeGenerator::onScopeFinished($6);
+                                                                                        }
                                                                                         $$ = $1; }
                         ;
 
@@ -203,10 +201,9 @@ sentencias_metodo       : sentencias_metodo declaracion_variables ','   { $$ = I
                         |                                               { $$ = IntermediateCodeGenerator::getLastTerceto() }
                         ;
 
-local_function_declaration      :  encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' {      Logger::infoMsg("Declaracion de funcion local");
-                                                                                                                SyntacticActions::addParamToMethod($1, $3);
-                                                                                                                IntermediateCodeGenerator::onScopeFinished($6);
-                                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", $1); }
+local_function_declaration      :  encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' { SyntacticActions::addParamToMethod($1, $3);
+                                                                                                        IntermediateCodeGenerator::onScopeFinished($6);
+                                                                                                        IntermediateCodeGenerator::addLabelTerceto("end_func", $1); }
                                 ;
 
 sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','    { $$ = IntermediateCodeGenerator::getLastTerceto() }
@@ -239,7 +236,7 @@ distributed_methods     : distributed_methods funcion_declaration ','   { Interm
                         | funcion_declaration ','                       { IntermediateCodeGenerator::setCustomScope($1, "dist-implementation"); }
                         ;
 
-distributed_method_implementation       : distributed_header ':' '{' distributed_methods '}'    { Logger::infoMsg("Declaracion distribuida de metodos");
+distributed_method_implementation       : distributed_header ':' '{' distributed_methods '}'    { //Logger::infoMsg("Declaracion distribuida de metodos");
                                                                                                 SyntacticActions::checkDistributedMethodImplementation($1);
                                                                                                 IntermediateCodeGenerator::onScopeFinished(); }
                                         | distributed_header ':' '{' '}'        { Logger::logError("Implementacion distrbuida de metodos vacia"); }
@@ -248,14 +245,10 @@ distributed_method_implementation       : distributed_header ':' '{' distributed
 retorno                 : RETURN
                         ;
 
-// TODO 1 Informar si var No esta en lado derecho en su ambito pero Si en izquierdo en otro
-asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple");
-                                                if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkTypes($1, $3)){
+asignacion      : ID asignador expresion        { if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkTypes($1, $3)){
                                                         IntermediateCodeGenerator::addTerceto($2, $1, $3);
                                                 } }
-                | acceso_atributo asignador expresion  { Logger::infoMsg("Asignacion de atributo");
-                                SyntacticActions::checkAttributeAssignment($2, $3);
-                        }
+                | acceso_atributo asignador expresion  { SyntacticActions::checkAttributeAssignment($2, $3); }
                 | ID asignador  { Logger::logError("Asignacion vacia") }
                 | acceso_atributo asignador    { Logger::logError("Asignacion vacia") }
                 | ID asignador '-'       { Logger::logError("Asignacion vacia") }
@@ -276,9 +269,9 @@ asignador       : '=' {
                  }
                 ;
 
-invocacion      : ID '(' argumentos ')' { Logger::infoMsg("Invocacion de funcion");
+invocacion      : ID '(' argumentos ')' { //Logger::infoMsg("Invocacion de funcion");
                                 if(SyntacticActions::checkDeclaredMethod($1) && SyntacticActions::checkParameters($1, $3)) IntermediateCodeGenerator::addTerceto("INVOKE", $1, $3); }
-                | acceso_atributo '(' argumentos ')'  { Logger::infoMsg("Invocacion de metodo");
+                | acceso_atributo '(' argumentos ')'  { //Logger::infoMsg("Invocacion de metodo");
                                 SyntacticActions::checkMethodParameters($3);
                         }
                 ;
@@ -293,23 +286,22 @@ argumentos      : expresion { $$ = $1; }
 encabezado_if   : IF    { IntermediateCodeGenerator::addScope("if"); }
                 ;
 
-seleccion       : encabezado_if '(' condicion ')' bloque_if ELSE bloque_else END_IF  { Logger::infoMsg("Sentencia IF completa");
-                                                                                if(!IntermediateCodeGenerator::isInvalidScope){
+else            : ELSE  { IntermediateCodeGenerator::addScope("else"); }
+                ;
+
+seleccion       : encabezado_if '(' condicion ')' bloque_if else bloque_else END_IF  { if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                         IntermediateCodeGenerator::ifElseExpression($3, $5, $7);
                                                                                 }
                                                                                 IntermediateCodeGenerator::onScopeFinished();
                                                                                 }
-                | encabezado_if '(' condicion ')' bloque_if END_IF         { Logger::infoMsg("Sentencia IF sin ELSE");
-                                                                        if(!IntermediateCodeGenerator::isInvalidScope){
+                | encabezado_if '(' condicion ')' bloque_if END_IF         { if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                 IntermediateCodeGenerator::ifExpression($3, $5);
-                                                                        }
-                                                                        IntermediateCodeGenerator::onScopeFinished(); }
+                                                                        } }
                 | encabezado_if '(' condicion ')' bloque_if        { Logger::logWarning("Falta sentencia END_IF");
                                                                         if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                 IntermediateCodeGenerator::ifExpression($3, $5);
-                                                                        }
-                                                                        IntermediateCodeGenerator::onScopeFinished(); }
-                | encabezado_if '(' condicion ')' bloque_if ELSE bloque_else       { Logger::logWarning("Falta sentencia END_IF");
+                                                                        } }
+                | encabezado_if '(' condicion ')' bloque_if else bloque_else       { Logger::logWarning("Falta sentencia END_IF");
                                                                                         if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                                 IntermediateCodeGenerator::ifElseExpression($3, $5, $7);
                                                                                         }
@@ -320,21 +312,21 @@ seleccion       : encabezado_if '(' condicion ')' bloque_if ELSE bloque_else END
 bloque_if       : bloque_sentencias { IntermediateCodeGenerator::addTerceto("BI", "", "");
                                         IntermediateCodeGenerator::addStack(IntermediateCodeGenerator::lastTerceto);
                                         IntermediateCodeGenerator::addLabelTerceto();
-                                        $$ = IntermediateCodeGenerator::getLastTerceto() }
+                                        $$ = IntermediateCodeGenerator::getLastTerceto();
+                                        IntermediateCodeGenerator::onScopeFinished(); }
                 ;
 
 bloque_else     : bloque_sentencias
                 ;
 
-condicion       : expresion comparador expresion        { Logger::infoMsg("Condicion de control");
-                                                                if(SyntacticActions::checkTypes($1, $3)){
-                                                                        IntermediateCodeGenerator::addTerceto($2, $1, $3);
-                                                                        IntermediateCodeGenerator::endCondition();
-                                                                        $$ = IntermediateCodeGenerator::getLastTerceto();
-                                                                }else{
-                                                                        IntermediateCodeGenerator::isInvalidScope = true;
-                                                                }
-                                                                }
+condicion       : expresion comparador expresion        { if(SyntacticActions::checkTypes($1, $3)){
+                                                                IntermediateCodeGenerator::addTerceto($2, $1, $3);
+                                                                IntermediateCodeGenerator::endCondition();
+                                                                $$ = IntermediateCodeGenerator::getLastTerceto();
+                                                        }else{
+                                                                IntermediateCodeGenerator::isInvalidScope = true;
+                                                        }
+                                                        }
                 | expresion comparador          { Logger::logError("Se esperaba expresion en lado derecho de comparacion") }
                 | comparador expresion          { Logger::logError("Se esperaba expresion en lado izquierdo de comparacion") }
                 | expresion                     { Logger::logError("Se esperaba un operador de comparacion") }
@@ -386,8 +378,7 @@ bloque_sentencias       : sentencia { $$ = IntermediateCodeGenerator::getLastTer
                         | '{' sentencias '}' { $$ = IntermediateCodeGenerator::getLastTerceto(); }
                         ;
 
-print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT");
-                        IntermediateCodeGenerator::addTerceto("PRINT", $2, ""); }
+print   : PRINT STRING  { IntermediateCodeGenerator::addTerceto("PRINT", $2, ""); }
         | PRINT         { Logger::logError("Se esperaba cadena para imprimir") }
         | STRING        { Logger::logError("Falta sentencia PRINT") }
         ;
@@ -523,9 +514,8 @@ termino         : factor { $$ = $1; }
                                         }  }
                 ;
 
-acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo");
-                                        if(SyntacticActions::checkDeclaredVar($1)) {
-                                                $$ = SyntacticActions::checkHasMember($1, $3);
+acceso_atributo : ID '.' ID     { if(SyntacticActions::checkDeclaredVar($1)) {
+                                                $$ = SyntacticActions::checkHasMember($3, $1, "");
                                         }
                                 }
                 ;

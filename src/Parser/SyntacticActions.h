@@ -46,13 +46,15 @@ class SyntacticActions {
         static void emptyObjects(bool);
         static bool checkDistributedMethodImplementation(string);
 
-        static char* checkHasMember(string, string, char*, char*, char*);
+        static char* checkHasMember(string, string, string);
         static bool checkMethodParameters(char*);
         static bool checkAttributeAssignment(string, char*);
+        static bool checkAttributOverride(string);
     private:
         static Token * getSymbolToken(string key);
         static bool checkTypes(Token*, Token*, string, string);
         static bool checkParameters(Token*, Token*, string, string);
+        static char* checkHasMember(Token*, string, bool);
 
         static stack<string> objects;
 };

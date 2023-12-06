@@ -1,43 +1,27 @@
 {
-    SHORT int1 ,
+    CLASS ca{
+        UINT x,
 
-    VOID funcion ( DOUBLE arg ){
-        DOUBLE x ,
-        arg += x + 12.5d+20 ,
-    } ,
-    
-    CLASS clase {
-        UINT at_ui ,
-        SHORT at_s ,
-        DOUBLE at_d ,
-
-        VOID q(UINT aux) ,
-
-        VOID k (){
-            int1 = 45_s ,
-            IF (int1 == 0_s)
-                RETURN ,
-            END_IF ,
+        VOID q (DOUBLE par){
+            RETURN ,
         } ,
 
-        VOID p (DOUBLE arg) ,
-    } ,
-
-    IMPL FOR clase : {
         VOID p(DOUBLE arg){
-            arg = .6d-1 ,
+            RETURN ,
         } ,
+    },
+
+    CLASS cb {
+        SHORT _s1 ,
+
+        VOID k(){
+            _s1 += 8_s ,
+        } ,
+
+        VOID p(UINT arg){
+            arg = 1_ui ,
+        } ,
+
+        ca ,
     } ,
-
-    clase objeto ,
-    objeto.at_ui = 10_ui ,
-    objeto.p(1.5d+20) ,
-
-    int1 = 10_s - ( objeto.at_s + 34_s ) ,
-
-    IF ( int1 !! objeto.at_s )
-        PRINT #hola mundo# ,
-    END_IF ,
-
-    funcion(objeto.at_d) ,
 }

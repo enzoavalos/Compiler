@@ -57,24 +57,6 @@ Assembler::~Assembler()
 
 string Assembler::getFreeRegister(int size)
 {
-    // map<string, bool>::iterator it = registers.begin();
-
-    // while (it != registers.end())
-    // {
-    //     string registerName = it->first;
-    //     bool isUsed = it->second;
-
-    //     if (!isUsed)
-    //     {
-    //         registers[registerName] = true;
-    //         return registerName;
-    //     }
-
-    //     it++;
-    // }
-
-    // return "";
-
     vector<Register*>::iterator it = registersVector.begin();
 
     while (it != registersVector.end())
@@ -222,7 +204,7 @@ void Assembler::generate()
     fileStream << "includelib \\masm32\\lib\\kernel32.lib" << endl;
     fileStream << "includelib \\masm32\\lib\\user32.lib" << endl;
 
-    fileStream << ".data" << endl;
+    fileStream << "\n.data" << endl;
 
     fileStream << "msg1 db \"Error: Double overflow\", 0" << endl;
     fileStream << "msg2 db \"Error: Int overflow\", 0" << endl;
@@ -230,7 +212,7 @@ void Assembler::generate()
 
     declareVariables();
 
-    fileStream << ".code" << endl;
+    fileStream << "\n.code" << endl;
 
     fileStream << "doubleOverflow:" << endl;
     fileStream << "invoke MessageBox, NULL, addr msg1, addr msg1, MB_OK" << endl;
@@ -247,15 +229,14 @@ void Assembler::generate()
     // Declarar funciones
     for (auto it = functionDeclarations.begin(); it != functionDeclarations.end(); it++)
     {
-        fileStream << it->second.str();
+        fileStream << "\n" << it->second.str();
     }
 
-    fileStream << "start:" << endl;
+    fileStream << "\nstart:" << endl;
     fileStream << dataStream.str();
     fileStream << "end start" << endl;
 }
 
-// TODO 3: revisar estas generaciones, probablemente se puede optimizar y sacar codigo repetido
 void Assembler::generateAssign(Terceto *terceto)
 {
     string op1 = this->replaceScopeChar(terceto->getOp1());
@@ -857,9 +838,8 @@ void Assembler::start()
         else if (op == "end_func")
         {
             reference = &functionDeclarations[op1];
-            // Revisar, si hay un RETURN y end_func juntos, que no se repitan los ret
 
-            (*reference) << "end_" << op1 << ":" << endl;
+            //(*reference) << "end_" << op1 << ":" << endl;
             (*reference) << "ret" << endl;
 
             functionStack.pop();

@@ -20,9 +20,12 @@
     } ,
 
     IF ( int1 >= int2 ){
-        d1 += 1.4 ,
-    } ELSE
-        d1 = .5d+1 ,
+        DOUBLE x ,
+        d1 += 1.4 - x ,
+    } ELSE{
+        DOUBLE x ,
+        d1 = .5d+1 * x ,
+    }
     END_IF ,
 
     IF ( int1 !! int2 )
@@ -32,7 +35,7 @@
     **Este es un comentario
 
     INTERFACE z {
-        VOID q (DOUBLE par) ,
+        VOID q (DOUBLE arg) ,
     } ,
 
     CLASS ca IMPLEMENT z{

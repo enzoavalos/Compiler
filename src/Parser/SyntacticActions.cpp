@@ -89,7 +89,19 @@ bool SyntacticActions::checkLimits(string key){
 }
 
 bool SyntacticActions::checkReturnScope(){
-    if(IntermediateCodeGenerator::scope == IntermediateCodeGenerator::initialScope){
+    string scope = IntermediateCodeGenerator::scope;
+    string lastScope = scope;
+
+    do{
+        size_t index = scope.rfind(":");
+        if(index != string::npos){
+            lastScope = scope.substr(index + 1, scope.length());
+            scope = scope.substr(0, index);
+        }
+    }while((lastScope == "if" || lastScope == "for" || lastScope == "else") && scope != IntermediateCodeGenerator::initialScope);
+
+    Token* token = findId(lastScope);
+    if(token == NULL || token->getUse() != "nombre-funcion"){
         Logger::logError("Sentencia RETURN fuera del cuerpo de una funcion");
         return false;
     }
@@ -314,14 +326,17 @@ bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, stri
     if(parameterToken == NULL) {
         if (isTerceto(parameter)) {
             string type = IntermediateCodeGenerator::getTercetoType(parameter);
-            return type == token->getParameter()->getType();
+            bool valid = (type == token->getParameter()->getType());
+            if(!valid)
+                Logger::logError("El tipo del parametro no coincide con el argumento de la funcion " + function);
+            return valid;
         }
         Logger::logError("El parametro " + parameter + " no esta declarado");
         return false;
     }
 
     if(token->getParameter()->getType() != parameterToken->getType()){
-        Logger::logError("El parametro " + parameter + " no coincide con el argumento de la funcion " + function);
+        Logger::logError("El tipo del parametro " + parameter + " no coincide con el argumento de la funcion " + function);
         return false;
     }
 
@@ -480,15 +495,25 @@ void SyntacticActions::addClassToObjects(char* key){
     }
 }
 
-char* SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL, char* assignOperator=NULL) {
-    Token* objectToken = findId(object);
-    Lexer::symbolTable->decreaseSymbolReferences(member);
-
-    if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
-        Logger::logError("Objeto " + object + " no declarado");
-        return NULL;
+char* SyntacticActions::checkHasMember(string member, string object="", string className="") {
+    if(className != "")
+        return checkHasMember(findId(className), member, true);
+    else if(object != ""){
+        Token* objectToken = findId(object);
+        if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
+            Logger::logError("Objeto " + object + " no declarado");
+            return NULL;
+        }
+        return checkHasMember(findId(objectToken->getType()), member, true);
     }
-    Token* classToken = findId(objectToken->getType());
+
+    return NULL;
+}
+
+char* SyntacticActions::checkHasMember(Token* classToken, string member, bool showMsg = true) {
+    Lexer::symbolTable->decreaseSymbolReferences(member);
+    if(classToken == NULL)
+        return NULL;
 
     do {
         // Revisar todas las variblas en el ambito de la clase
@@ -506,10 +531,7 @@ char* SyntacticActions::checkHasMember(string object, string member, char* param
                 subscopes.push_back(subscope);
             }
 
-            //bool hasScope = memberAux == member;
-
             if (memberAux == member) {
-                //hasScope = false;
                 for (string scope : subscopes) {
                     if (scope == classToken->getLexeme()) {
                         lastClassMember = str;
@@ -517,45 +539,16 @@ char* SyntacticActions::checkHasMember(string object, string member, char* param
                         char* lastMember = (char*) malloc(sizeof(str) + 1);
                         lastMember = strcpy(lastMember, str.c_str());
                         return lastMember;
-                        /* hasScope = true;
-                        break; */
                     }
                 }
             }
-
-            /* if (hasScope) {
-                // Check parameters if its a method
-                Token* memberToken = getSymbolToken(str);
-                if(memberToken->getUse() == "nombre-funcion"){
-                    string lastScope = IntermediateCodeGenerator::scope;
-                    IntermediateCodeGenerator::scope = auxscope;
-                    bool valid = checkParameters(member, parameter);
-                    IntermediateCodeGenerator::scope = lastScope;
-                    if(valid)
-                        IntermediateCodeGenerator::addTerceto("INVOKE", str, parameter);
-                    return valid;
-                }
-
-                // En caso de que expression no sea NULL se trata de una asignacion y se deben chequear los tipos
-                if(expression != NULL){
-                    Token* exp = isId(expression) ? findId(expression) : getSymbolToken(expression);
-                    bool valid = checkTypes(memberToken, exp, str, expression);
-                    if(valid)
-                        IntermediateCodeGenerator::addTerceto(assignOperator, str, expression);
-                    return valid;
-                }
-
-                if(memberToken->getUse() == "prototipo-metodo"){
-                    Logger::logError("El metodo " + member + " no fue implementado");
-                    return false;
-                }
-            } */
         }
         classToken = classToken->getFather();
     } while (classToken != NULL);
 
-    string msg = "Atributo " + member + " no encontrado en la clase " + objectToken->getType();
-    Logger::logError(msg);
+    string msg = "Atributo " + member + " no encontrado en la clase " + classToken->getLexeme();
+    if(showMsg)
+        Logger::logError(msg);
     lastClassMember = "";
 
     return NULL;
