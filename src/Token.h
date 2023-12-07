@@ -37,6 +37,8 @@ class Token
         string use;
         string type;
 
+        string key;
+
         Token * parameter = NULL;
 
         Token * father = NULL;
@@ -64,6 +66,8 @@ class Token
         void setEnd(int);
         int getBegin();
         int getEnd();
+        void setKey(string);
+        string getKey();
 
         void setParameter(Token*);
         Token* getParameter();

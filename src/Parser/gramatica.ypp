@@ -185,8 +185,8 @@ encabezado_funcion      : VOID ID       { if(!SyntacticActions::checkRedeclarati
 funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' { //Logger::infoMsg("Declaracion de funcion");
                                                                                         if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                                 SyntacticActions::addParamToMethod($1, $3);
-                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", $1);
                                                                                                 IntermediateCodeGenerator::onScopeFinished($6);
+                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", $1);
                                                                                         }
                                                                                         $$ = $1; }
                         ;

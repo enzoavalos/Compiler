@@ -52,14 +52,13 @@ private:
     void generateAssign(Terceto *terceto);
     void generateAssignDouble(Terceto *terceto);
 
-    void generateOp(string operation, Terceto *terceto);
-    void generateDoubleOp(string operation, Terceto *terceto);
+    void generateOp(string operation, Terceto *terceto, bool assign = false);
+    void generateDoubleOp(string operation, Terceto *terceto, bool assign = false);
 
     void generateComp(Terceto *terceto);
     void generateDoubleComp(Terceto *terceto);
 
     void checkDoubleOverflow(string auxVar);
-    void checkNegativeUint(Terceto *terceto);
 
     string replaceScopeChar(string scope);
     string removeNumberSuffix(string name);
@@ -69,6 +68,8 @@ private:
     bool isRegister(string key);
 
     int getOperationSize(string type);
+
+    string convertDoubleToHex(string value);
 
 public:
     Assembler(string filePath);

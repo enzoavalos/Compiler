@@ -1844,8 +1844,8 @@ yyreduce:
     { //Logger::infoMsg("Declaracion de funcion");
                                                                                         if(!IntermediateCodeGenerator::isInvalidScope){
                                                                                                 SyntacticActions::addParamToMethod((yyvsp[(1) - (7)].string), (yyvsp[(3) - (7)].string));
-                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", (yyvsp[(1) - (7)].string));
                                                                                                 IntermediateCodeGenerator::onScopeFinished((yyvsp[(6) - (7)].string));
+                                                                                                                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", (yyvsp[(1) - (7)].string));
                                                                                         }
                                                                                         (yyval.string) = (yyvsp[(1) - (7)].string); ;}
     break;

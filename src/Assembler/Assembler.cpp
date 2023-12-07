@@ -1,43 +1,43 @@
 #include "Assembler.h"
 #include "../Parser/gramatica.tab.hpp"
-
+#include <cstdint>
 
 Assembler::Assembler(string filePath)
 {
     this->fileStream.open(filePath);
     this->functions = list<string>();
 
-    Register * eax = new Register("eax", 32);
-    Register * ax = new Register("ax", 16);
-    Register * ah = new Register("ah", 8);
-    Register * al = new Register("al", 8);
+    Register *eax = new Register("eax", 32);
+    Register *ax = new Register("ax", 16);
+    Register *ah = new Register("ah", 8);
+    Register *al = new Register("al", 8);
 
     ax->addRegister(ah);
     ax->addRegister(al);
     eax->addRegister(ax);
 
-    Register * ebx = new Register("ebx", 32);
-    Register * bx = new Register("bx", 16);
-    Register * bh = new Register("bh", 8);
-    Register * bl = new Register("bl", 8);
+    Register *ebx = new Register("ebx", 32);
+    Register *bx = new Register("bx", 16);
+    Register *bh = new Register("bh", 8);
+    Register *bl = new Register("bl", 8);
 
     bx->addRegister(bh);
     bx->addRegister(bl);
     ebx->addRegister(bx);
 
-    Register * ecx = new Register("ecx", 32);
-    Register * cx = new Register("cx", 16);
-    Register * ch = new Register("ch", 8);
-    Register * cl = new Register("cl", 8);
+    Register *ecx = new Register("ecx", 32);
+    Register *cx = new Register("cx", 16);
+    Register *ch = new Register("ch", 8);
+    Register *cl = new Register("cl", 8);
 
     cx->addRegister(ch);
     cx->addRegister(cl);
     ecx->addRegister(cx);
 
-    Register * edx = new Register("edx", 32);
-    Register * dx = new Register("dx", 16);
-    Register * dh = new Register("dh", 8);
-    Register * dl = new Register("dl", 8);
+    Register *edx = new Register("edx", 32);
+    Register *dx = new Register("dx", 16);
+    Register *dh = new Register("dh", 8);
+    Register *dl = new Register("dl", 8);
 
     dx->addRegister(dh);
     dx->addRegister(dl);
@@ -47,7 +47,6 @@ Assembler::Assembler(string filePath)
     registersVector.push_back(ebx);
     registersVector.push_back(ecx);
     registersVector.push_back(edx);
-
 }
 
 Assembler::~Assembler()
@@ -57,37 +56,39 @@ Assembler::~Assembler()
 
 string Assembler::getFreeRegister(int size)
 {
-    vector<Register*>::iterator it = registersVector.begin();
+    vector<Register *>::iterator it = registersVector.begin();
 
     while (it != registersVector.end())
     {
-        Register * reg = *it;
+        Register *reg = *it;
         if (reg->getSize() == size && reg->isFree())
         {
             reg->getRegister();
             return reg->getName();
         }
 
-        if (reg->getSize() > size) {
-            vector<Register*> subRegisters = reg->getRegisters();
-            vector<Register*>::iterator it2 = subRegisters.begin();
+        if (reg->getSize() > size)
+        {
+            vector<Register *> subRegisters = reg->getRegisters();
+            vector<Register *>::iterator it2 = subRegisters.begin();
 
             while (it2 != subRegisters.end())
             {
-                Register * subReg = *it2;
+                Register *subReg = *it2;
                 if (subReg->getSize() == size && subReg->isFree())
                 {
                     subReg->getRegister();
                     return subReg->getName();
                 }
 
-                if (subReg->getSize() > size) {
-                    vector<Register*> subSubRegisters = subReg->getRegisters();
-                    vector<Register*>::iterator it3 = subSubRegisters.begin();
+                if (subReg->getSize() > size)
+                {
+                    vector<Register *> subSubRegisters = subReg->getRegisters();
+                    vector<Register *>::iterator it3 = subSubRegisters.begin();
 
                     while (it3 != subSubRegisters.end())
                     {
-                        Register * subSubReg = *it3;
+                        Register *subSubReg = *it3;
                         if (subSubReg->getSize() == size && subSubReg->isFree())
                         {
                             subSubReg->getRegister();
@@ -103,43 +104,41 @@ string Assembler::getFreeRegister(int size)
         it++;
     }
     return "";
-
-
 }
 
 void Assembler::freeRegister(string registerName)
 {
     // registers[registerName] = false;
 
-    vector<Register*>::iterator it = registersVector.begin();
+    vector<Register *>::iterator it = registersVector.begin();
 
     while (it != registersVector.end())
     {
-        Register* reg = *it;
+        Register *reg = *it;
         if (reg->getName() == registerName)
         {
             reg->freeRegister();
             return;
         }
 
-        vector<Register*> subRegisters = reg->getRegisters();
-        vector<Register*>::iterator it2 = subRegisters.begin();
+        vector<Register *> subRegisters = reg->getRegisters();
+        vector<Register *>::iterator it2 = subRegisters.begin();
 
         while (it2 != subRegisters.end())
         {
-            Register* subReg = *it2;
+            Register *subReg = *it2;
             if (subReg->getName() == registerName)
             {
                 subReg->freeRegister();
                 return;
             }
 
-            vector<Register*> subSubRegisters = subReg->getRegisters();
-            vector<Register*>::iterator it3 = subSubRegisters.begin();
+            vector<Register *> subSubRegisters = subReg->getRegisters();
+            vector<Register *>::iterator it3 = subSubRegisters.begin();
 
             while (it3 != subSubRegisters.end())
             {
-                Register* subSubReg = *it3;
+                Register *subSubReg = *it3;
                 if (subSubReg->getName() == registerName)
                 {
                     subSubReg->freeRegister();
@@ -151,8 +150,6 @@ void Assembler::freeRegister(string registerName)
         }
         it++;
     }
-
-
 }
 
 void Assembler::declareVariables()
@@ -229,7 +226,8 @@ void Assembler::generate()
     // Declarar funciones
     for (auto it = functionDeclarations.begin(); it != functionDeclarations.end(); it++)
     {
-        fileStream << "\n" << it->second.str();
+        fileStream << "\n"
+                   << it->second.str();
     }
 
     fileStream << "\nstart:" << endl;
@@ -255,8 +253,6 @@ void Assembler::generateAssign(Terceto *terceto)
     {
         string operator1 = SyntacticActions::isConstant(op1) ? this->removeNumberSuffix(op1) : op1;
         string operator2 = SyntacticActions::isConstant(op2) ? this->removeNumberSuffix(op2) : op2;
-        cout << operator1 << endl;
-        cout << operator2 << endl;
         string registerName = getFreeRegister(this->getOperationSize(terceto->getType()));
         (*reference) << "mov " << registerName << ", " << operator2 << endl;
         (*reference) << "mov " << operator1 << ", " << registerName << endl;
@@ -269,7 +265,6 @@ void Assembler::generateAssignDouble(Terceto *terceto)
 {
     string op1 = this->replaceScopeChar(terceto->getOp1());
     string op2 = this->replaceScopeChar(terceto->getOp2());
-    cout << "Assign double" << endl;
 
     if (this->isRegister(op1) && this->isRegister(op2))
     {
@@ -299,7 +294,7 @@ void Assembler::generateAssignDouble(Terceto *terceto)
         string operator2 = op2;
         string aux = "@aux" + to_string(auxVars.size());
         auxVars.push_back(aux);
-        auxStream << aux << " dq " << operator2 << endl;
+        auxStream << aux << " dq " << convertDoubleToHex(op2) << endl;
         (*reference) << "fld " << aux << endl;
     }
     else
@@ -310,14 +305,13 @@ void Assembler::generateAssignDouble(Terceto *terceto)
     (*reference) << "fstp " << op1 << endl;
 }
 
-void Assembler::generateOp(string operation, Terceto *terceto)
+void Assembler::generateOp(string operation, Terceto *terceto, bool assign)
 {
     string op1 = this->replaceScopeChar(terceto->getOp1());
     string op2 = this->replaceScopeChar(terceto->getOp2());
     // Caso 3, 2 tercetos
     if (this->isRegister(op1) && this->isRegister(op2))
     {
-        cout << "Caso 3" << endl;
         int terceto1 = atoi(op1.c_str());
         int terceto2 = atoi(op2.c_str());
         Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
@@ -326,7 +320,8 @@ void Assembler::generateOp(string operation, Terceto *terceto)
 
         // Considerando que se usan todos los registros correspondientes, detectar overflow de short y uint deberia ser facil
         (*reference) << "jo intOverflow" << endl;
-        if (terceto->getType() == "uint") {
+        if (terceto->getType() == "uint")
+        {
             (*reference) << "js uintNegative" << endl;
         }
         this->freeRegister(tercetoOp2->getRegisterName());
@@ -337,7 +332,6 @@ void Assembler::generateOp(string operation, Terceto *terceto)
     // Caso 4, 1 terceto y 1 variable/constante
     if (!this->isRegister(op1) && this->isRegister(op2))
     {
-        cout << "Caso 4" << endl;
         string operator1 = SyntacticActions::isConstant(op1) ? this->removeNumberSuffix(op1) : op1;
         // Caso conmutativo (*, +)
         if (operation == "add" || operation == "mul")
@@ -346,6 +340,12 @@ void Assembler::generateOp(string operation, Terceto *terceto)
             int terceto2 = atoi(op2.c_str());
             Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
             (*reference) << operation << " " << tercetoOp2->getRegisterName() << ", " << operator1 << endl;
+
+            if (assign)
+            {
+                (*reference) << "mov " << operator1 << ", " << tercetoOp2->getRegisterName() << endl;
+            }
+
             (*reference) << "jo intOverflow" << endl;
 
             terceto->setRegisterName(tercetoOp2->getRegisterName());
@@ -359,10 +359,16 @@ void Assembler::generateOp(string operation, Terceto *terceto)
             (*reference) << "mov " << registerName << ", " << operator1 << endl;
             (*reference) << operation << " " << registerName << ", " << tercetoOp2->getRegisterName() << endl;
 
-            if (terceto->getType() == "uint") {
+            if (assign)
+            {
+                (*reference) << "mov " << operator1 << ", " << tercetoOp2->getRegisterName() << endl;
+            }
+
+            if (terceto->getType() == "uint")
+            {
                 (*reference) << "js uintNegative" << endl;
             }
-            
+
             terceto->setRegisterName(registerName);
             return;
         }
@@ -377,12 +383,19 @@ void Assembler::generateOp(string operation, Terceto *terceto)
         string registerName = getFreeRegister(this->getOperationSize(terceto->getType()));
         (*reference) << "mov " << registerName << ", " << operator1 << endl;
         (*reference) << operation << " " << registerName << ", " << operator2 << endl;
+
+        if (assign)
+        {
+            (*reference) << "mov " << op1 << ", " << registerName << endl;
+        }
+
         (*reference) << "jo intOverflow" << endl;
 
-        if (terceto->getType() == "uint") {
+        if (terceto->getType() == "uint")
+        {
             (*reference) << "js uintNegative" << endl;
         }
-            
+
         terceto->setRegisterName(registerName);
         return;
     }
@@ -396,7 +409,8 @@ void Assembler::generateOp(string operation, Terceto *terceto)
         (*reference) << operation << " " << tercetoOp1->getRegisterName() << ", " << operator2 << endl;
         (*reference) << "jo intOverflow" << endl;
 
-        if (terceto->getType() == "uint") {
+        if (terceto->getType() == "uint")
+        {
             (*reference) << "js uintNegative" << endl;
         }
 
@@ -405,14 +419,13 @@ void Assembler::generateOp(string operation, Terceto *terceto)
     }
 }
 
-void Assembler::generateDoubleOp(string operation, Terceto *terceto)
+void Assembler::generateDoubleOp(string operation, Terceto *terceto, bool assign)
 {
     string op1 = this->replaceScopeChar(terceto->getOp1());
     string op2 = this->replaceScopeChar(terceto->getOp2());
     // Caso 3, 2 tercetos
     if (this->isRegister(op1) && this->isRegister(op2))
     {
-        cout << "Caso 1" << endl;
         int terceto1 = atoi(op1.c_str());
         int terceto2 = atoi(op2.c_str());
         Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
@@ -426,26 +439,24 @@ void Assembler::generateDoubleOp(string operation, Terceto *terceto)
         (*reference) << "fld " << tercetoOp2->getRegisterName() << endl;
         (*reference) << operation << endl;
 
-        
         // Chequear overflow
-        if (operation == "fadd") {
+        if (operation == "fadd")
+        {
             checkDoubleOverflow(aux);
         }
+
         (*reference) << "fstp " << aux << endl;
 
         terceto->setRegisterName(aux);
         freeRegister(tercetoOp1->getRegisterName());
         freeRegister(tercetoOp2->getRegisterName());
 
-
-        
         return;
     }
 
     // Caso 4, 1 terceto y 1 variable/constante
     if (this->isRegister(op1) && !this->isRegister(op2))
     {
-        cout << "Caso 2" << endl;
         string operator2 = op2;
         int terceto1 = atoi(op1.c_str());
         Terceto *tercetoOp1 = IntermediateCodeGenerator::getTerceto(terceto1);
@@ -455,7 +466,8 @@ void Assembler::generateDoubleOp(string operation, Terceto *terceto)
         (*reference) << "fld " << operator2 << endl;
         (*reference) << operation << endl;
         // Chequear overflow
-        if (operation == "fadd") {
+        if (operation == "fadd")
+        {
             checkDoubleOverflow(aux);
         }
         (*reference) << "fstp " << aux << endl;
@@ -466,7 +478,6 @@ void Assembler::generateDoubleOp(string operation, Terceto *terceto)
 
     if (this->isRegister(op2) && !this->isRegister(op1))
     {
-        cout << "Caso 3" << endl;
         string operator1 = op1;
         int terceto2 = atoi(op2.c_str());
         Terceto *tercetoOp2 = IntermediateCodeGenerator::getTerceto(terceto2);
@@ -476,18 +487,27 @@ void Assembler::generateDoubleOp(string operation, Terceto *terceto)
         (*reference) << "fld " << tercetoOp2->getRegisterName() << endl;
         (*reference) << operation << endl;
         // Chequear overflow
-        if (operation == "fadd") {
+        if (operation == "fadd")
+        {
             checkDoubleOverflow(aux);
         }
-        (*reference) << "fstp " << aux << endl;
-        terceto->setRegisterName(aux);
+
+        if (assign)
+        {
+            (*reference) << "fstp " << operator1 << endl;
+        }
+        else
+        {
+            (*reference) << "fstp " << aux << endl;
+            terceto->setRegisterName(aux);
+        }
+
         freeRegister(tercetoOp2->getRegisterName());
         return;
     }
 
     if ((SyntacticActions::isId(op1) || SyntacticActions::isConstant(op1)) && (SyntacticActions::isId(op2) || SyntacticActions::isConstant(op2)))
     {
-        cout << "Caso 4" << endl;
         string operator1 = op1;
         string operator2 = op2;
 
@@ -495,7 +515,7 @@ void Assembler::generateDoubleOp(string operation, Terceto *terceto)
         {
             string aux = "@aux" + to_string(auxVars.size());
             auxVars.push_back(aux);
-            auxStream << aux << " dq " << operator1 << endl;
+            auxStream << aux << " dq " << convertDoubleToHex(op1) << endl;
             (*reference) << "fld " << aux << endl;
         }
         else
@@ -506,7 +526,7 @@ void Assembler::generateDoubleOp(string operation, Terceto *terceto)
         {
             string aux = "@aux" + to_string(auxVars.size());
             auxVars.push_back(aux);
-            auxStream << aux << " dq " << operator2 << endl;
+            auxStream << aux << " dq " << convertDoubleToHex(operator2) << endl;
             (*reference) << "fld " << aux << endl;
         }
         else
@@ -520,11 +540,20 @@ void Assembler::generateDoubleOp(string operation, Terceto *terceto)
         auxStream << aux << " dq ?" << endl;
         (*reference) << operation << endl;
         // Chequear overflow
-        if (operation == "fadd") {
+        if (operation == "fadd")
+        {
             checkDoubleOverflow(aux);
         }
-        (*reference) << "fstp " << aux << endl;
-        terceto->setRegisterName(aux);
+
+        if (assign)
+        {
+            (*reference) << "fstp " << operator1 << endl;
+        }
+        else
+        {
+            (*reference) << "fstp " << aux << endl;
+            terceto->setRegisterName(aux);
+        }
     }
 }
 
@@ -662,7 +691,6 @@ void Assembler::generateDoubleComp(Terceto *terceto)
 
 void Assembler::start()
 {
-
     reference = &dataStream;
 
     map<int, Terceto> *tercetos = IntermediateCodeGenerator::getTercetos();
@@ -701,11 +729,14 @@ void Assembler::start()
         }
         else if (op == "+=")
         {
-            string registerName = getFreeRegister(this->getOperationSize(terceto->getType()));
-            (*reference) << "mov " << registerName << ", " << op1 << endl;
-            (*reference) << "add " << registerName << ", " << op2 << endl;
-            (*reference) << "mov " << op1 << ", " << registerName << endl;
-            freeRegister(registerName);
+            if (isDoubleOperation)
+            {
+                generateDoubleOp("fadd", terceto);
+            }
+            else
+            {
+                generateOp("add", terceto, true);
+            }
         }
         else if (op == "-")
         {
@@ -833,6 +864,19 @@ void Assembler::start()
             functionDeclarations[op1] = stringstream();
             reference = &functionDeclarations[op1];
             (*reference) << op1 << ":" << endl;
+
+            string oldScope = op1;
+            replace(oldScope.begin(), oldScope.end(), '@', ':');
+
+            Token *token = Lexer::symbolTable->getSymbol(oldScope);
+            if (token != NULL)
+            {
+                if (token->getParameter() != NULL)
+                {
+                    (*reference) << "pop " << token->getParameter()->getKey() << endl;
+                }
+            }
+
             functionStack.push(op1);
         }
         else if (op == "end_func")
@@ -841,7 +885,6 @@ void Assembler::start()
 
             //(*reference) << "end_" << op1 << ":" << endl;
             (*reference) << "ret" << endl;
-
             functionStack.pop();
             if (functionStack.empty())
             {
@@ -894,6 +937,8 @@ string Assembler::removeNumberSuffix(string name)
 
 bool Assembler::isDouble(string key)
 {
+    if (key.length() == 0)
+        return false;
     if (SyntacticActions::isTerceto(key))
         return IntermediateCodeGenerator::getTerceto(atoi(key.c_str()))->getType() == "double";
     if (SyntacticActions::isId(key))
@@ -917,21 +962,18 @@ bool Assembler::isAuxVar(string key)
 
 bool Assembler::isRegister(string key)
 {
-    cout << "Register: " << key << endl;
     return SyntacticActions::isTerceto(key) || isAuxVar(key);
 }
 
-void Assembler::checkDoubleOverflow(string auxVar) {
-    (*reference) << "fst " << auxVar << endl; // Copio el resultado de la suma en una variable auxiliar de 64 bits
-    (*reference) << "fcom " << auxVar << endl; // Comparo si el valor en ST es igual al valor actual en la variable aux
-    (*reference) << "fstsw ax" << endl; // Copio el valor del registro de estado en AX
-    (*reference) << "sahf" << endl; // Copio el valor de AX en el registro de estado
-    (*reference) << "jne doubleOverflow" << endl; // Si no son iguales, hubo overflow
-}
-
-void Assembler::checkNegativeUint(Terceto * terceto) {
-
-    
+void Assembler::checkDoubleOverflow(string auxVar)
+{
+    string registerName = getFreeRegister(8);
+    (*reference) << "fst " << auxVar << endl;        // Copio el resultado de la suma en una variable auxiliar de 64 bits
+    (*reference) << "fcom " << auxVar << endl;       // Comparo si el valor en ST es igual al valor actual en la variable aux
+    (*reference) << "fstsw" << registerName << endl; // Copio el valor del registro de estado en AX
+    (*reference) << "sahf" << endl;                  // Copio el valor de AX en el registro de estado
+    (*reference) << "jne doubleOverflow" << endl;    // Si no son iguales, hubo overflow
+    freeRegister(registerName);
 }
 
 int Assembler::getOperationSize(string type)
@@ -945,4 +987,22 @@ int Assembler::getOperationSize(string type)
         return 8;
     }
     return 32;
+}
+
+string Assembler::convertDoubleToHex(string number)
+{
+    int index = number.find('D');
+    if (index == string::npos)
+        index = number.find('d');
+    if (index != string::npos)
+        number = number.replace(index, 1, "e");
+
+    istringstream iss(number);
+    double valorDouble;
+    iss >> valorDouble;
+
+    ostringstream oss;
+    oss << std::hexfloat << valorDouble;
+    string valorHex = oss.str();
+    return valorHex;
 }

@@ -369,6 +369,7 @@ void SyntacticActions::addParamToMethod(char* function, char* paramater){
     string paramaterLex = paramater;
     paramaterLex += ":" + IntermediateCodeGenerator::scope;
     Token * paramaterToken = getSymbolToken(paramaterLex);
+    paramaterToken->setKey(paramaterLex);
 
     if(token == NULL)
         return;

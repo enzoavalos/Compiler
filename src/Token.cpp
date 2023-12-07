@@ -110,3 +110,11 @@ int Token::getBegin(){
 int Token::getEnd(){
     return this->end;
 }
+
+void Token::setKey(string key){
+    this->key = key;
+}
+
+string Token::getKey(){
+    return this->key;
+}

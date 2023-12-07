@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 
     assembler = new Assembler(pathOutAssembler);
 
-    //assembler->generate();
+    assembler->generate();
 
     delete lexer;
     //delete assembler;
