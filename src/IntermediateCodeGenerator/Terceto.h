@@ -20,6 +20,7 @@ class Terceto{
         void setRegisterName(string registerName);
         string getRegisterName();
 
+        void setType(string type);
         string getType() const;
 
         static void completarTerceto(int numeroTerceto); // Completar terceto incompleto, backpatching

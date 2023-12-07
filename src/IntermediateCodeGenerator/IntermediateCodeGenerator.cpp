@@ -85,11 +85,14 @@ void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string opera
     }
     
     if(!SyntacticActions::isTerceto(operand1) && !SyntacticActions::isConstant(operand1) && !SyntacticActions::isString(operand1)
-        && operand1.rfind(":") == string::npos && operand1 != "")
-        operand1 += ":" + scope;
+        && operand1.rfind(":") == string::npos && operand1 != "") {
+            operand1 = SyntacticActions::findId(operand1)->getKey();
+        }
+        
     if(!SyntacticActions::isTerceto(operand2) && !SyntacticActions::isConstant(operand2) && !SyntacticActions::isString(operand2)
-    && operand2.rfind(":") == string::npos && operand2 != "")
-        operand2 += ":" + scope;
+    && operand2.rfind(":") == string::npos && operand2 != "") {
+        operand2 = SyntacticActions::findId(operand2)->getKey();
+    }
     
     Terceto terceto = Terceto(operatorTercerto, operand1, operand2, type);
     lastTerceto++;
@@ -206,16 +209,18 @@ void IntermediateCodeGenerator::forBlock(char *id, char *block)
 
     // Seteo el terceto de BF con el numero del terceto posterior al bloque
     tercetos[tercetoNumber].setOp2(to_string(blockInt + 2));
-
-    string idString = id;
+    string idType = SyntacticActions::findId(id)->getType();
+    string idString = SyntacticActions::findId(id)->getKey();
     // Asigno el identificador a los tercetos de asignacion, suma y comparacion
     // Suma
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
+    tercetos[tercetoNumber].setType(idType);
 
     // Comparacion
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
+    tercetos[tercetoNumber].setType(idType);
 
     // Bifuracion incondicional a label previo a la comparacion
     tercetoNumber = removeStack();
@@ -227,6 +232,7 @@ void IntermediateCodeGenerator::forBlock(char *id, char *block)
     // Asignacion inicial
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
+    tercetos[tercetoNumber].setType(idType);
 }
 
 void IntermediateCodeGenerator::returnStatement(){

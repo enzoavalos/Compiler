@@ -124,7 +124,9 @@ interface_metodos       : interface_metodos interface_metodo_declaration
                         ;
 
 interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { SyntacticActions::addParamToMethod($1, $3);
-                                                                                IntermediateCodeGenerator::onScopeFinished() }
+                                                                                IntermediateCodeGenerator::onScopeFinished();
+                                                                                IntermediateCodeGenerator::removeTerceto(IntermediateCodeGenerator::lastTerceto);
+                                                                                 }
                                 ;
 
 encabezado_implement    : CLASS ID IMPLEMENT ID         { if(SyntacticActions::checkDeclaredClass($4)){
@@ -283,7 +285,7 @@ argumentos      : expresion { $$ = $1; }
                         $$ = aux; }
                 ;
 
-encabezado_if   : IF    { IntermediateCodeGenerator::addScope("if"); }
+encabezado_if   : IF 
                 ;
 
 else            : ELSE  { IntermediateCodeGenerator::addScope("else"); }
@@ -323,6 +325,7 @@ condicion       : expresion comparador expresion        { if(SyntacticActions::c
                                                                 IntermediateCodeGenerator::addTerceto($2, $1, $3);
                                                                 IntermediateCodeGenerator::endCondition();
                                                                 $$ = IntermediateCodeGenerator::getLastTerceto();
+                                                                IntermediateCodeGenerator::addScope("if");
                                                         }else{
                                                                 IntermediateCodeGenerator::isInvalidScope = true;
                                                         }

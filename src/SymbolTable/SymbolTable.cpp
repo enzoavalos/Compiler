@@ -73,6 +73,7 @@ void SymbolTable::setScope(string lexeme, string scope){
     if(token != NULL){
         string varName = token->getLexeme() + ":" + scope;
         Token * _token = token->copy();
+        _token->setKey(varName);
         this->addSymbol(_token, varName);
 
         this->deleteSymbol(lexeme);

@@ -55,3 +55,7 @@ string Terceto::getRegisterName() {
 string Terceto::getType() const{
     return this->type;
 }
+
+void Terceto::setType(string type){
+    this->type = type;
+}

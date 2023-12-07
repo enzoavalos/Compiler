@@ -883,7 +883,7 @@ void Assembler::start()
         {
             reference = &functionDeclarations[op1];
 
-            //(*reference) << "end_" << op1 << ":" << endl;
+            (*reference) << "end_" << op1 << ":" << endl;
             (*reference) << "ret" << endl;
             functionStack.pop();
             if (functionStack.empty())
@@ -991,12 +991,6 @@ int Assembler::getOperationSize(string type)
 
 string Assembler::convertDoubleToHex(string number)
 {
-    int index = number.find('D');
-    if (index == string::npos)
-        index = number.find('d');
-    if (index != string::npos)
-        number = number.replace(index, 1, "e");
-
     istringstream iss(number);
     double valorDouble;
     iss >> valorDouble;
