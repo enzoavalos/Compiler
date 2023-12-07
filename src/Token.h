@@ -6,7 +6,6 @@
 using namespace std;
 
 enum Type {
-    // EOF
     TOKEN_EOF = 0,
     // Return ASCII value
     TOKEN_PLUS = 43,
@@ -33,9 +32,12 @@ class Token
         string lexeme;
         int line;
         int references;
+        int begin, end;
         
         string use;
         string type;
+
+        string key;
 
         Token * parameter = NULL;
 
@@ -49,6 +51,7 @@ class Token
         int getTokenType();
         string getLexeme();
         int getLine();
+        void setReferences(int);
         void increaseReferences();
         void decreaseReferences();
         int getReferences() const;
@@ -58,6 +61,13 @@ class Token
         void setUse(string);
         string getUse();
         string getType();
+
+        void setBegin(int);
+        void setEnd(int);
+        int getBegin();
+        int getEnd();
+        void setKey(string);
+        string getKey();
 
         void setParameter(Token*);
         Token* getParameter();

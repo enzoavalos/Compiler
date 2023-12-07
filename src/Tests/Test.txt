@@ -1,6 +1,10 @@
 {
-    CLASS ca {
+    CLASS ca{
         UINT x,
+
+        VOID q (DOUBLE par){
+            RETURN ,
+        } ,
 
         VOID p(DOUBLE arg){
             RETURN ,
@@ -8,24 +12,16 @@
     },
 
     CLASS cb {
-        DOUBLE y,
-    
-        VOID m(){
-            RETURN ,
+        SHORT _s1 ,
+
+        VOID k(){
+            _s1 += 8_s ,
         } ,
 
-        ca,
-    },
+        VOID p(UINT arg){
+            arg = 1_ui ,
+        } ,
 
-    CLASS cc {
-        SHORT z ,
-
-        cb ,
+        ca ,
     } ,
-
-    cc c1 ,
-    c1.x = 2_ui ,
-    c1.y = .6d+20 ,
-    c1.z = 4_s + 20_s ,
-    c1.p(1.5d+20) ,
 }

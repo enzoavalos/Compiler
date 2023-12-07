@@ -28,7 +28,7 @@ void SymbolTable::printTable() const{
     cout << "\nTabla de simbolos\n";
     for(auto& pair: this->symbols){
         Token* token = pair.second;
-        string msg = pair.first + " - referencias: " + to_string(token->getReferences());
+        string msg = pair.first + " - lexema: " + token->getLexeme() + " - referencias: " + to_string(token->getReferences());
 
         if(token->getType() != "no-type")
             msg += " - tipo: " + token->getType();
@@ -41,6 +41,9 @@ void SymbolTable::printTable() const{
 
         if(token->getFather() != NULL)
             msg += " - padre: " + token->getFather()->getLexeme();
+
+        if(token->getUse() == "nombre-funcion")
+            msg += " - inicio: " + to_string(token->getBegin()) + " - fin: " + to_string(token->getEnd());
         
         cout << msg << endl;
     }
@@ -68,9 +71,9 @@ void SymbolTable::setScope(string lexeme, string scope){
     Token * token = this->getSymbol(lexeme);
 
     if(token != NULL){
-        string lexeme = token->getLexeme();
-        string varName = lexeme + ":" + scope;
+        string varName = token->getLexeme() + ":" + scope;
         Token * _token = token->copy();
+        _token->setKey(varName);
         this->addSymbol(_token, varName);
 
         this->deleteSymbol(lexeme);
@@ -90,4 +93,8 @@ list<string>* SymbolTable::getSymbolsByScope(string scope){
 
 int SymbolTable::getSymbolsSize(){
     return this->symbols.size();
+}
+
+map<string,Token*> SymbolTable::getSymbols(){
+    return this->symbols;
 }

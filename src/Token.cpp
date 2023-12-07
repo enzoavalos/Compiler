@@ -8,6 +8,8 @@ Token::Token(int tokenType, string lexeme, int line)
     this->references = 1;
     this->type = "no-type";
     this->use = "unused";
+    this->begin = -1;
+    this->end = -1;
 }
 
 Token::~Token() {
@@ -16,6 +18,13 @@ Token::~Token() {
 
 Token* Token::copy(){
     Token* newToken = new Token(tokenType, lexeme, line);
+    newToken->setType(this->type);
+    newToken->setUse(this->use);
+    newToken->setFather(this->father);
+    newToken->setParameter(this->parameter);
+    newToken->setReferences(this->references);
+    newToken->setBegin(this->begin);
+    newToken->setEnd(this->end);
     return newToken;
 }
 
@@ -32,6 +41,10 @@ string Token::getLexeme()
 int Token::getLine()
 {
     return this->line;
+}
+
+void Token::setReferences(int refs){
+    this->references = refs;
 }
 
 void Token::increaseReferences(){
@@ -80,4 +93,28 @@ Token* Token::getFather(){
 
 void Token::setFather(Token* father){
     this->father = father;
+}
+
+void Token::setBegin(int begin){
+    this->begin = begin;
+}
+
+void Token::setEnd(int end){
+    this->end = end;
+}
+
+int Token::getBegin(){
+    return this->begin;
+}
+
+int Token::getEnd(){
+    return this->end;
+}
+
+void Token::setKey(string key){
+    this->key = key;
+}
+
+string Token::getKey(){
+    return this->key;
 }

@@ -12,11 +12,11 @@
         char *string;
 }
 
-%token <string> LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL // Operadores de comparación
+%token <string> LESS_EQUAL GREATER_EQUAL EQUAL NOT_EQUAL PLUS_EQUAL
 %token <string> ID STRING CTE_SHORT CTE_UINT CTE_DOUBLE
 %type <string> factor constante expresion asignador termino expresion_parentesis comparador condicion bloque_sentencias asignacion seleccion argumentos
-%type <string> bloque_else bloque_if argumento_bucle_for acceso_atributo encabezado_funcion sentencias_metodo sentencias_funcion_local parametro
-%type <string> encabezado_for encabezado_implement
+%type <string> bloque_else bloque_if argumento_bucle_for encabezado_funcion sentencias_metodo sentencias_funcion_local parametro
+%type <string> encabezado_for encabezado_implement herencia_composicion distributed_header funcion_declaration acceso_atributo
 
 %left '=' PLUS_EQUAL  // Asociatividad izquierda para asignación y asignación con adición
 %left '.'  // Asociatividad izquierda para acceso a atributos y métodos
@@ -52,11 +52,10 @@ ejecutable      : asignacion
                 | seleccion
                 | print
                 | bucle_for
-                | acceso_atributo
                 | retorno       { if(SyntacticActions::checkReturnScope()) IntermediateCodeGenerator::returnStatement(); }
                 ;
 
-declaracion_variables   : tipo lista_variables          { Logger::infoMsg("Declaracion de variables") }
+declaracion_variables   : tipo lista_variables
                         | error lista_variables         { Logger::logError("Falta especificar el tipo de las variables") }
                         ;
 
@@ -64,21 +63,31 @@ lista_variables : lista_variables ';' ID        { if(!SyntacticActions::checkRed
                                                         IntermediateCodeGenerator::setVarScope($3);
                                                         SyntacticActions::setIdType($3);
                                                         SyntacticActions::setIdUse($3, "variable");
+                                                        SyntacticActions::addObject($3);
                                                 }
                                         }
                 | ID                            { if(!SyntacticActions::checkRedeclaration($1)){
                                                         IntermediateCodeGenerator::setVarScope($1);
                                                         SyntacticActions::setIdType($1);
                                                         SyntacticActions::setIdUse($1, "variable");
+                                                        SyntacticActions::addObject($1);
                                                 }
                                         }
                 | ID error ','    { Logger::logError("declaracion de variables invalida") }
                 ;
 
+objeto_declaration      : ID lista_variables    { if(SyntacticActions::checkDeclaredClass($1)) {
+                                                        SyntacticActions::lastType = $1;
+                                                        SyntacticActions::addClassToObjects($1);
+                                                } else {
+                                                        SyntacticActions::emptyObjects(true);
+                                                }
+                                                }
+                        ;
+
 encabezado_clase        : CLASS ID      {
                                         if (SyntacticActions::checkRedeclaration($2)) {
                                                 IntermediateCodeGenerator::isInvalidScope = true;
-                                                IntermediateCodeGenerator::addScope("remove");
                                         } else {
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 SyntacticActions::setIdUse($2, "nombre-clase");
@@ -87,13 +96,17 @@ encabezado_clase        : CLASS ID      {
 }
                         ;
 
-clase_declaration       : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' { Logger::infoMsg("Declaracion de clase");
-                                                                                                IntermediateCodeGenerator::onScopeFinished() }
+clase_declaration       : encabezado_clase '{' nested_class_declaration atributos metodos_clase
+                                herencia_composicion '}' { //Logger::infoMsg("Declaracion de clase");
+                                                                IntermediateCodeGenerator::onScopeFinished(); }
                         ;
+
+nested_class_declaration        : encabezado_clase '{' atributos metodos_clase herencia_composicion '}' ','         { IntermediateCodeGenerator::onScopeFinished(); }
+                                |
+                                ;
 
 encabezado_interfaz     : INTERFACE ID          { if (SyntacticActions::checkRedeclaration($2)) {
                                                         IntermediateCodeGenerator::isInvalidScope = true;
-                                                        IntermediateCodeGenerator::addScope("remove");
                                                 } else {
                                                         IntermediateCodeGenerator::setVarScope($2);
                                                         SyntacticActions::setIdUse($2, "nombre-interfaz");
@@ -102,17 +115,18 @@ encabezado_interfaz     : INTERFACE ID          { if (SyntacticActions::checkRed
                                                 }
                         ;
 
-interface_declaration   : encabezado_interfaz '{' interface_metodos '}' { Logger::infoMsg("Declaracion de interfaz");
-                                                                IntermediateCodeGenerator::onScopeFinished() }
+interface_declaration   : encabezado_interfaz '{' interface_metodos '}' { //Logger::infoMsg("Declaracion de interfaz");
+                                                                IntermediateCodeGenerator::onScopeFinished(); }
                         ;
 
 interface_metodos       : interface_metodos interface_metodo_declaration
                         |
                         ;
 
-interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { Logger::infoMsg("Declaracion de metodo de interfaz");
-                                                                                SyntacticActions::addParamToMethod($1, $3);
-                                                                                IntermediateCodeGenerator::onScopeFinished() }
+interface_metodo_declaration    : encabezado_funcion '(' parametro ')' ',' { SyntacticActions::addParamToMethod($1, $3);
+                                                                                IntermediateCodeGenerator::onScopeFinished();
+                                                                                IntermediateCodeGenerator::removeTerceto(IntermediateCodeGenerator::lastTerceto);
+                                                                                 }
                                 ;
 
 encabezado_implement    : CLASS ID IMPLEMENT ID         { if(SyntacticActions::checkDeclaredClass($4)){
@@ -123,53 +137,64 @@ encabezado_implement    : CLASS ID IMPLEMENT ID         { if(SyntacticActions::c
                                                                 $$ = $4;
                                                         }else{
                                                                 IntermediateCodeGenerator::isInvalidScope = true;
-                                                                IntermediateCodeGenerator::addScope("remove");
                                                         }
                                                         }
                         ;
 
-// Ver como eliminar simbolos y tercetos creados si no implementa todos los metodos de la interfaz
-implement_declaration   : encabezado_implement '{' atributos metodos_clase '}'    { Logger::infoMsg("Implementacion de interfaz");
-                                                                                if(!IntermediateCodeGenerator::isInvalidScope && !SyntacticActions::classImplementsInterfaceMethods($1)){
-                                                                                        IntermediateCodeGenerator::isInvalidScope = true;
-                                                                                        IntermediateCodeGenerator::addScope("remove");
-                                                                                }
-                                                                                IntermediateCodeGenerator::onScopeFinished();
-                                                                        }
+implement_declaration   : encabezado_implement '{' atributos metodos_clase herencia_composicion '}'
+                        { //Logger::infoMsg("Implementacion de interfaz");
+                                SyntacticActions::removeClassComposition($5);
+                                if(!IntermediateCodeGenerator::isInvalidScope && !SyntacticActions::classImplementsInterfaceMethods($1)){
+                                        IntermediateCodeGenerator::isInvalidScope = true;
+                                }
+                                IntermediateCodeGenerator::onScopeFinished();
+                        }
                         ;
 
-atributos               : atributos atributo_declaration
+atributos               : atributos declaracion_variables ','
                         |
-                        ;
-
-atributo_declaration    : declaracion_variables ',' { Logger::infoMsg("Declaracion de atributos de clase") }
                         ;
 
 metodos_clase   : metodos_clase metodo_declaration
                 |
                 ;
 
-metodo_declaration      : funcion_declaration ',' { Logger::infoMsg("Declaracion de metodo") }
+metodo_declaration      : funcion_declaration ','
+                        | encabezado_funcion '(' parametro ')' ','      { //Logger::infoMsg("Prototipo de metodo");
+                                                                                if(!IntermediateCodeGenerator::isInvalidScope){
+                                                                                        SyntacticActions::addParamToMethod($1, $3);
+                                                                                        IntermediateCodeGenerator::onScopeFinished();
+                                                                                        SyntacticActions::setIdUse($1, "prototipo-metodo");
+                                                                                        IntermediateCodeGenerator::setCustomScope($1, "prototype");
+                                                                                        // Deletes begin of function label
+                                                                                        IntermediateCodeGenerator::removeTerceto(IntermediateCodeGenerator::lastTerceto);
+                                                                                }
+                                                                        }
                         ;
 
 encabezado_funcion      : VOID ID       { if(!SyntacticActions::checkRedeclaration($2)){
                                                 IntermediateCodeGenerator::setVarScope($2);
                                                 SyntacticActions::setIdUse($2, "nombre-funcion");
+                                                IntermediateCodeGenerator::addLabelTerceto("inic_func", $2);
                                                 IntermediateCodeGenerator::addScope($2);
                                                 $$ = $2;
+                                        }else{
+                                                IntermediateCodeGenerator::isInvalidScope = true;
                                         }
                                 }
                         ;
 
-funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' { Logger::infoMsg("Declaracion de funcion");
-                                                                                        SyntacticActions::addParamToMethod($1, $3);
-                                                                                        IntermediateCodeGenerator::onScopeFinished($6); }
-                        |
+funcion_declaration     : encabezado_funcion '(' parametro ')' '{' sentencias_metodo '}' { //Logger::infoMsg("Declaracion de funcion");
+                                                                                        if(!IntermediateCodeGenerator::isInvalidScope){
+                                                                                                SyntacticActions::addParamToMethod($1, $3);
+                                                                                                IntermediateCodeGenerator::onScopeFinished($6);
+                                                                                                IntermediateCodeGenerator::addLabelTerceto("end_func", $1);
+                                                                                        }
+                                                                                        $$ = $1; }
                         ;
 
-// TODO 2 Informar error cuando se quiera heredar en una implementacion de interfaz
-herencia_composicion    : ID ','   { SyntacticActions::addClassComposition($1); }
-                        |
+herencia_composicion    : ID ','   { SyntacticActions::addClassComposition($1); $$ = $1; }
+                        |          { $$ = NULL; }
                         ;
 
 sentencias_metodo       : sentencias_metodo declaracion_variables ','   { $$ = IntermediateCodeGenerator::getLastTerceto() }
@@ -178,9 +203,9 @@ sentencias_metodo       : sentencias_metodo declaracion_variables ','   { $$ = I
                         |                                               { $$ = IntermediateCodeGenerator::getLastTerceto() }
                         ;
 
-local_function_declaration      :  encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' {      Logger::infoMsg("Declaracion de funcion local");
-                                                                                                                SyntacticActions::addParamToMethod($1, $3);
-                                                                                                                IntermediateCodeGenerator::onScopeFinished($6) }
+local_function_declaration      :  encabezado_funcion '(' parametro ')' '{' sentencias_funcion_local '}' { SyntacticActions::addParamToMethod($1, $3);
+                                                                                                        IntermediateCodeGenerator::onScopeFinished($6);
+                                                                                                        IntermediateCodeGenerator::addLabelTerceto("end_func", $1); }
                                 ;
 
 sentencias_funcion_local        : sentencias_funcion_local declaracion_variables ','    { $$ = IntermediateCodeGenerator::getLastTerceto() }
@@ -190,55 +215,44 @@ sentencias_funcion_local        : sentencias_funcion_local declaracion_variables
                                 |                                                       { $$ = IntermediateCodeGenerator::getLastTerceto() }
                                 ;
 
-parametro       : tipo ID       { 
-                                        IntermediateCodeGenerator::setVarScope($2);
-        SyntacticActions::setIdType($2);
+parametro       : tipo ID       { IntermediateCodeGenerator::setVarScope($2);
+                                SyntacticActions::setIdType($2);
                                 SyntacticActions::setIdUse($2, "parametro");
                                 $$ = $2;
-                                 }
+                                }
                 | ID                    { Logger::logError("Falta el tipo del argumento") }
                 | parametro ';' tipo ID { Logger::logError("Solo se permite un parametro en declaracion de funcion") }
                 | { $$ = NULL; }
                 ;
 
-distributed_method_implementation       : IMPL FOR ID ':' '{' metodos_clase '}'    { Logger::infoMsg("Declaracion distribuida de metodos");
-                                                                                        SyntacticActions::checkDeclaredClass($3) }
+distributed_header      : IMPL FOR ID   { if(SyntacticActions::checkDeclaredClass($3)){
+                                                IntermediateCodeGenerator::addScope($3);
+                                                $$ = $3;
+                                        } else{
+                                                IntermediateCodeGenerator::isInvalidScope = true;
+                                        }
+                                        }
+                        ;
+
+distributed_methods     : distributed_methods funcion_declaration ','   { IntermediateCodeGenerator::setCustomScope($2, "dist-implementation"); }
+                        | funcion_declaration ','                       { IntermediateCodeGenerator::setCustomScope($1, "dist-implementation"); }
+                        ;
+
+distributed_method_implementation       : distributed_header ':' '{' distributed_methods '}'    { //Logger::infoMsg("Declaracion distribuida de metodos");
+                                                                                                SyntacticActions::checkDistributedMethodImplementation($1);
+                                                                                                IntermediateCodeGenerator::onScopeFinished(); }
+                                        | distributed_header ':' '{' '}'        { Logger::logError("Implementacion distrbuida de metodos vacia"); }
                                         ;
                         
 retorno                 : RETURN
                         ;
 
-objeto_declaration      : ID lista_objetos      { if(SyntacticActions::checkDeclaredClass($1)) {
-                                                        SyntacticActions::lastType = $1;
-                                                        SyntacticActions::addClassToObjects($1);
-                                                }
-                                                Logger::infoMsg("Declaracion de objeto") }
-                        ;
-
-lista_objetos           : lista_objetos ';' objeto
-                        | objeto
-                        ;
-
-objeto          : ID    { if(!SyntacticActions::checkRedeclaration($1)){
-                                IntermediateCodeGenerator::setVarScope($1);
-                                SyntacticActions::setIdType($1);
-                                SyntacticActions::setIdUse($1, "variable-objeto");
-                                SyntacticActions::addObject($1);
-                        }
-                }
-                ;
-
-asignacion      : ID asignador expresion        { Logger::infoMsg("Asignacion simple");
-                                                if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkTypes($1, $3)) IntermediateCodeGenerator::addTerceto($2, $1, $3); }
-                | ID '.' ID asignador expresion  { Logger::infoMsg("Asignacion de atributo");
-                                if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkHasMember($1, $3, NULL, $5)) {
-                                        char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
-                                        sprintf(aux, "%s.%s", $1, $3);
-                                        IntermediateCodeGenerator::addTerceto($4, aux, $5);
-                                }
-                        }
+asignacion      : ID asignador expresion        { if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkTypes($1, $3)){
+                                                        IntermediateCodeGenerator::addTerceto($2, $1, $3);
+                                                } }
+                | acceso_atributo asignador expresion  { SyntacticActions::checkAttributeAssignment($2, $3); }
                 | ID asignador  { Logger::logError("Asignacion vacia") }
-                | ID '.' ID asignador    { Logger::logError("Asignacion vacia") }
+                | acceso_atributo asignador    { Logger::logError("Asignacion vacia") }
                 | ID asignador '-'       { Logger::logError("Asignacion vacia") }
                 ;
 
@@ -257,43 +271,65 @@ asignador       : '=' {
                  }
                 ;
 
-invocacion      : ID '(' argumentos ')' { Logger::infoMsg("Invocacion de funcion");
+invocacion      : ID '(' argumentos ')' { //Logger::infoMsg("Invocacion de funcion");
                                 if(SyntacticActions::checkDeclaredMethod($1) && SyntacticActions::checkParameters($1, $3)) IntermediateCodeGenerator::addTerceto("INVOKE", $1, $3); }
-                | ID '.' ID '(' argumentos ')'  { Logger::infoMsg("Invocacion de metodo");
-                        if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkHasMember($1, $3, $5)){
-                                char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
-                                sprintf(aux, "%s.%s", $1, $3);
-                                IntermediateCodeGenerator::addTerceto("INVOKE", aux, $5);
-                                }
+                | acceso_atributo '(' argumentos ')'  { //Logger::infoMsg("Invocacion de metodo");
+                                SyntacticActions::checkMethodParameters($3);
                         }
                 ;
 
 argumentos      : expresion { $$ = $1; }
-                | argumentos ';' expresion      { Logger::logError("Solo se permite un argumento en invocacion de funcion") }
-                | { char *aux = (char*) malloc(2);
-                        aux[0] = '-';
+                | argumentos ';' expresion      { Logger::logError("Solo se permite un argumento en invocacion de funcion");
+                                                $$ = $1; }
+                | { char *aux = (char*) malloc(1);
                         $$ = aux; }
                 ;
 
-seleccion       : IF '(' condicion ')' bloque_if ELSE bloque_else END_IF  { Logger::infoMsg("Sentencia IF completa");
-                                                                                IntermediateCodeGenerator::ifElseExpression($3, $5, $7); }
-                | IF '(' condicion ')' bloque_if END_IF         { Logger::infoMsg("Sentencia IF sin ELSE");
-                                                                        IntermediateCodeGenerator::ifExpression($3, $5); }
-                | IF '(' condicion ')' bloque_if        { Logger::logError("Falta sentencia END_IF") }
-                | IF '(' condicion ')' bloque_if ELSE bloque_else       { Logger::logError("Falta sentencia END_IF") }
+encabezado_if   : IF 
                 ;
 
-bloque_if       : bloque_sentencias { IntermediateCodeGenerator::addTerceto("BI", "", "-");
+else            : ELSE  { IntermediateCodeGenerator::addScope("else"); }
+                ;
+
+seleccion       : encabezado_if '(' condicion ')' bloque_if else bloque_else END_IF  { if(!IntermediateCodeGenerator::isInvalidScope){
+                                                                                        IntermediateCodeGenerator::ifElseExpression($3, $5, $7);
+                                                                                }
+                                                                                IntermediateCodeGenerator::onScopeFinished();
+                                                                                }
+                | encabezado_if '(' condicion ')' bloque_if END_IF         { if(!IntermediateCodeGenerator::isInvalidScope){
+                                                                                IntermediateCodeGenerator::ifExpression($3, $5);
+                                                                        } }
+                | encabezado_if '(' condicion ')' bloque_if        { Logger::logWarning("Falta sentencia END_IF");
+                                                                        if(!IntermediateCodeGenerator::isInvalidScope){
+                                                                                IntermediateCodeGenerator::ifExpression($3, $5);
+                                                                        } }
+                | encabezado_if '(' condicion ')' bloque_if else bloque_else       { Logger::logWarning("Falta sentencia END_IF");
+                                                                                        if(!IntermediateCodeGenerator::isInvalidScope){
+                                                                                                IntermediateCodeGenerator::ifElseExpression($3, $5, $7);
+                                                                                        }
+                                                                                        IntermediateCodeGenerator::onScopeFinished();
+                                                                                }
+                ;
+
+bloque_if       : bloque_sentencias { IntermediateCodeGenerator::addTerceto("BI", "", "");
                                         IntermediateCodeGenerator::addStack(IntermediateCodeGenerator::lastTerceto);
                                         IntermediateCodeGenerator::addLabelTerceto();
-                                        $$ = IntermediateCodeGenerator::getLastTerceto() }
+                                        $$ = IntermediateCodeGenerator::getLastTerceto();
+                                        IntermediateCodeGenerator::onScopeFinished(); }
+                ;
 
 bloque_else     : bloque_sentencias
+                ;
 
-condicion       : expresion comparador expresion        { Logger::infoMsg("Condicion de control");
+condicion       : expresion comparador expresion        { if(SyntacticActions::checkTypes($1, $3)){
                                                                 IntermediateCodeGenerator::addTerceto($2, $1, $3);
                                                                 IntermediateCodeGenerator::endCondition();
-                                                                $$ = IntermediateCodeGenerator::getLastTerceto(); }
+                                                                $$ = IntermediateCodeGenerator::getLastTerceto();
+                                                                IntermediateCodeGenerator::addScope("if");
+                                                        }else{
+                                                                IntermediateCodeGenerator::isInvalidScope = true;
+                                                        }
+                                                        }
                 | expresion comparador          { Logger::logError("Se esperaba expresion en lado derecho de comparacion") }
                 | comparador expresion          { Logger::logError("Se esperaba expresion en lado izquierdo de comparacion") }
                 | expresion                     { Logger::logError("Se esperaba un operador de comparacion") }
@@ -335,7 +371,7 @@ comparador      : '<' {
                 | NOT_EQUAL {
                         char *aux = (char*) malloc(sizeof(char) * 3);
                         aux[0] = '!';
-                        aux[1] = '=';
+                        aux[1] = '!';
                         aux[2] = '\0';
                         $$ = aux;
                 }
@@ -345,8 +381,7 @@ bloque_sentencias       : sentencia { $$ = IntermediateCodeGenerator::getLastTer
                         | '{' sentencias '}' { $$ = IntermediateCodeGenerator::getLastTerceto(); }
                         ;
 
-print   : PRINT STRING  { Logger::infoMsg("Sentencia PRINT");
-                        IntermediateCodeGenerator::addTerceto("PRINT", $2, "-"); }
+print   : PRINT STRING  { IntermediateCodeGenerator::addTerceto("PRINT", $2, ""); }
         | PRINT         { Logger::logError("Se esperaba cadena para imprimir") }
         | STRING        { Logger::logError("Falta sentencia PRINT") }
         ;
@@ -415,7 +450,6 @@ argumento_bucle_for     : constante ';' constante ';' constante { if(SyntacticAc
                                                                         IntermediateCodeGenerator::forArguments($1, $3, $5);
                                                                 } else {
                                                                         IntermediateCodeGenerator::isInvalidScope = true;
-                                                                        IntermediateCodeGenerator::addScope("remove");
                                                                 }
                                                                 }
                         | constante ';' constante ';' '-' constante     { SyntacticActions::addNegativeConstant($6);
@@ -425,7 +459,6 @@ argumento_bucle_for     : constante ';' constante ';' constante { if(SyntacticAc
                                                                         IntermediateCodeGenerator::forArguments($1, $3, aux);
                                                                         } else {
                                                                                 IntermediateCodeGenerator::isInvalidScope = true;
-                                                                                IntermediateCodeGenerator::addScope("remove");
                                                                         }
                                                                         }
                         | constante ';' constante { Logger::logError("Sentencia FOR recibe 3 parametros, 2 encontrados") }
@@ -433,16 +466,6 @@ argumento_bucle_for     : constante ';' constante ';' constante { if(SyntacticAc
                         |       { Logger::logError("Sentencia FOR recibe 3 parametros, ninguno encontrado") }
                         ;
 
-acceso_atributo : ID '.' ID     { Logger::infoMsg("Acceso a atributo");
-                                        if(SyntacticActions::checkDeclaredVar($1) && SyntacticActions::checkHasMember($1, $3)) {
-                                                char *aux = (char*) malloc(sizeof($1) + sizeof($3) + 2);
-                                                sprintf(aux, "%s.%s", $1, $3);
-                                                $$ = aux;
-                                        }
-                                }
-                ;
-
-// Si los tipos son diferentes, no generar tercetos
 expresion       : expresion '+' termino { if (SyntacticActions::checkTypes($1, $3)) {
                                                 IntermediateCodeGenerator::addTerceto("+", $1, $3);
                                                 $$ = IntermediateCodeGenerator::getLastTerceto();
@@ -484,14 +507,20 @@ expresion_parentesis    : '(' expresion_parentesis ')' { Logger::logError("Anida
 
 termino         : factor { $$ = $1; }
                 | termino '*' factor { if (SyntacticActions::checkTypes($1, $3)) {
-                                        IntermediateCodeGenerator::addTerceto("*", $1, $3);
-                                        $$ = IntermediateCodeGenerator::getLastTerceto();
-                }  }
-                | termino '/' factor { if (SyntacticActions::checkTypes($1, $3)) {
-                                        SyntacticActions::check_division_by_zero($3);
-                                        IntermediateCodeGenerator::addTerceto("/", $1, $3); 
-                                        $$ = IntermediateCodeGenerator::getLastTerceto();
+                                                IntermediateCodeGenerator::addTerceto("*", $1, $3);
+                                                $$ = IntermediateCodeGenerator::getLastTerceto();
                                         }  }
+                | termino '/' factor { if (SyntacticActions::checkTypes($1, $3)) {
+                                                SyntacticActions::check_division_by_zero($3);
+                                                IntermediateCodeGenerator::addTerceto("/", $1, $3); 
+                                                $$ = IntermediateCodeGenerator::getLastTerceto();
+                                        }  }
+                ;
+
+acceso_atributo : ID '.' ID     { if(SyntacticActions::checkDeclaredVar($1)) {
+                                                $$ = SyntacticActions::checkHasMember($3, $1, "");
+                                        }
+                                }
                 ;
 
 factor          : ID { if(SyntacticActions::checkDeclaredVar($1)) $$ = $1; }
@@ -504,16 +533,17 @@ factor          : ID { if(SyntacticActions::checkDeclaredVar($1)) $$ = $1; }
                                         }
                                 }
                 | constante     { if(SyntacticActions::checkLimits($1)){
-                                        $$ = $1;        
+                                        $$ = $1;
                                 }else{
                                         $$ = NULL;
                                 }
                                 }
+                | acceso_atributo { $$ = $1; }
                 ;
 
-constante       : CTE_SHORT     { SyntacticActions::lastType = "short"; }
-                | CTE_DOUBLE    { SyntacticActions::lastType = "double"; }
-                | CTE_UINT      { SyntacticActions::lastType = "uint"; }
+constante       : CTE_SHORT     { $$ = $1; SyntacticActions::lastType = "short"; }
+                | CTE_DOUBLE    { $$ = $1; SyntacticActions::lastType = "double"; }
+                | CTE_UINT      { $$ = $1; SyntacticActions::lastType = "uint"; }
                 ;
 
 tipo    : SHORT         { SyntacticActions::lastType = "short"; }

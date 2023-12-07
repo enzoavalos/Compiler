@@ -5,23 +5,27 @@
     b = 4_s,
     c = -4_s,
 
-    ** c = (a + 45_s) - (c * b) ,
-
     SHORT int1 ; int2 ,
     DOUBLE d1; d2 ,
+    UINT u1 ,
 
-    int1 = 43_s / 0_s ,
+    int1 = 43_s / 1_s ,
 
     VOID funcion ( DOUBLE arg ){
         DOUBLE x ,
-        x = arg ,
-        RETURN ,
+        
+        VOID funcion_anidada(){
+            RETURN ,
+        } ,
     } ,
 
     IF ( int1 >= int2 ){
-        d1 += 1.4 ,
-    } ELSE
-        d1 = .5d+1 ,
+        DOUBLE x ,
+        d1 += 1.4 - x ,
+    } ELSE{
+        DOUBLE x ,
+        d1 = .5d+1 * x ,
+    }
     END_IF ,
 
     IF ( int1 !! int2 )
@@ -31,11 +35,15 @@
     **Este es un comentario
 
     INTERFACE z {
-        VOID q () ,
+        VOID q (DOUBLE arg) ,
     } ,
 
-    CLASS ca {
+    CLASS ca IMPLEMENT z{
         UINT x,
+
+        VOID q (DOUBLE par){
+            RETURN ,
+        } ,
 
         VOID p(DOUBLE arg){
             RETURN ,
@@ -43,13 +51,23 @@
     },
 
     CLASS cb {
+        CLASS anidada {
+            UINT myuint ,
+
+            VOID k(){
+                RETURN ,
+            } ,
+        } ,
+
         SHORT _s1 ,
 
         ca ,
     } ,
 
-    CLASS clase {
+    CLASS cc {
         UINT atributo ,
+        DOUBLE atr_d ,
+        SHORT at_s ,
 
         VOID k (){
             int1 = 45_s ,
@@ -57,6 +75,8 @@
                 RETURN ,
             END_IF ,
         } ,
+
+        VOID p (SHORT my_var) ,
     } ,
 
     FOR i IN RANGE (2_s; 10_s; 1_s)
@@ -68,10 +88,22 @@
         funcion(-4.d-10),
     } ,
 
+    IMPL FOR cc : {
+        VOID p(SHORT my_var){
+            my_var = int1 + 56_s ,
+        } ,
+    } ,
+
     DOUBLE d3 ,
     funcion(d3 + 1.5d+20),
 
-    clase objeto ,
+    cc objeto ,
     objeto.atributo = 10_ui ,
     objeto.k() ,
+    funcion(objeto.atr_d) ,
+    u1 = 10_ui + (objeto.atributo * 34_ui) ,
+
+    IF ( int1 !! objeto.at_s )
+        PRINT #hola mundo# ,
+    END_IF ,
 }

@@ -1,0 +1,40 @@
+{
+    DOUBLE x ,
+
+    ** Redeclaracion valida de variable x en distinto ambito
+    VOID funcion(UINT x){
+        x = 145_ui ,
+    } ,
+
+    ** Redeclaracion valida de identificadores como metodos y atributos
+    CLASS clase1{
+        UINT x ,
+
+        VOID funcion(SHORT arg){
+            x = 89_ui ,
+        } ,
+    } ,
+
+    CLASS myclass {
+        ** Redeclaracion valida de identificador de clase
+        CLASS clase1{
+            SHORT _s1 ,
+        } ,        
+    } ,
+
+    ** Redeclaracion valida de variable x, esta solo es visible en el ambito anonimo del for
+    FOR x IN RANGE (2_s; 10_s; 1_s){
+        x = 45_s ,
+        UINT myuint ,
+        myuint = 45_ui ,
+        funcion(myuint),
+    } ,
+
+    ** Re-declaracion de variable x
+    SHORT x ,
+
+    ** Re-declaracion de identificador funcion
+    VOID funcion(){
+        x = 45.3 ,
+    } ,
+}

@@ -1,0 +1,31 @@
+{
+    ** Variable s1 solo estara visible despues de su declaracion
+    s1 = 45_s,
+    
+    SHORT s1 ,
+
+    IF (s1 > 45_s){
+        SHORT x ,
+        s1 += x ,
+    }ELSE{
+        DOUBLE d1 ,
+        d1 = 45.4 ,
+    } END_IF,
+
+    ** Error, variable x unicamente visible dentro del cuerpo del if
+    x = s1 ,
+
+    VOID funcion(){
+        DOUBLE d2 ,
+
+        VOID anidada(){
+            ** Variable s1 es alcanzable desde dentro de funcion local
+            s1 = 56_s ,
+            RETURN ,
+        } ,
+    } ,
+
+    ** Error, ni variable ni funcion estan a alcande
+    d2 = 56.5 ,
+    anidada() ,
+}

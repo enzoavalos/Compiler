@@ -22,9 +22,10 @@ void SyntacticActions::check_division_by_zero(char* key){
 }
 
 bool SyntacticActions::addNegativeConstant(char* key){
-    int line = Lexer::symbolTable->getSymbol(key)->getLine();
+    Token* token = getSymbolToken(key);
+    int line = token->getLine();
     string lex = "-";
-    lex.append(Lexer::symbolTable->getSymbol(key)->getLexeme());
+    lex.append(token->getLexeme());
     Lexer::symbolTable->decreaseSymbolReferences(key);
     if(checkLimits(lex)){
         int aux = CTE_SHORT;
@@ -88,7 +89,19 @@ bool SyntacticActions::checkLimits(string key){
 }
 
 bool SyntacticActions::checkReturnScope(){
-    if(IntermediateCodeGenerator::scope == IntermediateCodeGenerator::initialScope){
+    string scope = IntermediateCodeGenerator::scope;
+    string lastScope = scope;
+
+    do{
+        size_t index = scope.rfind(":");
+        if(index != string::npos){
+            lastScope = scope.substr(index + 1, scope.length());
+            scope = scope.substr(0, index);
+        }
+    }while((lastScope == "if" || lastScope == "for" || lastScope == "else") && scope != IntermediateCodeGenerator::initialScope);
+
+    Token* token = findId(lastScope);
+    if(token == NULL || token->getUse() != "nombre-funcion"){
         Logger::logError("Sentencia RETURN fuera del cuerpo de una funcion");
         return false;
     }
@@ -134,7 +147,8 @@ bool SyntacticActions::checkRedeclaration(string lexeme, bool showMsg = true){
     string errorMsg = "Redeclaracion de identificador " + lexeme;
     Token * token = getSymbolToken(lexeme + ":" + IntermediateCodeGenerator::scope);
 
-    if (token != NULL) {
+    // Its allowed to redefine a metthod prototype inside the class scope
+    if (token != NULL && token->getUse() != "prototipo-metodo") {
         if(showMsg)
             Logger::logError(errorMsg);
         Lexer::symbolTable->deleteSymbol(lexeme);
@@ -149,7 +163,8 @@ bool SyntacticActions::checkDeclaredVar(char* key, bool showMsg = true){
     string errorMsg = "Variable " + lexeme + " no declarada";
     Lexer::symbolTable->decreaseSymbolReferences(key);
 
-    if(!findId(lexeme)){
+    Token* varToken = findId(lexeme);
+    if(varToken == NULL){
         if(showMsg)
             Logger::logError(errorMsg);
         return false;
@@ -167,7 +182,7 @@ bool SyntacticActions::isConstant(string lexeme){
 }
 
 Token* SyntacticActions::findId(string id){
-    if(isConstant(id))
+    if(isConstant(id) || id.rfind(":") != string::npos)
         return getSymbolToken(id);
 
     string lexeme = id;
@@ -204,14 +219,11 @@ bool SyntacticActions::checkDeclaredMethod(char* key, bool showMsg = true){
     return true;
 }
 
-// TODO 1 Permitir declaracion anidad de clases
 bool SyntacticActions::checkDeclaredClass(char* key, bool showMsg = true){
     string lexeme = key;
     string errorMsg = "Tipo " + lexeme + " no declarado";
     Lexer::symbolTable->decreaseSymbolReferences(key);
-    // Clases e interfaces solo pueden ser declaradas en un ambito global
-    lexeme += ":" + IntermediateCodeGenerator::initialScope;
-    Token * token = getSymbolToken(lexeme);
+    Token * token = findId(lexeme);
 
     if(token == NULL || (token->getUse() != "nombre-clase" && token->getUse() != "nombre-interfaz")){
         if(showMsg)
@@ -266,7 +278,7 @@ bool SyntacticActions::checkTypes(Token* token1, Token* token2, string lex1, str
     }
 
     if(type1 != type2){
-        string errorMsg = "Tipos incompatibles: " + token1->getType() + " y " + token2->getType();
+        string errorMsg = "Tipos incompatibles: " + type1 + " y " + type2;
         Logger::logError(errorMsg);
         return false;
     }
@@ -289,14 +301,14 @@ bool SyntacticActions::checkTypes(char* key1=NULL, char* key2=NULL){
 }
 
 bool SyntacticActions::isTerceto(string key){
-    return key.find_first_not_of("0123456789") == string::npos;
+    return (key.find_first_not_of("0123456789") == string::npos) && (key != "");
 }
 
 bool SyntacticActions::isId(string key){
-    return key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789") == string::npos;
+    return (key.find_first_not_of("abcdefghijklmnopqrstuvwxyz_0123456789:@") == string::npos) && (key != "");
 }
 
-bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, string function, string parameter) {
+bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, string function, string parameter="") {
     if(parameterToken == NULL && !isTerceto(parameter)){
         if(token->getParameter() == NULL)
             return true;
@@ -314,21 +326,26 @@ bool SyntacticActions::checkParameters(Token* token, Token* parameterToken, stri
     if(parameterToken == NULL) {
         if (isTerceto(parameter)) {
             string type = IntermediateCodeGenerator::getTercetoType(parameter);
-            return type == token->getParameter()->getType();
+            bool valid = (type == token->getParameter()->getType());
+            if(!valid)
+                Logger::logError("El tipo del parametro no coincide con el argumento de la funcion " + function);
+            return valid;
         }
         Logger::logError("El parametro " + parameter + " no esta declarado");
         return false;
     }
 
     if(token->getParameter()->getType() != parameterToken->getType()){
-        Logger::logError("El parametro " + parameter + " no coincide con el argumento de la funcion " + function);
+        Logger::logError("El tipo del parametro " + parameter + " no coincide con el argumento de la funcion " + function);
         return false;
     }
 
     return true;
 }
 
-bool SyntacticActions::checkParameters(string function, string parameter="") {
+bool SyntacticActions::checkParameters(string function, char* parameter=NULL) {
+    if(parameter == NULL)
+        return false;
     Token * token = findId(function);
     Token * parameterToken = isId(parameter) ? findId(parameter) : getSymbolToken(parameter);
 
@@ -352,6 +369,7 @@ void SyntacticActions::addParamToMethod(char* function, char* paramater){
     string paramaterLex = paramater;
     paramaterLex += ":" + IntermediateCodeGenerator::scope;
     Token * paramaterToken = getSymbolToken(paramaterLex);
+    paramaterToken->setKey(paramaterLex);
 
     if(token == NULL)
         return;
@@ -373,6 +391,24 @@ bool SyntacticActions::checkForArguments(string arg1, string arg2, string arg3){
     bool validRanges = (checkLimits(arg1) && checkLimits(arg2) || checkLimits(arg3));
 
     return validRanges;
+}
+
+void SyntacticActions::removeClassComposition(char* key = NULL){
+    if(key == NULL)
+        return;
+    
+    string className = IntermediateCodeGenerator::scope.find_last_of(":") != string::npos ?
+        IntermediateCodeGenerator::scope.substr(IntermediateCodeGenerator::scope.find_last_of(":") + 1) : IntermediateCodeGenerator::scope;
+
+    Token * classToken = findId(className);
+
+    if (classToken == NULL)
+        return;
+
+    if (classToken->getUse() == "nombre-clase")
+        classToken->setFather(NULL);
+
+    Logger::logError("No se permite herencia en clase que implementa una interfaz");
 }
 
 void SyntacticActions::addClassComposition(char* key){
@@ -423,6 +459,14 @@ string SyntacticActions::getObject(){
     return object;
 }
 
+void SyntacticActions::emptyObjects(bool deleteObjects=false){
+    while(!objects.empty()){
+        string object = getObject();
+        if(deleteObjects)
+            Lexer::symbolTable->deleteSymbol(object);
+    }
+}
+
 void SyntacticActions::addClassToObjects(char* key){
     string lexeme = key;
 
@@ -438,34 +482,45 @@ void SyntacticActions::addClassToObjects(char* key){
         return;
     }
 
-    do {
+    while (!objects.empty()) {
         string object = getObject();
         Token* objectToken = findId(object);
 
-        if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
+        if (objectToken == NULL || objectToken->getUse() != "variable") {
             Logger::logError("Objeto " + object + " no declarado");
             continue;
         }
-
+        
+        objectToken->setUse("variable-objeto");
         objectToken->setType(token->getLexeme());
-    } while (!objects.empty());
+    }
 }
 
-bool SyntacticActions::checkHasMember(string object, string member, char* parameter=NULL, char* expression=NULL) {
-    Token* objectToken = findId(object);
-    Lexer::symbolTable->decreaseSymbolReferences(member);
-
-    if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
-        Logger::logError("Objeto " + object + " no declarado");
-        return false;
+char* SyntacticActions::checkHasMember(string member, string object="", string className="") {
+    if(className != "")
+        return checkHasMember(findId(className), member, true);
+    else if(object != ""){
+        Token* objectToken = findId(object);
+        if (objectToken == NULL || objectToken->getUse() != "variable-objeto") {
+            Logger::logError("Objeto " + object + " no declarado");
+            return NULL;
+        }
+        return checkHasMember(findId(objectToken->getType()), member, true);
     }
-    Token* classToken = findId(objectToken->getType());
+
+    return NULL;
+}
+
+char* SyntacticActions::checkHasMember(Token* classToken, string member, bool showMsg = true) {
+    Lexer::symbolTable->decreaseSymbolReferences(member);
+    if(classToken == NULL)
+        return NULL;
 
     do {
         // Revisar todas las variblas en el ambito de la clase
         list<string>* lista = Lexer::symbolTable->getSymbolsByScope(classToken->getLexeme());
 
-        for(const string& str : *lista) {
+        for(string& str : *lista) {
             string memberAux = str.substr(0, str.find(":"));
             string auxscope = str.substr(str.find(":") + 1);
 
@@ -477,47 +532,62 @@ bool SyntacticActions::checkHasMember(string object, string member, char* parame
                 subscopes.push_back(subscope);
             }
 
-            bool hasScope = memberAux == member;
-
-            if (hasScope) {
-                hasScope = false;
+            if (memberAux == member) {
                 for (string scope : subscopes) {
                     if (scope == classToken->getLexeme()) {
-                        hasScope = true;
-                        break;
+                        lastClassMember = str;
+                        str += '\0';
+                        char* lastMember = (char*) malloc(sizeof(str) + 1);
+                        lastMember = strcpy(lastMember, str.c_str());
+                        return lastMember;
                     }
                 }
-            }
-
-            if (hasScope) {
-                //cout << "Miembro " << member << " encontrado en la clase " << auxscope << endl;
-
-                // En caso de que corresponda a un metodo se deben chequear sus parametros
-                Token* memberToken = getSymbolToken(str);
-                if(memberToken->getUse() == "nombre-funcion"){
-                    string lastScope = IntermediateCodeGenerator::scope;
-                    IntermediateCodeGenerator::scope = auxscope;
-                    bool valid = checkParameters(member, parameter);
-                    IntermediateCodeGenerator::scope = lastScope;
-                    return valid;
-                }
-
-                // En caso de que expression no sea NULL se trata de una asignacion y se deben chequear los tipos
-                if(expression != NULL){
-                    Token* exp = isId(expression) ? findId(expression) : getSymbolToken(expression);
-                    return checkTypes(memberToken, exp, str, expression);
-                }
-
-                return true;
             }
         }
         classToken = classToken->getFather();
     } while (classToken != NULL);
 
-    string msg = "Atributo " + member + " no encontrado en la clase " + objectToken->getType();
-    Logger::logError(msg);
+    string msg = "Atributo " + member + " no encontrado en la clase " + classToken->getLexeme();
+    if(showMsg)
+        Logger::logError(msg);
+    lastClassMember = "";
 
-    return false;
+    return NULL;
+}
+
+bool SyntacticActions::checkAttributeAssignment(string assignOperator, char* expression=NULL){
+    Token* memberToken = getSymbolToken(lastClassMember);
+    if(IntermediateCodeGenerator::isInvalidScope || lastClassMember == "" || memberToken == NULL || expression == NULL)
+        return false;
+
+    Token* exp = isId(expression) ? findId(expression) : getSymbolToken(expression);
+    bool valid = checkTypes(memberToken, exp, lastClassMember, expression);
+    if(valid)
+        IntermediateCodeGenerator::addTerceto(assignOperator, lastClassMember, expression);
+    
+    lastClassMember = "";
+    return valid;
+}
+
+bool SyntacticActions::checkMethodParameters(char* parameter = NULL){
+    Token* memberToken = getSymbolToken(lastClassMember);
+    if(IntermediateCodeGenerator::isInvalidScope || lastClassMember == "" || memberToken == NULL || parameter == NULL)
+        return false;
+
+    bool valid = false;
+    if(memberToken->getUse() == "nombre-funcion"){
+        string auxscope = lastClassMember.substr(lastClassMember.find(":") + 1);
+        string lastScope = IntermediateCodeGenerator::scope;
+        IntermediateCodeGenerator::scope = auxscope;
+        valid = checkParameters(memberToken->getLexeme(), parameter);
+        IntermediateCodeGenerator::scope = lastScope;
+        if(valid)
+            IntermediateCodeGenerator::addTerceto("INVOKE", lastClassMember, parameter);
+    }else if(memberToken->getUse() == "prototipo-metodo")
+        Logger::logError("El metodo " + lastClassMember + " no fue implementado");
+
+    lastClassMember = "";
+    return valid;
 }
 
 bool SyntacticActions::classImplementsInterfaceMethods(char* interface){
@@ -531,14 +601,68 @@ bool SyntacticActions::classImplementsInterfaceMethods(char* interface){
                 Logger::logError("La clase no implementa todos los metodos de la interfaz " + interfaceLex);
                 return false;
             }else{
-                Token* functionToken = findId(memberToken->getLexeme())->getParameter();
-                string parameter = functionToken ? functionToken->getLexeme() : "";
-                if(!checkParameters(memberToken->getLexeme(), parameter)){
-                    return false;
-                }
+                Token* parameterToken = findId(memberToken->getLexeme())->getParameter();
+                string parameter = parameterToken ? parameterToken->getLexeme() : "";
+                return checkParameters(memberToken, parameterToken, memberToken->getLexeme(), parameter);
             }
         }
     }
 
     return true;
+}
+
+bool SyntacticActions::checkDistributedMethodImplementation(string lexeme){
+    if(IntermediateCodeGenerator::isInvalidScope)
+        return false;
+
+    // Get class prototype methods
+    list<string>* prototypes = Lexer::symbolTable->getSymbolsByScope(lexeme + ":" + "prototype");
+    if(prototypes->size() == 0){
+        Logger::logError("La clase " + lexeme + " no posee prototipos de metodo");
+        return false;
+    }
+    // Get class members
+    list<string>* lista = Lexer::symbolTable->getSymbolsByScope(IntermediateCodeGenerator::scope + ":" + "dist-implementation");
+
+    bool valid = true;
+    // Iterate over all implemented methods in IMPL FOR block
+    for(const string& str : *lista) {
+        Token* methodToken = getSymbolToken(str);
+        bool found = false, showMsg = true;
+
+        // Iterate over all class prototypes
+        for(const string& memb : *prototypes) {
+            if(found)
+                break;
+            Token* prototypeToken = getSymbolToken(memb);
+
+            if(prototypeToken != NULL && prototypeToken->getLexeme() == methodToken->getLexeme()){
+                if(prototypeToken->getUse() == "prototipo-metodo"){
+                    found = true;
+                    Token* parameterToken = methodToken->getParameter();
+                    string parameter = parameterToken ? parameterToken->getLexeme() : "";
+                    if(!checkParameters(prototypeToken, parameterToken, prototypeToken->getLexeme(), parameter)){
+                        found = showMsg = false;
+                        break;
+                    }
+                    // Set implemented method scope to the class scope
+                    IntermediateCodeGenerator::setCustomScope(str, IntermediateCodeGenerator::scope);
+                }
+            }
+        }
+
+        if(!found){
+            if(showMsg)
+                Logger::logError("El metodo " + methodToken->getLexeme() + " no corresponde a un prototipo de metodo de la clase " + lexeme);
+            IntermediateCodeGenerator::deleteFunctionTercetos(str);
+            Lexer::symbolTable->deleteSymbol(str);
+            valid = false;
+        }
+    }
+
+    return valid;
+}
+
+bool SyntacticActions::isString(string key){
+    return (key.find('"') != string::npos);
 }

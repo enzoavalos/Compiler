@@ -18,9 +18,7 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
         lastScopeString = scope.substr(lastScope + 1, scope.length());
         scope = scope.substr(0, lastScope);
 
-    // Solucion dudosa pero anda
-    // No se borran constantes, debido a que no estan siendo guardadas con ambito, chequear
-    if (IntermediateCodeGenerator::isInvalidScope && lastScopeString == "remove") {
+    if (IntermediateCodeGenerator::isInvalidScope) {
         // Borro todas las variables del scope
         list<string>* lista = Lexer::symbolTable->getSymbolsByScope(lastScopeString);
 
@@ -28,11 +26,28 @@ void IntermediateCodeGenerator::onScopeFinished(char* end = nullptr)
             Lexer::symbolTable->deleteSymbol(str);
 
         // Borro todos los tercetos invalidos
-        for (int i = lastValidTerceto + 1; i <= lastTerceto; i++) {
-            removeTerceto(i);
-        }
+        deleteInvalidTercetos();
 
         IntermediateCodeGenerator::isInvalidScope = false;
+    }
+    SyntacticActions::emptyObjects(true);
+}
+
+void IntermediateCodeGenerator::deleteInvalidTercetos(){
+    for (int i = lastValidTerceto + 1; i <= lastTerceto; i++)
+        removeTerceto(i);
+}
+
+void IntermediateCodeGenerator::removeTerceto(int tercetoNumber)
+{
+    tercetos.erase(tercetoNumber);
+}
+
+void IntermediateCodeGenerator::deleteFunctionTercetos(string lexeme){
+    Token* token = Lexer::symbolTable->getSymbol(lexeme);
+    if(token != NULL && token->getBegin() != -1){
+        for(int i=token->getBegin(); i <= token->getEnd(); i++)
+            removeTerceto(i);
     }
 }
 
@@ -42,6 +57,16 @@ void IntermediateCodeGenerator::setVarScope(char *key)
     Lexer::symbolTable->setScope(lexeme, scope);
 }
 
+void IntermediateCodeGenerator::setCustomScope(string lexeme, string newScope){
+    // Determines whether lexeme is only and ID or an ID after name mangling
+    if (lexeme.rfind(":") == string::npos)
+        lexeme += ":" + scope;
+        
+    if (newScope.rfind(":") == string::npos)
+        newScope = scope + ":" + newScope;
+    Lexer::symbolTable->setScope(lexeme, newScope);
+}
+
 void IntermediateCodeGenerator::addTerceto(Terceto terceto)
 {
     lastTerceto++;
@@ -49,22 +74,30 @@ void IntermediateCodeGenerator::addTerceto(Terceto terceto)
     tercetos[lastTerceto] = terceto;
 }
 
-void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string operand1, string operand2)
-{
-    Terceto terceto = Terceto(operatorTercerto, operand1, operand2);
+void IntermediateCodeGenerator::addTerceto(string operatorTercerto, string operand1, string operand2){
+    string type = "no-type";
+    if(SyntacticActions::isTerceto(operand1))
+        type = getTercetoType(operand1);
+    else{
+        Token * token = SyntacticActions::findId(operand1);
+        if(token != NULL)
+            type = token->getType();
+    }
+    
+    if(!SyntacticActions::isTerceto(operand1) && !SyntacticActions::isConstant(operand1) && !SyntacticActions::isString(operand1)
+        && operand1.rfind(":") == string::npos && operand1 != "") {
+            operand1 = SyntacticActions::findId(operand1)->getKey();
+        }
+        
+    if(!SyntacticActions::isTerceto(operand2) && !SyntacticActions::isConstant(operand2) && !SyntacticActions::isString(operand2)
+    && operand2.rfind(":") == string::npos && operand2 != "") {
+        operand2 = SyntacticActions::findId(operand2)->getKey();
+    }
+    
+    Terceto terceto = Terceto(operatorTercerto, operand1, operand2, type);
     lastTerceto++;
     terceto.setLine(TransitionMatrix::getLine());
     tercetos[lastTerceto] = terceto;
-}
-
-void IntermediateCodeGenerator::completeTerceto(int tercetoNumber, string op)
-{
-    tercetos[tercetoNumber].setOp(op);
-}
-
-void IntermediateCodeGenerator::removeTerceto(int tercetoNumber)
-{
-    tercetos.erase(tercetoNumber);
 }
 
 void IntermediateCodeGenerator::addStack(int tercetoNumber)
@@ -79,20 +112,6 @@ int IntermediateCodeGenerator::removeStack()
     int value = pila.top();
     pila.pop();
     return value;
-}
-
-void IntermediateCodeGenerator::assignTerceto(char *operatorTerceto, char *operand1, char *operand2)
-{
-    string operatorString = operatorTerceto;
-    string operand1String = operand1;
-    string operand2String = operand2;
-    addTerceto(operatorString, operand1String, operand2String);
-}
-
-void IntermediateCodeGenerator::modifyLastTercetoOperator(char *op)
-{
-    string lexeme = op;
-    tercetos[lastTerceto - 1].setOp2(lexeme);
 }
 
 void IntermediateCodeGenerator::printTercetos()
@@ -117,6 +136,8 @@ char *IntermediateCodeGenerator::getLastTerceto()
 
 void IntermediateCodeGenerator::ifElseExpression(char *cond, char *first, char *second)
 {
+    if(cond == NULL || first == NULL || second == NULL)
+        return;
     int condInt = atoi(cond);
     int firstInt = atoi(first);
     int secondInt = atoi(second);
@@ -134,6 +155,8 @@ void IntermediateCodeGenerator::ifElseExpression(char *cond, char *first, char *
 
 void IntermediateCodeGenerator::ifExpression(char *cond, char *first)
 {
+    if(cond == NULL || first == NULL)
+        return;
     int firstInt = atoi(first);
     // Unconditional bifurcation not needed, thus its removed
     int aux = removeStack();
@@ -175,33 +198,33 @@ void IntermediateCodeGenerator::forArguments(char *inic, char *end, char *inc)
     addTerceto("+", "", incString);
     addStack(lastTerceto);
 
-    addTerceto("BF", to_string(lastTerceto -1), "-");
+    addTerceto("BF", to_string(lastTerceto -1), "");
     addStack(lastTerceto);
 }
 
 void IntermediateCodeGenerator::forBlock(char *id, char *block)
 {
-    //int tercetoNumber = pila.top();
     int blockInt = atoi(block);
-    //pila.pop();
     int tercetoNumber = removeStack();
 
     // Seteo el terceto de BF con el numero del terceto posterior al bloque
     tercetos[tercetoNumber].setOp2(to_string(blockInt + 2));
-
-    string idString = id;
+    string idType = SyntacticActions::findId(id)->getType();
+    string idString = SyntacticActions::findId(id)->getKey();
     // Asigno el identificador a los tercetos de asignacion, suma y comparacion
     // Suma
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
+    tercetos[tercetoNumber].setType(idType);
 
     // Comparacion
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
+    tercetos[tercetoNumber].setType(idType);
 
     // Bifuracion incondicional a label previo a la comparacion
     tercetoNumber = removeStack();
-    addTerceto("BI", to_string(tercetoNumber), "-");
+    addTerceto("BI", to_string(tercetoNumber), "");
 
     // Se agrega label para salto por falso
     addLabelTerceto();
@@ -209,11 +232,12 @@ void IntermediateCodeGenerator::forBlock(char *id, char *block)
     // Asignacion inicial
     tercetoNumber = removeStack();
     tercetos[tercetoNumber].setOp1(idString);
+    tercetos[tercetoNumber].setType(idType);
 }
 
 void IntermediateCodeGenerator::returnStatement(){
     string ret = "RETURN:" + scope;
-    addTerceto(ret, "", "-");
+    addTerceto(ret, "", "");
     returnStack.push(lastTerceto);
 }
 
@@ -241,10 +265,32 @@ string IntermediateCodeGenerator::getTercetoType(string tercetoNumber) {
     if(op == "BF" || op == "BI" || op == "RETURN")
         return "void";
     else
-        return SyntacticActions::findId(tercetos[terceto].getOp1())->getType();
+        return tercetos[terceto].getType();
 }
 
 void IntermediateCodeGenerator::addLabelTerceto(){
     string op = "Label" + to_string(lastTerceto+1);
-    addTerceto(op,"-","-");
+    addTerceto(op,"","");
+}
+
+void IntermediateCodeGenerator::addLabelTerceto(string label, string op){
+    addTerceto(label, op,"");
+
+    if(label == "inic_func"){
+        Token* token = Lexer::symbolTable->getSymbol(op + ":" + scope);
+        if(token != NULL)
+            token->setBegin(lastTerceto);
+    } else if(label == "end_func"){
+        Token* token = Lexer::symbolTable->getSymbol(op + ":" + scope);
+        if(token != NULL)
+            token->setEnd(lastTerceto);
+    }
+}
+
+map<int, Terceto> * IntermediateCodeGenerator::getTercetos(){
+    return &tercetos;
+}
+
+Terceto * IntermediateCodeGenerator::getTerceto(int tercetoNumber){
+    return tercetos.find(tercetoNumber) != tercetos.end() ? &tercetos[tercetoNumber] : nullptr;
 }

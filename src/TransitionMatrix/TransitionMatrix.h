@@ -31,7 +31,7 @@ enum State {
     UPPERCASE_D,
     DIGIT,
     UNDERSCORE,
-    UNKNOWN, // 24
+    UNKNOWN,
     FINAL = -1,
 };
 

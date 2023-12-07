@@ -1,0 +1,12 @@
+{
+    DOUBLE d1 ,
+    ** Overflow suma datos flotantes
+    d1 = 1.7D+308 + 1.6d+300 ,
+
+    UINT u1 ,
+    ** Overflow en producto de enteros
+    u1 = 42949675_ui * 4294967_ui ,
+
+    ** Resultado negativo es resta de enteros sin signo
+    u1 = 45_ui - 100_ui ,
+}
