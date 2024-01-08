@@ -1,0 +1,32 @@
+{
+    SHORT s1 ,
+    UINT u1 ,
+
+    CLASS clase{
+        DOUBLE d1 ,
+
+        VOID metodo(UINT myarg){
+            myarg += u1 ,
+        } ,
+    } ,
+
+    clase objeto ,
+
+    VOID funcion(SHORT arg){
+        arg = s1 ,
+    } ,
+
+    ** Asignacion de tipos incompatibles
+    s1 = 1.4 ,
+    u1 = s1 + 4_s ,
+    objeto.d1 = 4_s ,
+
+    ** Condicion de control con tipos incompatibles
+    IF (s1 > 8_ui)
+        PRINT #hola mundo# ,
+    END_IF ,
+
+    ** Invocacion con tipos incompatibles
+    funcion(u1),
+    objeto.metodo(56_s + s1),
+}

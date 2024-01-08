@@ -1,0 +1,15 @@
+{
+    ** El identificador siguiente debe ser truncado para tener una longitud de 20 caracteres
+    SHORT abcdefghijklmnoprstuvwxyz ,
+    
+    RETURN ,
+    return ,
+
+    UINT my/variable ,
+
+    ** Como Comentario empieza con mayuscula la reconocera como palabra reservada
+    * Comentario mal escrito
+
+    # hola
+    mundo #
+}

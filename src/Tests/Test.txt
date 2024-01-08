@@ -1,0 +1,27 @@
+{
+    CLASS ca{
+        UINT x,
+
+        VOID q (DOUBLE par){
+            RETURN ,
+        } ,
+
+        VOID p(DOUBLE arg){
+            RETURN ,
+        } ,
+    },
+
+    CLASS cb {
+        SHORT _s1 ,
+
+        VOID k(){
+            _s1 += 8_s ,
+        } ,
+
+        VOID p(UINT arg){
+            arg = 1_ui ,
+        } ,
+
+        ca ,
+    } ,
+}

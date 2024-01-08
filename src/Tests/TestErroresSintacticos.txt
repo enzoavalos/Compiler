@@ -1,0 +1,31 @@
+{
+    ** Variables no declaradas, se informa como error
+    ** No se permite anidamiento de expresiones con parentesis, se informa como error
+    a = a + ((b - c)) ,
+
+    ** No se permite conversion explicita de tipos, se informa como error
+    b = SHORT (45_s + a) ,
+
+    ** Se informa error de division por cero
+    c = b / 0_s ,
+    d = c / .0d+12 ,
+
+    ** No se permite mas de 1 parametro en declaracion de funcion, se informa error
+    VOID funcion (SHORT a ; DOUBLE b){
+        RETURN ,
+    } ,
+
+    ** Palabra reservada END_IF faltante como fin de bloque de seleccion, se informa como error
+    IF (a !! b)
+        SHORT x ,
+    ELSE {
+        ** Se quiere asignar constante de tipo UINT a variable de tipo SHORT, se informa error
+        x += 45_ui ,
+        funcion(x) ,
+    } ,
+
+    ** Bloque FOR recibe 3 parametros, se informa por pantalla como error
+    FOR i IN RANGE (0_s ; 100_s )
+        PRINT #hola mundo# ,
+    ,
+}
